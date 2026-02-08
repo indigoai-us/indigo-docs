@@ -13,12 +13,20 @@ export default defineConfig({
         src: "./src/assets/logo.svg",
         replacesTitle: true,
       },
-      favicon: "/favicon.svg",
+      favicon: "/favicon.ico",
       social: {
         github: "https://github.com/indigoai-us",
         "x.com": "https://x.com/getindigo",
       },
       head: [
+        {
+          tag: "link",
+          attrs: {
+            rel: "apple-touch-icon",
+            sizes: "180x180",
+            href: "/apple-touch-icon.png",
+          },
+        },
         {
           tag: "script",
           content: `document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.social-icons a, header a[rel="me"]').forEach(a=>{a.setAttribute('target','_blank');a.setAttribute('rel','noopener noreferrer')});const s=document.querySelector('.social-icons');if(s){const l=document.createElement('a');l.href='https://getindigo.ai';l.target='_blank';l.rel='noopener noreferrer';l.textContent='getindigo.ai';l.className='site-link';s.parentNode.insertBefore(l,s)}});`,
