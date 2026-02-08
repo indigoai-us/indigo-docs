@@ -1,0 +1,178 @@
+---
+title: Use Cases
+description: Practical prompts and workflows for getting the most out of Indigo's MCP integration with Claude.
+---
+
+import { Aside, Steps } from "@astrojs/starlight/components";
+
+These examples show what you can ask Claude once the Indigo MCP server is connected. Each prompt triggers the right tool calls automatically — you just ask in natural language.
+
+---
+
+## Weekly meeting summary
+
+Get a digest of everything that happened across your meetings.
+
+**Prompt:**
+```
+Summarize my meetings from the past week. Include key decisions made,
+action items assigned, and any important facts that came up.
+```
+
+**What happens:** Claude queries the `meetings` collection for the past 7 days, then queries `signals` filtered by those meeting IDs to pull decisions, actions, and key facts. Results are synthesized into a narrative summary.
+
+---
+
+## Action item tracking
+
+Find open action items across all your meetings.
+
+**Prompt:**
+```
+What pending action items do I have? Show who assigned them
+and which meeting they came from.
+```
+
+**What happens:** Claude queries `signals` where `insightType: "action"` and `data.status: "pending"`, includes citation and source info, and presents a structured list.
+
+**Follow-up prompts:**
+- `Which of these are high priority?`
+- `What actions were completed last week?`
+- `Show me overdue action items`
+
+---
+
+## Decision log
+
+Surface decisions by time period, topic, or project.
+
+**Prompt:**
+```
+Show me all high-impact decisions from the last 30 days,
+grouped by who made them.
+```
+
+**What happens:** Claude runs an aggregation on `signals` filtering for `insightType: "decision"` and `data.impactLevel: "high"`, grouped by `data.owner`.
+
+**Variations:**
+- `What decisions were made about pricing?` — regex search on `data.title`
+- `List decisions from meetings with the engineering team` — cross-references meeting participants
+- `How many decisions have we made this quarter vs last?` — aggregation comparison
+
+---
+
+## Meeting prep
+
+Prepare for an upcoming meeting with context from past interactions.
+
+**Prompt:**
+```
+I have a meeting with Sarah Chen tomorrow. What were the key outcomes
+from our last 3 meetings together?
+```
+
+**What happens:** Claude searches `meetings` for participant email matching Sarah Chen, takes the 3 most recent, then pulls all signals from those meetings. Results are organized chronologically with open action items highlighted.
+
+**Prompt:**
+```
+What's on my calendar this week? For each meeting, show any
+unresolved action items from previous meetings with the same people.
+```
+
+---
+
+## Team activity report
+
+Understand what your team is working on across meetings.
+
+**Prompt:**
+```
+Give me a summary of what the product team discussed this week.
+Focus on decisions and new action items.
+```
+
+**What happens:** Claude queries `taxonomy` for team members, then searches `signals` where `citation.speaker` or `data.assignee` matches team members. Results are grouped by person.
+
+---
+
+## Signal search
+
+Find specific information from past meetings.
+
+**Prompt:**
+```
+Did anyone mention the API migration in the last 2 weeks?
+What was the context?
+```
+
+**What happens:** Claude searches `signals` with regex on `data.title`, `data.details`, and `citation.quote` for "API migration", returns matches with full citation context including speaker and timestamp.
+
+**Prompt:**
+```
+What key facts have been captured about our Q2 roadmap?
+```
+
+**What happens:** Queries `signals` for `insightType: "key_fact"` with content matching "Q2 roadmap".
+
+---
+
+## Meeting analytics
+
+Get quantitative insights about your meeting patterns.
+
+**Prompt:**
+```
+How many meetings did I have each week for the past month?
+How many signals were generated?
+```
+
+**What happens:** Claude runs aggregation pipelines on both `meetings` and `signals`, grouping by ISO week, and presents the data as a comparison.
+
+**Prompt:**
+```
+Which meetings generate the most action items?
+```
+
+**What happens:** Aggregation joining signals back to meetings, grouped by meeting title, sorted by action count.
+
+---
+
+## Organizational context
+
+Explore your taxonomy to understand organizational relationships.
+
+**Prompt:**
+```
+Who are the people in my taxonomy? Show me their roles and
+which teams they belong to.
+```
+
+**What happens:** Claude queries `taxonomy` for `type: "person"`, then resolves team references. Results show people grouped by team with roles.
+
+**Prompt:**
+```
+What projects are linked to the Platform initiative?
+```
+
+**What happens:** Finds the initiative in taxonomy, then queries for projects with matching `initiative` reference.
+
+---
+
+## Custom reports
+
+Combine multiple data points for structured reporting.
+
+**Prompt:**
+```
+Create a weekly standup report. For each day this week, show:
+- Meetings held
+- Decisions made
+- New action items
+- Completed action items
+```
+
+**What happens:** Claude runs multiple queries across `meetings` and `signals`, groups by date, and formats as a structured daily breakdown.
+
+<Aside type="tip">
+These prompts are starting points. Claude understands follow-up questions, so you can refine results by asking for more detail, different time ranges, or specific filters in conversation.
+</Aside>

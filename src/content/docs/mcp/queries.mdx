@@ -1,0 +1,283 @@
+---
+title: Query Patterns
+description: Developer reference for querying the Indigo MCP server — filters, projections, aggregations, and cross-collection lookups.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+This page covers query patterns for developers building on the MCP server or writing precise prompts. For natural-language use cases, see [Use Cases](/mcp/use-cases/).
+
+<Aside type="tip">
+Tenancy filters are injected automatically. You never need to include user or company IDs in your queries.
+</Aside>
+
+## Basic filtering
+
+### By signal type
+
+```javascript
+{
+  collection: "signals",
+  filter: { insightType: "decision" }
+}
+```
+
+### By date range
+
+```javascript
+{
+  collection: "signals",
+  filter: {
+    createdAt: {
+      $gte: { $date: "2025-01-01T00:00:00Z" },
+      $lt: { $date: "2025-02-01T00:00:00Z" }
+    }
+  }
+}
+```
+
+### By meeting status
+
+```javascript
+{
+  collection: "meetings",
+  filter: { status: "completed" },
+  sort: { end_time: -1 }
+}
+```
+
+### Nested field filters (dot notation)
+
+```javascript
+{
+  collection: "signals",
+  filter: {
+    insightType: "action",
+    "data.status": "pending",
+    "data.priority": "high"
+  }
+}
+```
+
+### Text search with regex
+
+```javascript
+{
+  collection: "meetings",
+  filter: {
+    meeting_title: { $regex: "quarterly", $options: "i" }
+  }
+}
+```
+
+---
+
+## Projections
+
+Return only the fields you need:
+
+```javascript
+{
+  collection: "signals",
+  filter: { insightType: "decision" },
+  projection: {
+    "data.title": 1,
+    "data.owner": 1,
+    "data.impactLevel": 1,
+    "citation.speaker": 1,
+    createdAt: 1
+  },
+  sort: { createdAt: -1 },
+  limit: 20
+}
+```
+
+Exclude large fields:
+
+```javascript
+{
+  collection: "meetings",
+  filter: { status: "completed" },
+  projection: { transcript: 0, recording_file: 0 }
+}
+```
+
+---
+
+## Sorting and pagination
+
+### Sort by multiple fields
+
+```javascript
+{
+  collection: "signals",
+  filter: { insightType: "action" },
+  sort: { "data.priority": -1, createdAt: -1 },
+  limit: 25
+}
+```
+
+### Pagination with limit
+
+The `limit` parameter caps results at 1–100 per query. For large result sets, combine with date-based or ID-based filtering to paginate.
+
+---
+
+## Aggregation pipelines
+
+### Count signals by type
+
+```javascript
+{
+  collection: "signals",
+  pipeline: [
+    {
+      $group: {
+        _id: "$insightType",
+        count: { $sum: 1 }
+      }
+    },
+    { $sort: { count: -1 } }
+  ]
+}
+```
+
+### Signals per week
+
+```javascript
+{
+  collection: "signals",
+  pipeline: [
+    {
+      $group: {
+        _id: {
+          week: { $isoWeek: "$createdAt" },
+          year: { $isoWeekYear: "$createdAt" }
+        },
+        count: { $sum: 1 }
+      }
+    },
+    { $sort: { "_id.year": -1, "_id.week": -1 } },
+    { $limit: 12 }
+  ]
+}
+```
+
+### Top speakers by signal count
+
+```javascript
+{
+  collection: "signals",
+  pipeline: [
+    { $match: { "citation.speaker": { $exists: true, $ne: "" } } },
+    {
+      $group: {
+        _id: "$citation.speaker",
+        signals: { $sum: 1 },
+        decisions: {
+          $sum: { $cond: [{ $eq: ["$insightType", "decision"] }, 1, 0] }
+        },
+        actions: {
+          $sum: { $cond: [{ $eq: ["$insightType", "action"] }, 1, 0] }
+        }
+      }
+    },
+    { $sort: { signals: -1 } },
+    { $limit: 10 }
+  ]
+}
+```
+
+### Signals by source platform
+
+```javascript
+{
+  collection: "signals",
+  pipeline: [
+    { $match: { sourceChannel: { $exists: true } } },
+    {
+      $group: {
+        _id: "$sourceChannel",
+        count: { $sum: 1 }
+      }
+    },
+    { $sort: { count: -1 } }
+  ]
+}
+```
+
+### Cross-collection lookup: signals with meeting details
+
+```javascript
+{
+  collection: "signals",
+  pipeline: [
+    { $match: { insightType: "decision", "data.impactLevel": "high" } },
+    {
+      $lookup: {
+        from: "meetings",
+        localField: "sourceId",
+        foreignField: "meeting_id",
+        as: "meeting"
+      }
+    },
+    { $unwind: { path: "$meeting", preserveNullAndEmptyArrays: true } },
+    {
+      $project: {
+        "data.title": 1,
+        "data.owner": 1,
+        "citation.speaker": 1,
+        "meeting.meeting_title": 1,
+        "meeting.start_time": 1,
+        createdAt: 1
+      }
+    },
+    { $sort: { createdAt: -1 } },
+    { $limit: 20 }
+  ]
+}
+```
+
+---
+
+## Tips
+
+### Dot notation for nested fields
+
+Signal content lives under `data.*` and citations under `citation.*`. Always use dot notation:
+
+```javascript
+// correct
+"data.title"
+"citation.speaker"
+"citation.sourceLocation.startTime"
+
+// incorrect — these won't match
+"data": { "title": "..." }
+```
+
+### Date handling
+
+Dates in filters should use the `$date` operator or ISO 8601 strings:
+
+```javascript
+{ createdAt: { $gte: { $date: "2025-01-15T00:00:00Z" } } }
+```
+
+For relative dates (last 7 days, this month), describe the time range in natural language and let Claude compute the date values.
+
+### Array fields
+
+For array fields like `people`, `teams`, `participants`, and `userIds`, use `$in` to check membership:
+
+```javascript
+{ people: { $in: [ObjectId("...")] } }
+```
+
+### ObjectId fields
+
+The `_id`, `people`, `teams`, `initiative`, `project`, and `task` fields are ObjectIds. When querying by ID, wrap values appropriately:
+
+```javascript
+{ _id: ObjectId("64f1a2b3c4d5e6f7a8b9c0d1") }
+```

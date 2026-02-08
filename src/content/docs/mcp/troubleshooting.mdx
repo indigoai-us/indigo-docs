@@ -1,0 +1,140 @@
+---
+title: Troubleshooting
+description: Common issues and fixes for the Indigo MCP server connection with Claude Desktop and Claude Code.
+---
+
+import { Tabs, TabItem, Aside, Steps } from "@astrojs/starlight/components";
+
+## Claude can't access my data
+
+<Steps>
+
+1. Check your authentication status:
+   ```bash
+   indigo auth status
+   ```
+   If not authenticated, run `indigo auth login`.
+
+2. Verify the MCP config was written:
+   <Tabs>
+     <TabItem label="macOS">
+       ```bash
+       cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
+       ```
+     </TabItem>
+     <TabItem label="Windows">
+       ```bash
+       type %APPDATA%\Claude\claude_desktop_config.json
+       ```
+     </TabItem>
+     <TabItem label="Linux">
+       ```bash
+       cat ~/.config/Claude/claude_desktop_config.json
+       ```
+     </TabItem>
+   </Tabs>
+   Look for an `indigo` entry in the `mcpServers` object.
+
+3. Restart Claude Desktop. MCP server configs are loaded at startup — changes require a restart.
+
+4. Test with a simple prompt:
+   ```
+   What signals do I have from this week?
+   ```
+
+</Steps>
+
+If none of these work, re-run the setup:
+
+```bash
+indigo setup mcp
+```
+
+---
+
+## No signals returned
+
+Signals are generated from meetings where the Indigo bot was present. If you see no results:
+
+- Check that you have meetings with bot recordings: `indigo meetings list --json`
+- Signals may not exist for your time range — try a broader window
+- Verify you're querying the right signal type. Valid types: `decision`, `action`, `accomplishment`, `key_fact`
+- If querying by nested fields, use dot notation: `data.status`, not `status`
+
+---
+
+## Connection errors
+
+The MCP server uses StreamableHTTP transport. Connection issues typically mean:
+
+| Symptom | Likely cause | Fix |
+|---------|-------------|-----|
+| Timeout on startup | Network/firewall blocking outbound HTTPS | Check network access to Indigo API |
+| Frequent disconnections | Unstable network | StreamableHTTP auto-reconnects — wait briefly |
+| "Unauthorized" errors | Expired OAuth token | Run `indigo auth login` to refresh |
+| "Server not found" | Config not written or malformed | Re-run `indigo setup mcp` |
+
+---
+
+## Stale or missing recent data
+
+The MCP server queries live data on every request — there is no caching layer. If recent signals are missing:
+
+- Meeting processing takes a few minutes after the meeting ends. Signals appear once the transcript is processed.
+- Check meeting status: `indigo meetings list` — look for `completed` status
+- Meetings in `processing` state haven't generated signals yet
+
+---
+
+## Config file locations
+
+The `indigo setup mcp` command writes to the Claude Desktop config at the platform-appropriate path:
+
+<Tabs>
+  <TabItem label="macOS">
+    ```
+    ~/Library/Application Support/Claude/claude_desktop_config.json
+    ```
+  </TabItem>
+  <TabItem label="Windows">
+    ```
+    %APPDATA%\Claude\claude_desktop_config.json
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```
+    ~/.config/Claude/claude_desktop_config.json
+    ```
+  </TabItem>
+</Tabs>
+
+For Claude Code, the MCP config lives in your project's `.claude/` directory or your global Claude Code settings.
+
+---
+
+## Multiple Indigo accounts
+
+The MCP server authenticates as the user who ran `indigo setup mcp`. To switch accounts:
+
+<Steps>
+
+1. Log out: `indigo auth logout`
+2. Log in with the other account: `indigo auth login`
+3. Re-run setup: `indigo setup mcp`
+4. Restart Claude Desktop
+
+</Steps>
+
+<Aside type="caution">
+Only one Indigo account can be active at a time per Claude Desktop instance.
+</Aside>
+
+---
+
+## Getting help
+
+If you're still having issues:
+
+- Check CLI version: `indigo --version` (requires v0.2+)
+- Check Node.js version: `node --version` (requires 18+)
+- Contact support: [getindigo.ai](https://getindigo.ai)

@@ -61,6 +61,17 @@ export default defineConfig({
           ],
         },
         {
+          label: "MCP Server",
+          items: [
+            { slug: "mcp/overview" },
+            { slug: "mcp/collections" },
+            { slug: "mcp/tools" },
+            { slug: "mcp/queries" },
+            { slug: "mcp/use-cases" },
+            { slug: "mcp/troubleshooting" },
+          ],
+        },
+        {
           label: "Indigo HQ",
           items: [
             {
