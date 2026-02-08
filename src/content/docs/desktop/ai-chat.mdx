@@ -1,0 +1,70 @@
+---
+title: AI Chat
+description: Model-agnostic AI chat for querying across meetings, decisions, and action items.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Indigo's AI chat lets you ask questions across your entire meeting history using the AI model of your choice. Instead of scrolling through transcripts, you query in natural language and get context-aware answers with citations.
+
+## Model-agnostic architecture
+
+Indigo does not lock you into a single AI provider. You choose which model powers your chat experience.
+
+Supported providers include:
+
+- OpenAI (GPT-4, GPT-4o, etc.)
+- Anthropic (Claude)
+- Google (Gemini)
+- xAI (Grok)
+
+You can switch between providers at any time. Your meeting data stays the same — only the AI model processing your queries changes.
+
+## Bring Your Own Key (BYOK)
+
+Indigo uses a BYOK model for AI chat. You provide your own API key from your preferred provider, and Indigo routes queries through that provider's API.
+
+This means:
+
+- **You control costs** — usage is billed directly by your AI provider
+- **You control data flow** — queries go to the provider you trust
+- **No vendor lock-in** — switch providers without losing any meeting data
+
+<Aside type="tip">
+  Configure your API keys in Indigo's settings. You can also manage keys through the [Indigo CLI](/cli/commands/) using `indigo config`.
+</Aside>
+
+## Context-aware responses
+
+AI chat operates across Indigo's hot and cold data architecture:
+
+| Data layer | What it includes |
+|-----------|-----------------|
+| **Hot data** | Active meetings, live transcripts, current decision streams |
+| **Cold data** | Historical transcripts, past decisions, action item archive, institutional knowledge |
+
+When you ask a question, the AI searches across both layers and returns answers grounded in your actual meeting content. Responses include citations — links back to the specific transcript segments, decisions, or action items that informed the answer.
+
+## Querying across meetings
+
+AI chat is not limited to a single meeting. You can query across your full history:
+
+- "What did we decide about the pricing model last quarter?"
+- "Who committed to the API integration and when is it due?"
+- "Summarize all customer feedback from the last 30 days of calls"
+- "What blockers has the engineering team raised in the last 3 standups?"
+
+The AI pulls from all relevant meetings, cross-references decisions and actions, and synthesizes a response with citations to the source material.
+
+## How it differs from generic AI
+
+| Generic AI chat | Indigo AI chat |
+|----------------|----------------|
+| No context about your meetings | Grounded in your transcript data |
+| Requires copy-pasting transcript text | Searches across all meetings automatically |
+| Single-session memory | Persistent cross-meeting memory |
+| General-purpose responses | Meeting-specific, citation-backed answers |
+
+<Aside type="note">
+  AI chat does not require prompt engineering. Ask questions in plain language — Indigo handles the context retrieval and prompt construction behind the scenes.
+</Aside>

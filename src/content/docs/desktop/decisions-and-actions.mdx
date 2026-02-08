@@ -1,0 +1,84 @@
+---
+title: Decisions and Actions
+description: Automatic decision detection and action item extraction from meeting transcripts.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Indigo goes beyond transcription. After every meeting, the AI layer analyzes the transcript to identify decisions that were made and action items that need follow-up. This turns hours of meeting audio into structured, actionable output.
+
+## Decision detection
+
+### How it works
+
+Indigo's AI scans meeting transcripts for language patterns that indicate a decision has been reached. This includes explicit agreements, resolved debates, confirmed plans, and commitments.
+
+Each detected decision includes:
+
+| Field | Description |
+|-------|-------------|
+| **Decision** | What was decided |
+| **Context** | The surrounding discussion that led to it |
+| **Participants** | Who was involved in making the decision |
+| **Timestamp** | When in the meeting it occurred |
+
+### What gets detected
+
+- Explicit agreements ("Let's go with option B")
+- Commitments ("I'll handle the vendor outreach")
+- Resolved discussions ("We've decided to postpone the launch")
+- Confirmed plans ("The deadline is March 15th")
+
+<Aside type="note">
+  Decision detection improves over time as Indigo processes more of your meetings and learns the patterns of your team's communication style.
+</Aside>
+
+### Linking to context
+
+Every decision links back to the original transcript segment where it occurred. You can click through from a decision to see the full surrounding discussion, including who raised the topic, what alternatives were considered, and how the group arrived at the conclusion.
+
+## Action item extraction
+
+### Automatic task detection
+
+Indigo identifies action items from natural conversation without requiring anyone to explicitly say "action item." The AI recognizes task-oriented language and extracts structured items from it.
+
+Each action item includes:
+
+| Field | Description |
+|-------|-------------|
+| **Task** | What needs to be done |
+| **Assignee** | Who is responsible (when identifiable) |
+| **Due date** | When it's due (when mentioned or inferable) |
+| **Source** | Link to the transcript moment |
+
+### Assignee identification
+
+When someone is named or volunteers for a task during a meeting, Indigo associates the action item with that person. This works with direct assignments ("Sarah, can you draft the proposal?") and self-assignments ("I'll send the follow-up email").
+
+### Due date inference
+
+If a deadline is mentioned in the conversation — either explicitly ("by Friday") or contextually ("before the next sprint") — Indigo extracts and associates it with the action item. When no date is mentioned, the field is left empty rather than guessed.
+
+## Use cases
+
+### Executive daily flow
+
+1. Start your day reviewing yesterday's decisions across all meetings
+2. Join meetings with auto-capture running
+3. After each meeting, review extracted actions and assign follow-ups
+4. End of day: all commitments from every meeting are tracked in one place
+
+### Team standup
+
+1. Standup runs with Indigo capturing
+2. Action items auto-extracted from discussion
+3. Blockers flagged and tracked
+4. Historical standups searchable for recurring patterns
+
+### Customer calls
+
+1. Sales or support call captured with participant consent
+2. Key points summarized automatically
+3. Follow-up tasks created as action items
+4. Full transcript available for reference

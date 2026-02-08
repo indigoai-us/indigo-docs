@@ -1,0 +1,149 @@
+---
+title: Automation
+description: Build scripts, dashboards, and CI/CD pipelines with Indigo CLI — JSON output, exit codes, and workflow examples.
+---
+
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+
+Indigo CLI is designed for automation. Every command produces structured output, uses consistent exit codes, and works with standard Unix tools.
+
+## JSON output
+
+Every command supports the `--json` flag. Without it, commands produce human-readable output. With it, you get structured JSON suitable for parsing.
+
+```bash
+# Human-readable
+indigo signals list
+
+# Machine-readable
+indigo signals list --json
+```
+
+This applies to all command groups: `auth`, `signals`, `meetings`, and `config`.
+
+## Exit codes
+
+The CLI uses structured exit codes for reliable scripting:
+
+| Code | Meaning |
+|------|---------|
+| `0` | Success |
+| `1` | General error |
+| `2` | Authentication error (not logged in or token expired) |
+| `3` | Network error (API unreachable) |
+| `4` | Invalid input (bad arguments or flags) |
+| `5` | Resource not found |
+
+Use these in scripts for conditional logic:
+
+```bash
+indigo auth status > /dev/null 2>&1
+if [ $? -eq 2 ]; then
+  echo "Not authenticated. Running login..."
+  indigo auth login
+fi
+```
+
+## Credential sharing
+
+The CLI shares credentials with Indigo Desktop through the system keychain. If you authenticate in one, both are authorized. This means automation scripts do not require separate credential management — authenticate once with `indigo auth login` and your scripts work immediately.
+
+## Example workflows
+
+### Morning briefing script
+
+Pull yesterday's decisions and today's meetings into a single digest:
+
+```bash
+#!/bin/bash
+
+echo "=== Decisions from recent meetings ==="
+indigo signals list --type decision --limit 10 --json | \
+  jq -r '.[] | "- \(.content) (\(.meeting))"'
+
+echo ""
+echo "=== Today's meetings ==="
+indigo meetings list --limit 10 --json | \
+  jq -r '.[] | "- \(.title) at \(.start)"'
+```
+
+### Decision audit trail
+
+Export all decisions to a CSV for tracking and compliance:
+
+```bash
+indigo signals list --type decision --json | \
+  jq -r '["ID","Content","Meeting","Date"],
+         (.[] | [.id, .content, .meeting, .created_at]) | @csv' \
+  > decisions.csv
+```
+
+### Meeting attendance tracking
+
+Track how many meetings involve a specific person:
+
+```bash
+indigo meetings search "alice@example.com" --json | \
+  jq 'length'
+```
+
+### Signal monitoring
+
+Watch for new action items and send to a webhook:
+
+```bash
+#!/bin/bash
+
+indigo signals list --type action --limit 5 --json | \
+  jq -c '.[]' | while read -r signal; do
+    curl -s -X POST "$WEBHOOK_URL" \
+      -H "Content-Type: application/json" \
+      -d "$signal"
+  done
+```
+
+## Combining with other tools
+
+<Tabs>
+  <TabItem label="Pipe to jq">
+    ```bash
+    # Count signals by type
+    indigo signals list --json | \
+      jq 'group_by(.type) | map({type: .[0].type, count: length})'
+    ```
+  </TabItem>
+  <TabItem label="Pipe to grep">
+    ```bash
+    # Quick text search on signal content
+    indigo signals list --json | jq -r '.[].content' | grep -i "deadline"
+    ```
+  </TabItem>
+  <TabItem label="Send to Slack">
+    ```bash
+    # Post decisions to a Slack channel
+    DECISIONS=$(indigo signals list --type decision --limit 5 --json | \
+      jq -r '.[] | "- \(.content)"' | head -10)
+
+    curl -s -X POST "$SLACK_WEBHOOK" \
+      -H "Content-Type: application/json" \
+      -d "{\"text\": \"Recent decisions:\n$DECISIONS\"}"
+    ```
+  </TabItem>
+</Tabs>
+
+## CI/CD integration
+
+Indigo CLI works in CI/CD environments. Authenticate once on the runner, then use commands in pipeline steps.
+
+```yaml
+# Example: GitHub Actions step
+- name: Export weekly decisions
+  run: |
+    indigo signals list --type decision --json > decisions.json
+  env:
+    INDIGO_TOKEN: ${{ secrets.INDIGO_TOKEN }}
+```
+
+<Aside type="note">
+For CI/CD environments where browser-based OAuth is not available, use the `INDIGO_TOKEN` environment variable to provide authentication credentials directly.
+</Aside>

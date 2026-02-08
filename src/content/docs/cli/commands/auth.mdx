@@ -1,0 +1,100 @@
+---
+title: indigo auth
+description: Authenticate with Indigo — browser-based OAuth login, token status, and logout.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The `auth` command group manages authentication for the Indigo CLI. Credentials are stored in the system keychain and shared with Indigo Desktop.
+
+## Commands
+
+### `indigo auth login`
+
+Opens your default browser for OAuth authentication. After you approve, the CLI receives and stores your credentials.
+
+```bash
+indigo auth login
+```
+
+**Output:**
+
+```
+Opening browser for authentication...
+Authentication successful. Credentials saved to keychain.
+```
+
+<Aside type="tip">
+If you are already signed into Indigo Desktop, the CLI can use those credentials automatically. You may not need to run `login` at all.
+</Aside>
+
+---
+
+### `indigo auth status`
+
+Displays the current authentication state, including the associated account and token expiry.
+
+```bash
+indigo auth status
+```
+
+**Output:**
+
+```
+Authenticated as: user@example.com
+Token expires: 2025-02-15T09:00:00Z
+Status: Valid
+```
+
+With JSON output:
+
+```bash
+indigo auth status --json
+```
+
+```json
+{
+  "authenticated": true,
+  "email": "user@example.com",
+  "expires_at": "2025-02-15T09:00:00Z",
+  "status": "valid"
+}
+```
+
+---
+
+### `indigo auth logout`
+
+Removes stored credentials from the system keychain.
+
+```bash
+indigo auth logout
+```
+
+**Output:**
+
+```
+Logged out. Credentials removed from keychain.
+```
+
+<Aside type="caution">
+Logging out from the CLI also removes shared credentials. If Indigo Desktop relies on the same keychain entry, you will need to re-authenticate in the desktop app as well.
+</Aside>
+
+## Credential sharing
+
+The CLI and Indigo Desktop share credentials through the system keychain:
+
+| Platform | Keychain |
+|----------|----------|
+| macOS | Keychain Access |
+| Windows | Windows Credential Manager |
+| Linux | libsecret / Secret Service API |
+
+Authenticating in either the CLI or the desktop app grants access to both. There is no need to sign in separately.
+
+## Options
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Output result as JSON (available on `login` and `status`) |

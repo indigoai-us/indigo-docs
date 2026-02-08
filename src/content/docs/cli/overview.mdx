@@ -1,0 +1,67 @@
+---
+title: Indigo CLI
+description: Terminal access to meeting intelligence, signals, and configuration — built for developers, power users, and automation.
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components";
+
+Indigo CLI brings your meeting intelligence to the terminal. Query signals, search meetings, manage configuration, and pipe structured data into scripts — all without leaving the command line.
+
+## Install
+
+```bash
+npm install -g indigo-cli
+```
+
+Requires Node.js 18 or later.
+
+## What you can do
+
+<CardGrid>
+  <Card title="Signals" icon="list-format">
+    List, search, and filter signals by type — decisions, actions, accomplishments, key facts. Pipe JSON output to downstream tools.
+  </Card>
+  <Card title="Meetings" icon="comment-alt">
+    Browse upcoming and past meetings, view attendee lists, and search by title, description, or participant.
+  </Card>
+  <Card title="Configuration" icon="setting">
+    Interactive setup wizard for BYOK (Bring Your Own Key) with OpenAI, Anthropic, Google, and xAI. Manage calendar connections from the terminal.
+  </Card>
+  <Card title="MCP Integration" icon="puzzle">
+    One-command Claude Desktop setup. Expose signals, meetings, and decisions as queryable tools through the Model Context Protocol.
+  </Card>
+</CardGrid>
+
+## Key features
+
+| Feature | Description |
+|---------|-------------|
+| JSON output | Every command supports `--json` for structured, machine-readable output |
+| Credential sharing | Shares OAuth tokens with Indigo Desktop via the system keychain |
+| Scriptable | Structured exit codes, pipe-friendly output, designed for automation |
+| BYOK | Configure your preferred AI model provider from the terminal |
+| MCP server | Expose your data to Claude Desktop with a single command |
+
+## Technical details
+
+| Detail | Value |
+|--------|-------|
+| Language | TypeScript / Node.js |
+| Framework | Commander.js v12 |
+| Binary | `indigo` |
+| Node requirement | >= 18.0.0 |
+| npm package | `indigo-cli` |
+| License | MIT |
+
+## Next steps
+
+<CardGrid>
+  <Card title="Getting started" icon="right-arrow">
+    Install the CLI, authenticate, and run your first commands.
+    [Get started](/cli/getting-started/)
+  </Card>
+  <Card title="Automation" icon="right-arrow">
+    Build scripts, dashboards, and CI/CD pipelines with Indigo CLI.
+    [Automation guide](/cli/automation/)
+  </Card>
+</CardGrid>

@@ -1,0 +1,140 @@
+---
+title: indigo meetings
+description: Browse upcoming and past meetings, view details and attendees, and search by title, description, or participant.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The `meetings` command group lets you browse your calendar and access meeting details from the terminal.
+
+<Aside type="note">
+Meeting commands require a Google Calendar connection. Set this up with [`indigo config setup`](/cli/commands/config/) or through the Indigo Desktop app.
+</Aside>
+
+## Commands
+
+### `indigo meetings list`
+
+Lists upcoming and past meetings from your connected calendar.
+
+```bash
+indigo meetings list [options]
+```
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--limit <n>` | Number of results to return |
+| `--offset <n>` | Number of results to skip (for pagination) |
+| `--json` | Output as JSON |
+
+**Examples:**
+
+List meetings:
+
+```bash
+indigo meetings list
+```
+
+Get JSON output for scripting:
+
+```bash
+indigo meetings list --json
+```
+
+---
+
+### `indigo meetings view <id>`
+
+Displays full details for a specific meeting, including title, time, attendees, and any associated signals.
+
+```bash
+indigo meetings view <id> [options]
+```
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Output as JSON |
+
+**Example:**
+
+```bash
+indigo meetings view mtg_xyz789
+```
+
+**JSON output:**
+
+```json
+{
+  "id": "mtg_xyz789",
+  "title": "Weekly Product Sync",
+  "start": "2025-01-15T10:00:00Z",
+  "end": "2025-01-15T10:30:00Z",
+  "attendees": [
+    "alice@example.com",
+    "bob@example.com"
+  ],
+  "signals_count": 4
+}
+```
+
+---
+
+### `indigo meetings search <query>`
+
+Searches meetings by title, description, or attendee name/email.
+
+```bash
+indigo meetings search <query> [options]
+```
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--limit <n>` | Number of results to return |
+| `--json` | Output as JSON |
+
+**Examples:**
+
+Search by meeting title:
+
+```bash
+indigo meetings search "product sync"
+```
+
+Search by attendee:
+
+```bash
+indigo meetings search "alice@example.com"
+```
+
+Search and output as JSON:
+
+```bash
+indigo meetings search "quarterly review" --json
+```
+
+## Practical usage
+
+Check your schedule before a meeting block:
+
+```bash
+indigo meetings list --limit 5
+```
+
+Find all meetings with a specific person:
+
+```bash
+indigo meetings search "bob@example.com" --json | jq '.[].title'
+```
+
+Look up a meeting for context, then check its signals:
+
+```bash
+indigo meetings view mtg_xyz789
+indigo signals search "product sync" --type decision
+```

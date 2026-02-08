@@ -1,0 +1,80 @@
+---
+title: Transcription
+description: Real-time meeting transcription with speaker identification, timestamps, and privacy controls.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Indigo Desktop provides real-time transcription for every meeting, automatically. There is no need to press record or remember to start capture — once connected to your calendar, Indigo handles it.
+
+## How it works
+
+When you join a scheduled meeting, Indigo detects the active session through your Google Calendar integration and begins transcribing. The transcript is generated in real time, so you can follow along or review key moments as they happen.
+
+After the meeting ends, the full transcript is processed, indexed, and made available for search, AI chat, and downstream features like decision detection and action extraction.
+
+## Speaker identification
+
+Indigo identifies individual speakers throughout the transcript. Each segment is attributed to the person speaking, making it easy to:
+
+- Follow who said what
+- Search for statements by a specific participant
+- Understand the flow of discussion across multiple voices
+
+## Timestamped transcripts
+
+Every line of the transcript includes a timestamp, allowing you to:
+
+- Jump to specific moments in a meeting
+- Reference exact times when decisions were made
+- Correlate transcript segments with calendar events
+
+## Automatic capture
+
+Indigo's calendar integration means transcription starts and stops without manual intervention:
+
+| Trigger | Behavior |
+|---------|----------|
+| Scheduled meeting begins | Transcription starts automatically |
+| Meeting ends | Transcription stops, processing begins |
+| Ad-hoc conversation | Use the global shortcut to start manual capture |
+
+<Aside type="tip">
+  Press **Option + I** (macOS) or **Alt + I** (Windows) to open Indigo's quick capture mode for unscheduled conversations.
+</Aside>
+
+## Privacy and controls
+
+Indigo is designed with transparency and user control at its core.
+
+### Local audio processing
+
+Indigo offers a local audio processing option. When enabled, audio is processed on your device rather than being sent to external servers for transcription.
+
+### User-controlled recording
+
+You decide when Indigo records. While automatic capture is the default for calendar-linked meetings, you can:
+
+- Disable auto-capture for specific meetings
+- Pause or stop transcription at any time
+- Delete transcripts after they are generated
+
+### Transparency to participants
+
+Meeting participants are informed when transcription is active. Indigo does not record covertly — transparency is a core design principle.
+
+<Aside type="caution">
+  Recording laws vary by jurisdiction. Some regions require all-party consent. Ensure your use of meeting transcription complies with applicable local regulations.
+</Aside>
+
+## Data flow
+
+```
+Microphone → Audio Processing → Transcription Engine → Indexed Transcript
+                                                            ↓
+                                                    Decision Detection
+                                                    Action Extraction
+                                                    AI Chat (searchable)
+```
+
+Transcripts feed into Indigo's hot and cold data architecture. Live transcripts are **hot data** — immediately available during the meeting. Once processed, they become **cold data** — part of your searchable institutional memory, queryable through AI chat with full citations.

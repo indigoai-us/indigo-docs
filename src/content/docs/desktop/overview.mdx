@@ -1,0 +1,67 @@
+---
+title: Indigo Desktop
+description: Native desktop app for real-time meeting intelligence — transcription, decision detection, action items, and AI chat.
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components";
+
+Indigo Desktop is a native application for macOS and Windows that provides always-on meeting intelligence. It captures your meetings in real time, detects decisions, extracts action items, and gives you an AI chat interface to query across your entire meeting history.
+
+## Who it's for
+
+- **Knowledge workers and executives** managing heavy meeting loads
+- **Sales teams** documenting customer calls and follow-ups
+- **Product teams** tracking requirements and decisions across meetings
+- **Anyone** who loses critical information in back-to-back calls
+
+## Key capabilities
+
+<CardGrid>
+  <Card title="Real-time transcription" icon="pencil">
+    Automatic meeting capture with speaker identification and timestamped transcripts. No manual recording — Indigo handles it.
+  </Card>
+  <Card title="Decision detection" icon="approve-check-circle">
+    AI identifies decisions made during meetings, extracts commitments, and links them to full context.
+  </Card>
+  <Card title="Action item extraction" icon="list-format">
+    Automatic task detection with assignee identification and due date inference. Nothing falls through the cracks.
+  </Card>
+  <Card title="AI chat" icon="comment-alt">
+    Model-agnostic AI chat with context-aware responses. Query across all your meetings using the AI model of your choice.
+  </Card>
+</CardGrid>
+
+## Supported platforms
+
+| Platform | Architecture |
+|----------|-------------|
+| macOS | Intel and Apple Silicon |
+| Windows | 64-bit |
+
+Both platforms receive automatic updates and share the same feature set.
+
+## How it works
+
+Indigo operates on a **hot and cold data architecture**:
+
+- **Hot data** — live meeting streams, active transcriptions, real-time decision detection
+- **Cold data** — historical meeting intelligence, searchable knowledge base, cross-meeting insights with citations
+
+The AI chat layer runs across both, so you can ask questions about the meeting happening right now or one from three months ago.
+
+## Global shortcut
+
+Press <kbd>Alt</kbd> + <kbd>I</kbd> (Windows) or <kbd>Option</kbd> + <kbd>I</kbd> (macOS) to open Indigo instantly from anywhere. The app is always running in the background, one keystroke away.
+
+## Next steps
+
+<CardGrid>
+  <Card title="Getting started" icon="right-arrow">
+    Download, install, and capture your first meeting.
+    [Set up Indigo Desktop](/desktop/getting-started/)
+  </Card>
+  <Card title="Transcription" icon="right-arrow">
+    Deep dive into real-time transcription and privacy controls.
+    [Learn more](/desktop/transcription/)
+  </Card>
+</CardGrid>

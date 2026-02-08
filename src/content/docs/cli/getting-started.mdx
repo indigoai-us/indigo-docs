@@ -1,0 +1,98 @@
+---
+title: Getting Started
+description: Install Indigo CLI, authenticate, and run your first commands in under two minutes.
+---
+
+import { Steps, Aside, Tabs, TabItem } from "@astrojs/starlight/components";
+
+## Prerequisites
+
+- **Node.js** 18+ ([nodejs.org](https://nodejs.org))
+- An **Indigo account** ([getindigo.ai](https://www.getindigo.ai))
+
+## Setup
+
+<Steps>
+
+1. **Install the CLI**
+
+   ```bash
+   npm install -g indigo-cli
+   ```
+
+   Verify the installation:
+
+   ```bash
+   indigo --version
+   ```
+
+2. **Authenticate**
+
+   ```bash
+   indigo auth login
+   ```
+
+   This opens your browser for OAuth authentication. Once you approve, the CLI stores your credentials in the system keychain.
+
+3. **Try your first commands**
+
+   List recent signals:
+
+   ```bash
+   indigo signals list
+   ```
+
+   Check today's meetings:
+
+   ```bash
+   indigo meetings list
+   ```
+
+</Steps>
+
+## Credential sharing
+
+If you have Indigo Desktop installed, the CLI shares credentials through the system keychain. Logging in with either the CLI or the desktop app authenticates both — no need to sign in twice.
+
+<Aside type="tip">
+Already signed into Indigo Desktop? You can skip `indigo auth login` entirely. The CLI picks up your existing session automatically.
+</Aside>
+
+## JSON output
+
+Every command supports the `--json` flag for structured output:
+
+```bash
+indigo signals list --json
+```
+
+```json
+[
+  {
+    "id": "sig_abc123",
+    "type": "decision",
+    "content": "Ship v2.0 by March 15",
+    "meeting": "Product Planning",
+    "created_at": "2025-01-10T14:30:00Z"
+  }
+]
+```
+
+This makes it straightforward to pipe output into `jq`, scripts, or other tools. See the [Automation guide](/cli/automation/) for workflow examples.
+
+## Command reference
+
+| Command group | Purpose |
+|---------------|---------|
+| [`indigo auth`](/cli/commands/auth/) | Login, logout, and credential management |
+| [`indigo signals`](/cli/commands/signals/) | List, search, and view signals |
+| [`indigo meetings`](/cli/commands/meetings/) | Browse and search meetings |
+| [`indigo config`](/cli/commands/config/) | Setup wizard, BYOK, and calendar connections |
+| [`indigo setup mcp`](/cli/commands/mcp/) | Claude Desktop MCP integration |
+
+## Next steps
+
+- Browse [signals](/cli/commands/signals/) or [meetings](/cli/commands/meetings/) to explore your data
+- Set up [BYOK configuration](/cli/commands/config/) for your preferred AI model
+- Connect Claude Desktop with [MCP integration](/cli/commands/mcp/)
+- Build [automation workflows](/cli/automation/) with JSON output and scripting

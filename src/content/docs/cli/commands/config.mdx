@@ -1,0 +1,67 @@
+---
+title: indigo config
+description: Interactive setup wizard for BYOK model configuration, API key management, and calendar connectivity.
+---
+
+import { Steps, Aside } from "@astrojs/starlight/components";
+
+The `config` command group manages your Indigo CLI configuration — AI model providers, API keys, and calendar connections.
+
+## Commands
+
+### `indigo config setup`
+
+Launches an interactive setup wizard that walks you through initial configuration.
+
+```bash
+indigo config setup
+```
+
+The wizard covers:
+
+<Steps>
+
+1. **AI model provider** — Select your preferred LLM provider and enter your API key
+2. **Calendar connection** — Connect Google Calendar for meeting data
+3. **Preferences** — Output format defaults and other settings
+
+</Steps>
+
+<Aside type="tip">
+You can re-run `indigo config setup` at any time to change providers or update your configuration.
+</Aside>
+
+## BYOK (Bring Your Own Key)
+
+Indigo is model-agnostic. Configure the AI provider of your choice:
+
+| Provider | Model examples |
+|----------|---------------|
+| OpenAI | GPT-4o, GPT-4 Turbo |
+| Anthropic | Claude Sonnet, Claude Opus |
+| Google | Gemini Pro, Gemini Ultra |
+| xAI | Grok |
+
+The setup wizard prompts for your API key and validates the connection before saving. Keys are stored securely in the system keychain alongside your authentication credentials.
+
+## Calendar connectivity
+
+Meeting commands require a Google Calendar connection. The setup wizard handles the OAuth flow:
+
+1. The CLI opens your browser for Google Calendar authorization
+2. You approve read access to your calendar
+3. The CLI stores the OAuth tokens in the system keychain
+
+<Aside type="note">
+Calendar connectivity can also be configured through the Indigo Desktop app. The CLI shares the same connection.
+</Aside>
+
+## API key management
+
+API keys configured through the CLI are stored in the system keychain and shared with Indigo Desktop. Updating a key in either the CLI or the desktop app takes effect in both.
+
+| Operation | How to |
+|-----------|--------|
+| Add or update a key | Run `indigo config setup` and select your provider |
+| Verify configuration | Check the provider section during setup |
+| Remove a key | Re-run setup and clear the provider field |

@@ -1,0 +1,159 @@
+---
+title: indigo signals
+description: List, search, and view meeting signals — decisions, actions, accomplishments, and key facts.
+---
+
+import { Aside, Tabs, TabItem } from "@astrojs/starlight/components";
+
+The `signals` command group provides access to the intelligence Indigo extracts from your meetings — decisions, action items, accomplishments, and key facts.
+
+## Commands
+
+### `indigo signals list`
+
+Lists signals with optional type filtering and pagination.
+
+```bash
+indigo signals list [options]
+```
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--type <type>` | Filter by signal type: `decision`, `action`, `accomplishment`, `key_fact` |
+| `--limit <n>` | Number of results to return |
+| `--offset <n>` | Number of results to skip (for pagination) |
+| `--json` | Output as JSON |
+
+**Examples:**
+
+List all signals:
+
+```bash
+indigo signals list
+```
+
+List only decisions:
+
+```bash
+indigo signals list --type decision
+```
+
+Paginate through results:
+
+```bash
+indigo signals list --limit 10 --offset 20
+```
+
+---
+
+### `indigo signals search <query>`
+
+Searches signals by content. The query matches against signal text, meeting titles, and related context.
+
+```bash
+indigo signals search <query> [options]
+```
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--type <type>` | Filter results by signal type |
+| `--limit <n>` | Number of results to return |
+| `--json` | Output as JSON |
+
+**Examples:**
+
+Search for pricing-related signals:
+
+```bash
+indigo signals search "pricing"
+```
+
+Search for decisions about a specific topic:
+
+```bash
+indigo signals search "launch date" --type decision
+```
+
+---
+
+### `indigo signals view <id>`
+
+Displays the full details of a specific signal, including its source meeting, timestamp, and any related context.
+
+```bash
+indigo signals view <id> [options]
+```
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Output as JSON |
+
+**Example:**
+
+```bash
+indigo signals view sig_abc123
+```
+
+## Signal types
+
+| Type | Description |
+|------|-------------|
+| `decision` | A decision made during a meeting |
+| `action` | An action item or task assigned |
+| `accomplishment` | A completed milestone or achievement noted |
+| `key_fact` | An important piece of information shared |
+
+## JSON output
+
+All commands support `--json` for structured output. This is the primary integration point for scripts and automation.
+
+```bash
+indigo signals list --type decision --json
+```
+
+```json
+[
+  {
+    "id": "sig_abc123",
+    "type": "decision",
+    "content": "Ship v2.0 by March 15",
+    "meeting": "Product Planning",
+    "created_at": "2025-01-10T14:30:00Z"
+  },
+  {
+    "id": "sig_def456",
+    "type": "decision",
+    "content": "Hire two more engineers for the platform team",
+    "meeting": "Leadership Sync",
+    "created_at": "2025-01-09T11:00:00Z"
+  }
+]
+```
+
+## Piping to jq
+
+Combine `--json` with `jq` for filtering and transformation:
+
+<Tabs>
+  <TabItem label="Filter by type">
+    ```bash
+    indigo signals list --json | jq '[.[] | select(.type == "decision")]'
+    ```
+  </TabItem>
+  <TabItem label="Extract content only">
+    ```bash
+    indigo signals list --json | jq '.[].content'
+    ```
+  </TabItem>
+  <TabItem label="Count by type">
+    ```bash
+    indigo signals list --json | jq 'group_by(.type) | map({type: .[0].type, count: length})'
+    ```
+  </TabItem>
+</Tabs>

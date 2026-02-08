@@ -1,0 +1,85 @@
+import { defineConfig } from "astro/config";
+import starlight from "@astrojs/starlight";
+
+export default defineConfig({
+  integrations: [
+    starlight({
+      title: "Indigo Docs",
+      description:
+        "Documentation for Indigo Desktop, Indigo CLI, and Indigo HQ",
+      logo: {
+        src: "./src/assets/logo.svg",
+        replacesTitle: true,
+      },
+      favicon: "/favicon.svg",
+      social: {
+        github: "https://github.com/indigoai-us",
+        "x.com": "https://x.com/getindigo",
+      },
+      head: [
+        {
+          tag: "script",
+          content: `document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.social-icons a, header a[rel="me"]').forEach(a=>{a.setAttribute('target','_blank');a.setAttribute('rel','noopener noreferrer')});const s=document.querySelector('.social-icons');if(s){const l=document.createElement('a');l.href='https://getindigo.ai';l.target='_blank';l.rel='noopener noreferrer';l.textContent='getindigo.ai';l.className='site-link';s.parentNode.insertBefore(l,s)}});`,
+        },
+      ],
+      customCss: ["./src/styles/custom.css"],
+      sidebar: [
+        {
+          label: "Indigo Desktop",
+          items: [
+            { slug: "desktop/overview" },
+            { slug: "desktop/getting-started" },
+            {
+              label: "Features",
+              items: [
+                { slug: "desktop/transcription" },
+                { slug: "desktop/decisions-and-actions" },
+                { slug: "desktop/ai-chat" },
+              ],
+            },
+            { slug: "desktop/pricing" },
+          ],
+        },
+        {
+          label: "Indigo CLI",
+          items: [
+            { slug: "cli/overview" },
+            { slug: "cli/getting-started" },
+            {
+              label: "Commands",
+              items: [
+                { slug: "cli/commands/auth" },
+                { slug: "cli/commands/signals" },
+                { slug: "cli/commands/meetings" },
+                { slug: "cli/commands/config" },
+                { slug: "cli/commands/mcp" },
+              ],
+            },
+            { slug: "cli/automation" },
+          ],
+        },
+        {
+          label: "Indigo HQ",
+          items: [
+            {
+              label: "Product Guide",
+              autogenerate: { directory: "hq/guide" },
+            },
+            {
+              label: "Architecture",
+              autogenerate: { directory: "hq/architecture" },
+            },
+            {
+              label: "Development",
+              autogenerate: { directory: "hq/development" },
+            },
+            {
+              label: "Roadmap",
+              autogenerate: { directory: "hq/roadmap" },
+            },
+          ],
+        },
+      ],
+    }),
+  ],
+});
