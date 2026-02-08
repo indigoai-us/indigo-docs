@@ -151,3 +151,139 @@ table td, table th {
 /* Links */
 a { text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+/* Mermaid diagrams — monochrome dark theme */
+.mermaid {
+  background: transparent !important;
+  border: 1px solid var(--sl-color-gray-4);
+  border-radius: 0;
+  padding: 1.5rem 1rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+
+.mermaid[data-status="rendered"] svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Node shapes */
+.mermaid .node rect,
+.mermaid .node circle,
+.mermaid .node ellipse,
+.mermaid .node polygon,
+.mermaid .node path {
+  fill: var(--sl-color-gray-5) !important;
+  stroke: var(--sl-color-gray-3) !important;
+  stroke-width: 1px !important;
+}
+
+/* Edge lines + arrows */
+.mermaid .edgePath .path,
+.mermaid .flowchart-link {
+  stroke: var(--sl-color-gray-2) !important;
+  stroke-width: 1.5px !important;
+}
+
+.mermaid marker path {
+  fill: var(--sl-color-gray-2) !important;
+  stroke: var(--sl-color-gray-2) !important;
+}
+
+/* All text */
+.mermaid text,
+.mermaid .nodeLabel,
+.mermaid .edgeLabel,
+.mermaid .label {
+  fill: var(--sl-color-white) !important;
+  color: var(--sl-color-white) !important;
+  font-family: var(--sl-font) !important;
+  font-weight: 400 !important;
+  font-size: var(--sl-text-sm) !important;
+}
+
+/* Edge labels */
+.mermaid .edgeLabel rect,
+.mermaid .labelBkg {
+  fill: var(--sl-color-black) !important;
+  opacity: 0.9 !important;
+}
+
+/* Subgraph clusters */
+.mermaid .cluster rect {
+  fill: var(--sl-color-gray-6) !important;
+  stroke: var(--sl-color-gray-4) !important;
+  stroke-width: 1px !important;
+  rx: 0 !important;
+  ry: 0 !important;
+}
+
+.mermaid .cluster text {
+  fill: var(--sl-color-gray-1) !important;
+}
+
+/* Sequence diagrams */
+.mermaid .actor {
+  fill: var(--sl-color-gray-5) !important;
+  stroke: var(--sl-color-gray-3) !important;
+}
+
+.mermaid .actor-line {
+  stroke: var(--sl-color-gray-4) !important;
+}
+
+.mermaid .messageLine0,
+.mermaid .messageLine1 {
+  stroke: var(--sl-color-gray-2) !important;
+}
+
+.mermaid .messageText {
+  fill: var(--sl-color-white) !important;
+  font-family: var(--sl-font) !important;
+  font-size: var(--sl-text-xs) !important;
+}
+
+.mermaid .sequenceNumber {
+  fill: var(--sl-color-black) !important;
+}
+
+.mermaid .activation0,
+.mermaid .activation1,
+.mermaid .activation2 {
+  fill: var(--sl-color-gray-5) !important;
+  stroke: var(--sl-color-gray-3) !important;
+}
+
+.mermaid .note {
+  fill: var(--sl-color-gray-5) !important;
+  stroke: var(--sl-color-gray-3) !important;
+}
+
+.mermaid .loopLine {
+  stroke: var(--sl-color-gray-3) !important;
+}
+
+.mermaid .loopText,
+.mermaid .loopText tspan {
+  fill: var(--sl-color-gray-1) !important;
+}
+
+/* Light theme overrides */
+:root[data-theme="light"] .mermaid .node rect,
+:root[data-theme="light"] .mermaid .node circle,
+:root[data-theme="light"] .mermaid .node ellipse,
+:root[data-theme="light"] .mermaid .node polygon,
+:root[data-theme="light"] .mermaid .node path {
+  fill: var(--sl-color-gray-5) !important;
+  stroke: var(--sl-color-gray-3) !important;
+}
+
+:root[data-theme="light"] .mermaid .edgePath .path,
+:root[data-theme="light"] .mermaid .flowchart-link {
+  stroke: var(--sl-color-gray-2) !important;
+}
+
+:root[data-theme="light"] .mermaid .cluster rect {
+  fill: var(--sl-color-gray-6) !important;
+  stroke: var(--sl-color-gray-4) !important;
+}

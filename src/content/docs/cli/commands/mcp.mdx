@@ -28,6 +28,28 @@ This command:
 Requires Indigo CLI v0.2 or later. Run `indigo --version` to check.
 </Aside>
 
+```mermaid
+sequenceDiagram
+    participant User
+    participant CLI as Indigo CLI
+    participant Browser
+    participant Auth as Indigo API
+    participant Config as Claude Desktop Config
+    participant CD as Claude Desktop
+    participant MCP as MCP Server
+
+    User->>CLI: indigo setup mcp
+    CLI->>Browser: Open OAuth URL
+    Browser->>Auth: Authenticate
+    Auth->>CLI: Token via callback
+    CLI->>Config: Write MCP server config
+    Note over CD,MCP: After restart
+    CD->>MCP: StreamableHTTP transport
+    MCP->>Auth: Query signals / meetings
+    Auth->>MCP: Return data
+    MCP->>CD: Structured results
+```
+
 ## Config file location
 
 The command writes to the Claude Desktop configuration file at the appropriate path for your platform:

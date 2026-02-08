@@ -78,11 +78,10 @@ This is the default strategy for knowledge bases. It preserves independent git h
 
 The **merge** strategy copies files from the source repository to the target path, with SHA256 hash tracking for conflict detection.
 
-```
-source repo → copy files → target path
-                  │
-                  ▼
-          sync state (per-file SHA256 hashes)
+```mermaid
+graph TD
+    source["Source repo"] --> copy["Copy files"] --> target["Target path"]
+    copy --> state["Sync state<br/>(per-file SHA256 hashes)"]
 ```
 
 On each sync:

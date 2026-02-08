@@ -7,51 +7,40 @@ description: System architecture of the HQ monorepo — package graph, data flow
 
 HQ is a monorepo that ships five packages, a documentation site, and cloud infrastructure. The user interacts with HQ through Claude Code locally, and optionally through a PWA dashboard on mobile. Cloud sync bridges the two.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        indigoai-us/hq monorepo                      │
-├──────────────┬──────────────┬──────────────┬────────────────────────┤
-│              │              │              │                        │
-│  packages/   │    apps/     │   infra/     │      template/         │
-│              │              │              │                        │
-│ create-hq    │  web (PWA)   │  SST stack   │  HQ starter kit        │
-│ hq-cli       │  docs        │  AWS infra   │  copied on install     │
-│ hq-cloud     │              │              │                        │
-│              │              │              │                        │
-└──────┬───────┴──────┬───────┴──────┬───────┴────────────────────────┘
-       │              │              │
-       ▼              ▼              ▼
-  ┌─────────┐   ┌──────────┐   ┌──────────────────────────────┐
-  │  npm     │   │ Vercel / │   │  AWS                         │
-  │ registry │   │ static   │   │  Cognito + S3 + API Gateway  │
-  │          │   │ host     │   │  Lambda + CloudFront         │
-  └─────────┘   └──────────┘   └──────────────────────────────┘
+```mermaid
+graph TD
+    subgraph repo["indigoai-us/hq monorepo"]
+        direction TB
+        subgraph packages["packages/"]
+            createhq["create-hq"]
+            hqcli["hq-cli"]
+            hqcloud["hq-cloud"]
+        end
+        subgraph apps["apps/"]
+            web["web (PWA)"]
+            docs["docs"]
+        end
+        subgraph infra["infra/"]
+            sst["SST stack<br/>AWS infra"]
+        end
+        subgraph template["template/"]
+            starter["HQ starter kit<br/>copied on install"]
+        end
+    end
+    packages --> npm["npm registry"]
+    apps --> hosting["Vercel / static host"]
+    infra --> aws["AWS<br/>Cognito + S3 + API Gateway<br/>Lambda + CloudFront"]
 ```
 
 ### Runtime Flow
 
-```
-┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│              │         │              │         │              │
-│  Claude Code │◄───────►│  Local HQ    │◄───────►│  hq-cloud    │
-│  (terminal)  │  reads/ │  (~/HQ/)     │  sync   │  (S3 engine) │
-│              │  writes │              │         │              │
-└──────────────┘         └──────┬───────┘         └──────┬───────┘
-                                │                        │
-                                │                        │
-                                ▼                        ▼
-                         ┌──────────────┐         ┌──────────────┐
-                         │  Knowledge   │         │  AWS S3      │
-                         │  git repos   │         │  bucket      │
-                         │  (symlinked) │         │              │
-                         └──────────────┘         └──────┬───────┘
-                                                         │
-                                                         ▼
-                                                  ┌──────────────┐
-                                                  │  PWA (web)   │
-                                                  │  dashboard   │
-                                                  │  mobile/desk │
-                                                  └──────────────┘
+```mermaid
+graph LR
+    claude["Claude Code<br/>(terminal)"] <-->|"reads/<br/>writes"| local["Local HQ<br/>(~/HQ/)"]
+    local <-->|sync| cloud["hq-cloud<br/>(S3 engine)"]
+    local --> knowledge["Knowledge<br/>git repos<br/>(symlinked)"]
+    cloud --> s3["AWS S3<br/>bucket"]
+    s3 --> pwa["PWA (web)<br/>dashboard<br/>mobile/desktop"]
 ```
 
 ## Data Flow
@@ -79,14 +68,16 @@ The `/setup` command walks through:
 
 Daily workflow happens entirely through Claude Code:
 
-```
-User ──► Claude Code ──► reads CLAUDE.md ──► discovers commands, workers, knowledge
-                  │
-                  ├──► /run worker skill     (execute worker)
-                  ├──► /prd                  (plan project)
-                  ├──► /run-project          (execute project)
-                  ├──► /checkpoint           (save state)
-                  └──► /handoff              (transfer to new session)
+```mermaid
+graph LR
+    user["User"] --> cc["Claude Code"]
+    cc --> claude["reads CLAUDE.md"]
+    claude --> discover["discovers commands,<br/>workers, knowledge"]
+    cc --> run["/run worker skill"]
+    cc --> prd["/prd"]
+    cc --> rp["/run-project"]
+    cc --> cp["/checkpoint"]
+    cc --> ho["/handoff"]
 ```
 
 All state lives in the filesystem. Workers read knowledge, write reports, update threads, and commit to git repos.
@@ -95,17 +86,13 @@ All state lives in the filesystem. Workers read knowledge, write reports, update
 
 `hq-cloud` synchronizes the local HQ directory to S3:
 
-```
-Local HQ ──► hq-cloud ──► S3 bucket (encrypted, per-user prefix)
-                               │
-                               ▼
-                          CloudFront CDN
-                               │
-                               ▼
-                          API Gateway + Lambda
-                               │
-                               ▼
-                          PWA dashboard
+```mermaid
+graph TD
+    local["Local HQ"] --> cloud["hq-cloud"]
+    cloud --> s3["S3 bucket<br/>(encrypted, per-user prefix)"]
+    s3 --> cdn["CloudFront CDN"]
+    cdn --> apigw["API Gateway + Lambda"]
+    apigw --> pwa["PWA dashboard"]
 ```
 
 Sync is selective — only workspace state, reports, and social drafts are synced. Git repos, node_modules, and credentials are excluded.
@@ -122,65 +109,29 @@ Authentication flows through AWS Cognito. Content is served from S3 via CloudFro
 
 ## Package Graph
 
-```
-┌────────────────────────────────────────────────────────────────┐
-│                         npm workspaces                         │
-├────────────────────────────────────────────────────────────────┤
-│                                                                │
-│   ┌──────────────┐                                             │
-│   │  create-hq   │  npx create-hq                              │
-│   │              │  One-time installer                          │
-│   │  depends on: │  Copies template/, runs setup                │
-│   │  (none)      │                                              │
-│   └──────────────┘                                             │
-│                                                                │
-│   ┌──────────────┐         ┌──────────────┐                    │
-│   │  hq-cli      │────────►│  hq-cloud    │                    │
-│   │              │         │              │                    │
-│   │  @indigoai/  │ imports │  @indigoai/  │                    │
-│   │  hq-cli      │         │  hq-cloud    │                    │
-│   │              │         │              │                    │
-│   │  Ongoing     │         │  S3 sync     │                    │
-│   │  management  │         │  engine      │                    │
-│   └──────────────┘         └──────────────┘                    │
-│                                                                │
-│   ┌──────────────┐         ┌──────────────┐                    │
-│   │  apps/web    │         │  apps/docs   │                    │
-│   │              │         │              │                    │
-│   │  PWA dash    │         │  Astro       │                    │
-│   │  React 19    │         │  Starlight   │                    │
-│   │  Vite        │         │              │                    │
-│   └──────────────┘         └──────────────┘                    │
-│                                                                │
-│   ┌──────────────┐                                             │
-│   │  infra/      │  SST (Serverless Stack)                     │
-│   │              │  Deploys AWS resources                       │
-│   │  Cognito     │                                              │
-│   │  S3 + CF     │                                              │
-│   │  API GW      │                                              │
-│   │  Lambda      │                                              │
-│   └──────────────┘                                             │
-│                                                                │
-│   ┌──────────────┐                                             │
-│   │  template/   │  HQ starter kit                              │
-│   │              │  Copied by create-hq                         │
-│   │  CLAUDE.md   │                                              │
-│   │  commands/   │                                              │
-│   │  workers/    │                                              │
-│   │  knowledge/  │                                              │
-│   └──────────────┘                                             │
-│                                                                │
-└────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph ws["npm workspaces"]
+        createhq["create-hq<br/><i>npx create-hq</i><br/>One-time installer<br/>Copies template/, runs setup"]
+        hqcli["hq-cli<br/><i>@indigoai/hq-cli</i><br/>Ongoing management"]
+        hqcloud["hq-cloud<br/><i>@indigoai/hq-cloud</i><br/>S3 sync engine"]
+        hqcli -->|imports| hqcloud
+        appsweb["apps/web<br/>PWA dashboard<br/>React 19, Vite"]
+        appsdocs["apps/docs<br/>Astro Starlight"]
+        infrabox["infra/<br/>SST (Serverless Stack)<br/>Cognito, S3 + CF,<br/>API GW, Lambda"]
+        templatebox["template/<br/>HQ starter kit<br/>CLAUDE.md, commands/,<br/>workers/, knowledge/"]
+    end
 ```
 
 ### Dependency Direction
 
-```
-create-hq ──► template/          (copies files at install time)
-hq-cli    ──► hq-cloud           (imports sync engine)
-apps/web  ──► hq-cloud           (reads synced data via API)
-infra/    ──► (standalone)       (deploys AWS resources)
-apps/docs ──► (standalone)       (static documentation site)
+```mermaid
+graph LR
+    createhq["create-hq"] -->|"copies files at install"| template["template/"]
+    hqcli["hq-cli"] -->|"imports sync engine"| hqcloud["hq-cloud"]
+    appsweb["apps/web"] -->|"reads synced data via API"| hqcloud2["hq-cloud"]
+    infrabox["infra/"] --- standalone1["(standalone)"]
+    appsdocs["apps/docs"] --- standalone2["(standalone)"]
 ```
 
 Packages are loosely coupled. `create-hq` only touches `template/` at install time and has no runtime dependency on other packages. `hq-cli` is the primary user-facing package and depends on `hq-cloud` for sync operations.

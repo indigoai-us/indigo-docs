@@ -13,6 +13,14 @@ Workers are AI agents with specific skills. Each worker has:
 
 Workers are invoked with `/run {worker-id} {skill}`.
 
+```mermaid
+graph LR
+    invoke["/run worker skill"] --> load["Load<br/>worker.yaml"]
+    load --> skill["Read<br/>skill.md"]
+    skill --> exec["Execute<br/>with context"]
+    exec --> checkpoint["Auto-checkpoint"]
+```
+
 **Types:** CodeWorker, ContentWorker, SocialWorker, ResearchWorker, OpsWorker, Library
 
 ## Knowledge Bases
@@ -50,6 +58,14 @@ HQ automatically saves session state so work survives context limits.
 - **Threads** (`workspace/threads/`) — Auto-saved session summaries with git state
 - **Checkpoints** (`workspace/checkpoints/`) — Manual saves via `/checkpoint`
 - **Auto-handoff** — When context reaches 70% capacity, HQ automatically runs `/handoff`
+
+```mermaid
+graph LR
+    work["Work"] --> thread["Auto-save<br/>thread"]
+    thread --> cp["Checkpoint<br/>(manual)"]
+    cp --> handoff["Handoff"]
+    handoff --> resume["New session<br/>resumes"]
+```
 
 ## Workspace
 

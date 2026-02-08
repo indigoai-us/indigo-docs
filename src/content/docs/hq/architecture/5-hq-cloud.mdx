@@ -138,22 +138,17 @@ Authentication uses an OAuth flow with `hq.indigoai.com`. The flow mints a refre
 
 ### OAuth Flow
 
-```
-┌──────────┐     1. Open browser      ┌───────────────────┐
-│  hq CLI  │ ─────────────────────────▶│ hq.indigoai.com/  │
-│          │                           │ auth?callback=...  │
-│          │                           └────────┬──────────┘
-│          │                                    │
-│          │     2. User signs in               │
-│          │                                    │
-│          │     3. Redirect to callback        │
-│          │◀───────────────────────────────────┘
-│          │     token, refresh_token,
-│          │     user_id, bucket, region
-│          │
-│          │     4. Store credentials
-│          │     ~/.hq/credentials.json
-└──────────┘
+```mermaid
+sequenceDiagram
+    participant CLI as hq CLI
+    participant Browser
+    participant Auth as hq.indigoai.com
+
+    CLI->>Browser: 1. Open browser
+    Browser->>Auth: Navigate to /auth?callback=...
+    Note over Browser,Auth: 2. User signs in
+    Auth->>CLI: 3. Redirect to callback<br/>token, refresh_token,<br/>user_id, bucket, region
+    CLI->>CLI: 4. Store credentials<br/>~/.hq/credentials.json
 ```
 
 1. `authenticate()` starts an HTTP server on `localhost:19847`.
@@ -165,17 +160,13 @@ The flow has a 5-minute timeout. If the browser does not complete authentication
 
 ### Credential Refresh
 
-```
-┌──────────┐     POST /api/auth/refresh     ┌──────────────────┐
-│ hq-cloud │ ──────────────────────────────▶│ hq.indigoai.com  │
-│          │     { refreshToken }            │                  │
-│          │                                 │  Cognito + STS   │
-│          │◀──────────────────────────────  │                  │
-│          │     { accessKeyId,              └──────────────────┘
-│          │       secretAccessKey,
-│          │       sessionToken,
-│          │       expiration }
-└──────────┘
+```mermaid
+sequenceDiagram
+    participant Cloud as hq-cloud
+    participant Auth as hq.indigoai.com<br/>Cognito + STS
+
+    Cloud->>Auth: POST /api/auth/refresh<br/>{ refreshToken }
+    Auth->>Cloud: { accessKeyId,<br/>secretAccessKey,<br/>sessionToken,<br/>expiration }
 ```
 
 `refreshAwsCredentials()` sends the stored refresh token to `/api/auth/refresh`, which validates it against Cognito and returns temporary STS credentials. The updated credentials (including `accessKeyId`, `secretAccessKey`, `sessionToken`, and `expiration`) are merged into the stored credentials file.
@@ -265,33 +256,23 @@ The `SyncWatcher` class monitors the HQ directory for filesystem changes and syn
 
 ### Change Pipeline
 
-```
-Filesystem event (add/change/unlink)
-        │
-        ▼
-   Size check — skip files over 50MB
-        │
-        ▼
-   Queue in pendingChanges map (keyed by relative path)
-        │
-        ▼
-   Reset 2-second debounce timer
-        │
-        ▼
-   Timer fires → flush()
-        │
-        ▼
-   For each pending change:
-   ├── unlink → deleteRemoteFile() + remove journal entry
-   └── add/change → hashFile() → compare with journal
-       ├── hash unchanged → skip
-       └── hash different → uploadFile() + updateEntry()
-        │
-        ▼
-   Write journal to disk
-        │
-        ▼
-   If new changes arrived during flush → restart debounce
+```mermaid
+graph TD
+    A["Filesystem event<br/>(add/change/unlink)"] --> B["Size check<br/>skip files over 50MB"]
+    B --> C["Queue in pendingChanges map<br/>(keyed by relative path)"]
+    C --> D["Reset 2-second<br/>debounce timer"]
+    D --> E["Timer fires → flush()"]
+    E --> F{"For each<br/>pending change"}
+    F -->|unlink| G["deleteRemoteFile()<br/>+ remove journal entry"]
+    F -->|add/change| H["hashFile()<br/>→ compare with journal"]
+    H -->|hash unchanged| I["skip"]
+    H -->|hash different| J["uploadFile()<br/>+ updateEntry()"]
+    G --> K["Write journal to disk"]
+    I --> K
+    J --> K
+    K --> L{"New changes<br/>during flush?"}
+    L -->|yes| D
+    L -->|no| M["Done"]
 ```
 
 ### Error Handling
@@ -360,18 +341,12 @@ The sync daemon runs as a detached child process so it survives after the CLI co
 
 ### Process Model
 
-```
-┌────────────┐    fork()     ┌──────────────────┐
-│  hq sync   │ ────────────▶ │  daemon-worker.ts │
-│  start     │   detached    │                    │
-│            │   stdio:      │  SyncWatcher       │
-│            │   "ignore"    │  .start()          │
-└────────────┘               │                    │
-                             │  setInterval       │
-                             │  (30s heartbeat)   │
-                             │                    │
-                             │  SIGTERM → stop()  │
-                             └──────────────────┘
+```mermaid
+graph LR
+    A["hq sync<br/>start"] -->|"fork()<br/>detached<br/>stdio: ignore"| B["daemon-worker.ts"]
+    B --> C["SyncWatcher<br/>.start()"]
+    B --> D["setInterval<br/>(30s heartbeat)"]
+    B --> E["SIGTERM → stop()"]
 ```
 
 `startDaemon()` uses `child_process.fork()` with `detached: true` and `stdio: "ignore"`. The child is immediately `unref()`'d so the parent CLI can exit without waiting for it.
@@ -513,40 +488,23 @@ function walkDir(
 
 Putting it all together, here is how data flows through the system during normal operation:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                   Local HQ Directory                     │
-│                                                         │
-│  workers/  projects/  companies/  workspace/  knowledge/ │
-└────────────────────┬────────────────────────────────────┘
-                     │
-              chokidar events
-                     │
-                     ▼
-┌──────────────────────────────────────┐
-│          SyncWatcher (watcher.ts)     │
-│                                      │
-│  ignore filter → size check →        │
-│  debounce (2s) → batch flush         │
-└──────────────────┬───────────────────┘
-                   │
-          hash + compare journal
-                   │
-                   ▼
-┌──────────────────────────────────────┐
-│           S3 Client (s3.ts)          │
-│                                      │
-│  auto-refresh credentials →          │
-│  PutObject / DeleteObject            │
-└──────────────────┬───────────────────┘
-                   │
-                   ▼
-┌──────────────────────────────────────┐
-│          Journal (journal.ts)        │
-│                                      │
-│  .hq-sync-journal.json              │
-│  SHA256 hashes + sync timestamps     │
-└──────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph local["Local HQ Directory"]
+        files["workers/ projects/ companies/<br/>workspace/ knowledge/"]
+    end
+    local -->|"chokidar events"| watcher
+    subgraph watcher["SyncWatcher (watcher.ts)"]
+        pipeline["ignore filter → size check →<br/>debounce (2s) → batch flush"]
+    end
+    watcher -->|"hash + compare journal"| s3
+    subgraph s3["S3 Client (s3.ts)"]
+        ops["auto-refresh credentials →<br/>PutObject / DeleteObject"]
+    end
+    s3 --> journal
+    subgraph journal["Journal (journal.ts)"]
+        state[".hq-sync-journal.json<br/>SHA256 hashes + sync timestamps"]
+    end
 ```
 
 The daemon worker keeps this pipeline alive as a background process, while the CLI's `pushAll()` and `pullAll()` functions bypass the watcher and operate directly on the S3 client and journal.

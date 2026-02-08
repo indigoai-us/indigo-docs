@@ -1,9 +1,11 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import starlightClientMermaid from "@pasqal-io/starlight-client-mermaid";
 
 export default defineConfig({
   integrations: [
     starlight({
+      plugins: [starlightClientMermaid()],
       title: "Indigo Docs",
       description:
         "Documentation for Indigo Desktop, Indigo CLI, and Indigo HQ",

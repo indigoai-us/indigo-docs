@@ -28,6 +28,23 @@ Authentication successful. Credentials saved to keychain.
 If you are already signed into Indigo Desktop, the CLI can use those credentials automatically. You may not need to run `login` at all.
 </Aside>
 
+```mermaid
+sequenceDiagram
+    participant User
+    participant CLI as Indigo CLI
+    participant Browser
+    participant Auth as Indigo API
+    participant KC as System Keychain
+
+    User->>CLI: indigo auth login
+    CLI->>Browser: Open OAuth URL
+    Browser->>Auth: User authenticates
+    Auth->>Browser: Redirect with token
+    Browser->>CLI: Callback with credentials
+    CLI->>KC: Store in keychain
+    Note over KC: Shared with<br/>Indigo Desktop
+```
+
 ---
 
 ### `indigo auth status`

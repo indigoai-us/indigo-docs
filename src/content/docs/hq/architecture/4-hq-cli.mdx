@@ -37,6 +37,19 @@ hq modules add https://github.com/org/knowledge-ralph.git \
 
 The core sync loop. For each module in the manifest:
 
+```mermaid
+graph TD
+    sync["hq modules sync"] --> each{"For each module<br/>in manifest"}
+    each --> clone["Clone or fetch<br/>module repo"]
+    clone --> strategy{"Apply strategy"}
+    strategy -->|link| symlink["Create<br/>symlink"]
+    strategy -->|merge| merge["Copy with<br/>conflict detection"]
+    strategy -->|copy| copy["Direct<br/>copy"]
+    symlink --> lock["Record commit SHA<br/>in modules.lock"]
+    merge --> lock
+    copy --> lock
+```
+
 1. **Clone or fetch** the module repo into `modules/<name>/`
 2. **Apply the sync strategy** (link, merge, or copy) based on path mappings
 3. **Record the commit SHA** in `modules.lock`

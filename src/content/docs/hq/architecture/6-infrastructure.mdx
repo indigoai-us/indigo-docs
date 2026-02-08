@@ -5,6 +5,18 @@ description: AWS infrastructure defined with SST — Cognito auth, S3 storage, A
 
 HQ Cloud runs on AWS, defined entirely with [SST (Serverless Stack)](https://sst.dev). The infrastructure config at `infra/sst.config.ts` provisions four resources: a Cognito user pool for authentication, an S3 bucket for file storage, an API Gateway for CRUD operations, and a CloudFront distribution for the web dashboard.
 
+```mermaid
+graph TD
+    user["User"] --> cognito["Cognito<br/>User Pool"]
+    user --> cf["CloudFront"]
+    user --> apigw["API Gateway<br/>(JWT authorizer)"]
+    cognito -->|JWT tokens| apigw
+    cf --> s3static["S3 bucket<br/>(static PWA assets)"]
+    apigw --> lambda["Lambda<br/>handlers"]
+    lambda --> s3files["S3 bucket<br/>(user files, per-user prefix)"]
+    cognito -->|STS credentials| s3files
+```
+
 ## Cognito User Pool
 
 Authentication uses Amazon Cognito with email-based sign-up and sign-in.

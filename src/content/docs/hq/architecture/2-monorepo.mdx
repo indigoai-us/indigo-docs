@@ -52,12 +52,13 @@ hq/
 
 ## Dependency Graph
 
-```
-create-hq        (standalone — no internal deps)
-hq-cli ──────▶ hq-cloud
-apps/web          (standalone)
-apps/docs         (standalone)
-infra/            (standalone)
+```mermaid
+graph LR
+    createhq["create-hq"] --- s1["standalone"]
+    hqcli["hq-cli"] --> hqcloud["hq-cloud"]
+    appsweb["apps/web"] --- s2["standalone"]
+    appsdocs["apps/docs"] --- s3["standalone"]
+    infrabox["infra/"] --- s4["standalone"]
 ```
 
 `create-hq` is fully standalone so it can run via `npx` without pulling in the rest of the monorepo. `hq-cli` depends on `hq-cloud` for sync and auth. The apps and infrastructure have no cross-dependencies on the packages.
