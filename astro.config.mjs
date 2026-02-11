@@ -65,14 +65,6 @@ export default defineConfig({
                 { slug: "cli/commands/mcp" },
               ],
             },
-            {
-              label: "Skills",
-              items: [
-                { slug: "cli/skills/overview" },
-                { slug: "cli/skills/getting-started" },
-                { slug: "cli/skills/available-skills" },
-              ],
-            },
             { slug: "cli/automation" },
           ],
         },
@@ -86,6 +78,10 @@ export default defineConfig({
             { slug: "mcp/use-cases" },
             { slug: "mcp/troubleshooting" },
           ],
+        },
+        {
+          label: "CLI Skills",
+          items: [{ slug: "skills/overview" }],
         },
         {
           label: "Indigo HQ",
