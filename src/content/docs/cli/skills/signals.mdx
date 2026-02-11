@@ -1,0 +1,373 @@
+---
+title: Signal & Insight Skills
+description: Agent-facing reference for searching, filtering, and retrieving meeting signals — decisions, actions, accomplishments, and key facts — via the Indigo CLI.
+---
+
+import { Aside, Tabs, TabItem, Card, CardGrid } from "@astrojs/starlight/components";
+
+Signals are the intelligence Indigo extracts from meetings, emails, and communications. Each signal is a discrete insight — a decision that was made, an action item assigned, an accomplishment noted, or a key fact shared. This page documents how to list, search, and inspect signals using the CLI.
+
+<Aside type="tip">
+Always pass `--json` when consuming signal data programmatically. The human-readable table format is for display only — it truncates content and omits metadata fields that agents need.
+</Aside>
+
+## Signal types
+
+Every signal has a type that describes what kind of insight it represents.
+
+| Type | CLI value | Description |
+|------|-----------|-------------|
+| Decision | `decision` | A decision made during a meeting or conversation |
+| Action | `action` | An action item or task assigned to a person or team |
+| Accomplishment | `accomplishment` | A completed milestone or achievement that was noted |
+| Key Fact | `key_fact` | An important piece of information shared during discussion |
+
+Use the `--type` flag on any command to filter results to a single signal type.
+
+## Commands
+
+### List signals
+
+Retrieves recent signals with optional type and date filtering.
+
+```bash
+indigo signals list [options]
+```
+
+**Options:**
+
+| Flag | Short | Description | Default |
+|------|-------|-------------|---------|
+| `--type <type>` | `-t` | Filter by signal type: `decision`, `action`, `accomplishment`, `key_fact` | All types |
+| `--limit <n>` | `-n` | Number of results to return | `20` |
+| `--json` | | Output as JSON for programmatic consumption | Off (table) |
+
+**Examples:**
+
+List all recent signals (default limit of 20):
+
+```bash
+indigo signals list
+```
+
+List the 5 most recent decisions:
+
+```bash
+indigo signals list --type decision --limit 5
+```
+
+List action items as JSON:
+
+```bash
+indigo signals list -t action --json
+```
+
+---
+
+### Search signals
+
+Full-text search across signal content, meeting titles, and related context. Results are ranked by relevance.
+
+```bash
+indigo signals search <query> [options]
+```
+
+**Options:**
+
+| Flag | Short | Description | Default |
+|------|-------|-------------|---------|
+| `--type <type>` | `-t` | Filter results by signal type | All types |
+| `--limit <n>` | `-n` | Number of results to return | `20` |
+| `--json` | | Output as JSON for programmatic consumption | Off (table) |
+
+**Examples:**
+
+Search for anything related to pricing:
+
+```bash
+indigo signals search "pricing"
+```
+
+Search for decisions about a launch date:
+
+```bash
+indigo signals search "launch date" --type decision
+```
+
+Search for action items about hiring, output as JSON:
+
+```bash
+indigo signals search "hiring" -t action --json
+```
+
+---
+
+### View signal details
+
+Retrieves the full detail of a single signal by its ID, including content, citations, source metadata, and related entities.
+
+```bash
+indigo signals view <id> [options]
+```
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Output as JSON for programmatic consumption |
+
+The `<id>` is a 24-character hexadecimal MongoDB ObjectId (e.g., `507f1f77bcf86cd799439011`).
+
+**Examples:**
+
+View a signal in human-readable format:
+
+```bash
+indigo signals view 507f1f77bcf86cd799439011
+```
+
+View a signal as JSON for parsing:
+
+```bash
+indigo signals view 507f1f77bcf86cd799439011 --json
+```
+
+## JSON output format
+
+When `--json` is passed, commands return structured JSON that agents can parse directly. This section documents the exact shapes.
+
+### Signal list / search response
+
+`indigo signals list --json` and `indigo signals search <query> --json` both return an array of signal objects:
+
+```json
+[
+  {
+    "_id": "507f1f77bcf86cd799439011",
+    "insightType": "decision",
+    "data": {
+      "decision": "Ship v2.0 by March 15",
+      "rationale": "Market window closes in Q2"
+    },
+    "people": [
+      { "id": "p_001", "type": "person", "name": "Alice Chen" }
+    ],
+    "teams": [
+      { "id": "t_001", "type": "team", "name": "Product" }
+    ],
+    "project": { "id": "proj_001", "type": "project", "name": "Platform v2" },
+    "initiative": { "id": "init_001", "type": "initiative", "name": "Q1 Launch" },
+    "citations": [
+      {
+        "quote": "We need to ship v2 by mid-March at the latest.",
+        "speaker": "Alice Chen",
+        "sourceType": "meeting",
+        "sourceID": "mtg_abc123",
+        "surroundingContext": "Discussion about release timeline"
+      }
+    ],
+    "source": { "type": "meeting", "id": "mtg_abc123" },
+    "sourceMetadata": {
+      "sourceChannel": "meeting",
+      "sourceId": "mtg_abc123",
+      "sourceUrl": "https://app.getindigo.ai/meetings/mtg_abc123",
+      "timestamp": "2025-01-10T14:30:00Z",
+      "participants": ["Alice Chen", "Bob Park", "Carol Liu"]
+    },
+    "createdAt": "2025-01-10T14:30:00Z",
+    "updatedAt": "2025-01-10T14:30:00Z"
+  }
+]
+```
+
+### Signal detail response
+
+`indigo signals view <id> --json` returns a single signal object with the same shape as above (not wrapped in an array).
+
+### Key fields for agents
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `_id` | `string` | Unique 24-character hex identifier |
+| `insightType` | `string` | Signal type: `decision`, `action`, `accomplishment`, `key_fact` |
+| `data` | `object` | The signal content — keys vary by type (see below) |
+| `people` | `array` | People associated with the signal |
+| `teams` | `array` | Teams associated with the signal |
+| `project` | `object` | Related project, if any |
+| `initiative` | `object` | Related initiative, if any |
+| `task` | `object` | Related task, if any |
+| `citations` | `array` | Source quotes with speaker attribution |
+| `sourceMetadata` | `object` | Channel, URL, timestamp, and participants |
+| `createdAt` | `string` | ISO 8601 timestamp |
+| `updatedAt` | `string` | ISO 8601 timestamp |
+
+### Data field by signal type
+
+The `data` object contains different keys depending on the signal type:
+
+| Signal type | Primary key | Other common keys |
+|-------------|-------------|-------------------|
+| `decision` | `data.decision` | `data.rationale`, `data.impact` |
+| `action` | `data.action_item` | `data.assignee`, `data.due_date`, `data.status` |
+| `accomplishment` | `data.accomplishment` | `data.impact`, `data.team` |
+| `key_fact` | `data.key_fact` | `data.context`, `data.source` |
+
+## Filtering signals
+
+### By type
+
+Use `--type` (or `-t`) to restrict results to a single signal type:
+
+```bash
+# Only decisions
+indigo signals list --type decision --json
+
+# Only action items
+indigo signals list --type action --json
+
+# Search within accomplishments
+indigo signals search "Q4" --type accomplishment --json
+```
+
+Valid values: `decision`, `action`, `accomplishment`, `key_fact`.
+
+<Aside type="caution">
+The `--type` flag accepts exactly one type. To query multiple types, run separate commands or use the MCP server's `query_collection` tool which supports richer filtering.
+</Aside>
+
+### By date range (API-level)
+
+The signals API supports `startDate` and `endDate` query parameters (ISO 8601 format). While these are not currently exposed as CLI flags, the API accepts them. For date-based filtering from the CLI, pipe through `jq`:
+
+```bash
+# Signals from January 2025 onward
+indigo signals list --json | jq '[.[] | select(.createdAt >= "2025-01-01")]'
+
+# Signals from a specific week
+indigo signals list --json | jq '[.[] | select(.createdAt >= "2025-01-06" and .createdAt < "2025-01-13")]'
+```
+
+## Piping and transformation
+
+Combine `--json` with `jq` for filtering and transformation:
+
+<Tabs>
+  <TabItem label="Filter by type">
+    ```bash
+    indigo signals list --json | jq '[.[] | select(.insightType == "decision")]'
+    ```
+  </TabItem>
+  <TabItem label="Extract content">
+    ```bash
+    indigo signals list --json | jq '.[].data'
+    ```
+  </TabItem>
+  <TabItem label="Count by type">
+    ```bash
+    indigo signals list --json | jq 'group_by(.insightType) | map({type: .[0].insightType, count: length})'
+    ```
+  </TabItem>
+  <TabItem label="Get people">
+    ```bash
+    indigo signals list --json | jq '[.[].people[]?.name] | unique'
+    ```
+  </TabItem>
+</Tabs>
+
+## Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | Success |
+| `1` | General error (API error, network failure) |
+| `2` | Authentication required — run `indigo auth login` |
+| `3` | API unreachable — check internet connection |
+| `4` | Validation error (invalid type, invalid ID format) |
+
+## Agent workflow: find meeting insights
+
+This is the recommended decision tree for an agent tasked with finding meeting insights on a topic.
+
+```
+1. Check authentication
+   └─ indigo auth status --json
+      ├─ authenticated: true  → proceed to step 2
+      └─ authenticated: false → indigo auth login, then proceed
+
+2. Search signals for the topic
+   └─ indigo signals search "<topic>" --json
+      ├─ results found → proceed to step 3
+      └─ no results    → try broader query, or list all: indigo signals list --json
+
+3. Filter by signal type (if needed)
+   └─ indigo signals search "<topic>" --type decision --json
+      (repeat for: action, accomplishment, key_fact as needed)
+
+4. Get full details for specific signals
+   └─ indigo signals view <id> --json
+      (extract citations, people, source metadata)
+
+5. Present findings
+   └─ Group by type, summarize content, cite sources
+```
+
+### Example: find all decisions about a product launch
+
+```bash
+# Step 1: verify auth
+indigo auth status --json
+
+# Step 2: search for launch-related decisions
+indigo signals search "product launch" --type decision --json
+
+# Step 3: get details on a specific decision
+indigo signals view 507f1f77bcf86cd799439011 --json
+
+# Step 4: find associated action items
+indigo signals search "product launch" --type action --json
+```
+
+### Example: weekly action item review
+
+```bash
+# Get all action items as JSON
+indigo signals list --type action --json | jq '[.[] | select(.createdAt >= "2025-01-06")] | sort_by(.createdAt) | reverse'
+```
+
+## When to use CLI vs MCP
+
+<Tabs>
+  <TabItem label="Use CLI signals when">
+    - You need a quick list or search from a terminal or script
+    - You want to pipe output to `jq`, `grep`, or other Unix tools
+    - You are building shell-based automation or CI/CD workflows
+    - You need exit codes for conditional logic
+  </TabItem>
+  <TabItem label="Use MCP signals when">
+    - You need aggregations (count signals by type, by week, by person)
+    - You need complex filters (multiple types, date ranges, team membership)
+    - You are working inside Claude Desktop or Claude Code with MCP support
+    - You need pagination control at the database level
+  </TabItem>
+</Tabs>
+
+## Related
+
+<CardGrid>
+  <Card title="Signals command reference" icon="list-format">
+    Full CLI reference for the signals command group.
+    [Commands: signals](/cli/commands/signals/)
+  </Card>
+  <Card title="MCP queries" icon="magnifier">
+    Use the MCP server for advanced signal queries and aggregations.
+    [MCP queries](/mcp/queries/)
+  </Card>
+  <Card title="Automation" icon="right-arrow">
+    Build scripts and pipelines using CLI JSON output.
+    [Automation guide](/cli/automation/)
+  </Card>
+  <Card title="Skills overview" icon="open-book">
+    How agents should discover and use Indigo CLI skills.
+    [Skills overview](/cli/skills/overview/)
+  </Card>
+</CardGrid>

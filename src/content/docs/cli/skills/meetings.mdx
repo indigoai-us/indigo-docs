@@ -1,0 +1,331 @@
+---
+title: "Skill: Meetings"
+description: Agent-facing reference for browsing, searching, and viewing calendar meetings using the Indigo CLI.
+---
+
+import { Aside, Tabs, TabItem, Steps } from "@astrojs/starlight/components";
+
+This skill covers how to browse and search meetings so you can help users find meeting information, participants, and summaries. Meetings are the source data from which [signals](/cli/commands/signals/) (decisions, actions, accomplishments, key facts) are extracted.
+
+<Aside type="caution">
+Meeting commands require a Google Calendar connection. If commands return a configuration error, instruct the user to run `indigo setup calendar` or connect through the Indigo Desktop app.
+</Aside>
+
+## Prerequisites
+
+Before using meeting commands, verify authentication and calendar access:
+
+```bash
+# 1. Check auth status
+indigo auth status --json
+
+# 2. If not authenticated, login first
+indigo auth login
+```
+
+If auth is valid but meeting commands fail with a config error, the user needs to connect their Google Calendar.
+
+## Commands
+
+### List meetings
+
+Browse upcoming or past meetings from the connected calendar.
+
+```bash
+indigo meetings list [options]
+```
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-n, --limit <number>` | Number of results to return | `20` |
+| `--upcoming` | Show upcoming meetings | Default behavior |
+| `--past` | Show past meetings | - |
+| `--json` | Output as JSON for programmatic consumption | - |
+
+**Examples:**
+
+```bash
+# List upcoming meetings (default)
+indigo meetings list
+
+# List past meetings
+indigo meetings list --past
+
+# Get the 5 most recent past meetings as JSON
+indigo meetings list --past --limit 5 --json
+```
+
+### Search meetings
+
+Search meetings by title, description, or attendee name/email. By default, searches both upcoming and past meetings.
+
+```bash
+indigo meetings search <query> [options]
+```
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-n, --limit <number>` | Number of results to return | `20` |
+| `--upcoming` | Search only upcoming meetings | - |
+| `--past` | Search only past meetings | - |
+| `--json` | Output as JSON for programmatic consumption | - |
+
+The search matches against three fields:
+- **Meeting title** — e.g., `"Weekly Product Sync"`
+- **Meeting description** — calendar event body text
+- **Participant names and emails** — e.g., `"alice@example.com"` or `"Alice"`
+
+**Examples:**
+
+```bash
+# Search by meeting title
+indigo meetings search "product sync"
+
+# Search by attendee email
+indigo meetings search "alice@example.com"
+
+# Search only past meetings for a keyword
+indigo meetings search "quarterly review" --past --json
+
+# Search only upcoming meetings
+indigo meetings search "standup" --upcoming
+```
+
+### View meeting details
+
+Display full details for a specific meeting including participants, description, summary, and bot status.
+
+```bash
+indigo meetings view <id> [options]
+```
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Output as JSON for programmatic consumption |
+
+The meeting ID is a 24-character hexadecimal string (MongoDB ObjectId). You obtain IDs from the output of `list` or `search` commands.
+
+**Example:**
+
+```bash
+indigo meetings view 507f1f77bcf86cd799439011 --json
+```
+
+## Filtering strategies
+
+Use these approaches to narrow down meeting results for common agent tasks.
+
+<Tabs>
+  <TabItem label="By title">
+    ```bash
+    indigo meetings search "sprint planning" --json
+    ```
+  </TabItem>
+  <TabItem label="By attendee">
+    ```bash
+    indigo meetings search "bob@example.com" --json
+    ```
+  </TabItem>
+  <TabItem label="By description">
+    ```bash
+    indigo meetings search "budget review" --json
+    ```
+  </TabItem>
+  <TabItem label="Past only">
+    ```bash
+    indigo meetings search "standup" --past --json
+    ```
+  </TabItem>
+  <TabItem label="Upcoming only">
+    ```bash
+    indigo meetings search "1:1" --upcoming --json
+    ```
+  </TabItem>
+</Tabs>
+
+For date-based filtering, combine `--json` with `jq`:
+
+```bash
+# Meetings from a specific date range
+indigo meetings list --past --limit 50 --json \
+  | jq '[.[] | select(.start_time >= "2025-01-01" and .start_time < "2025-02-01")]'
+```
+
+## JSON output format
+
+All commands accept `--json` for structured output. Always use this flag when output will be parsed programmatically.
+
+### List / Search response
+
+```json
+[
+  {
+    "_id": "507f1f77bcf86cd799439011",
+    "meeting_id": "gcal_event_abc123",
+    "calendar_id": "primary",
+    "meeting_title": "Weekly Product Sync",
+    "meeting_description": "Review sprint progress and blockers",
+    "meeting_url": "https://meet.google.com/abc-defg-hij",
+    "start_time": "2025-01-15T10:00:00Z",
+    "end_time": "2025-01-15T10:30:00Z",
+    "status": "completed",
+    "bot_enabled": true,
+    "bot_name": "Indigo Notetaker",
+    "participants": [
+      {
+        "email": "alice@example.com",
+        "displayName": "Alice Chen",
+        "responseStatus": "accepted",
+        "organizer": "true"
+      },
+      {
+        "email": "bob@example.com",
+        "displayName": "Bob Smith",
+        "responseStatus": "accepted"
+      }
+    ],
+    "summary": "Discussed sprint velocity and agreed to ship v2.0 by March 15.",
+    "summary_recipient": "all_participants",
+    "createdAt": "2025-01-14T08:00:00Z",
+    "updatedAt": "2025-01-15T11:00:00Z"
+  }
+]
+```
+
+### View response (single meeting)
+
+The `view` command returns a single meeting object with the same schema as above (not wrapped in an array).
+
+### Key fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `_id` | `string` | Unique meeting identifier (24-char hex). Use this for `meetings view`. |
+| `meeting_title` | `string` | Calendar event title |
+| `meeting_description` | `string?` | Calendar event description body |
+| `start_time` | `string` | ISO 8601 start timestamp |
+| `end_time` | `string` | ISO 8601 end timestamp |
+| `status` | `string` | One of: `scheduled`, `in-progress`, `processing`, `completed`, `failed`, `kicked`, `denied`, `cancelled` |
+| `participants` | `array` | List of attendees with `email`, `displayName`, `responseStatus`, `organizer`, `self` |
+| `summary` | `string?` | AI-generated meeting summary (available after processing) |
+| `bot_enabled` | `boolean` | Whether the Indigo bot joined this meeting |
+| `meeting_url` | `string?` | Video conferencing link |
+
+### Participant object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `email` | `string` | Participant email address |
+| `displayName` | `string?` | Participant display name |
+| `responseStatus` | `string` | Calendar RSVP: `accepted`, `declined`, `tentative`, `needsAction` |
+| `organizer` | `string?` | Present if this participant is the organizer |
+| `self` | `boolean?` | `true` if this is the authenticated user |
+
+## Agent workflow: find meeting, extract action items
+
+This workflow demonstrates how an agent finds a meeting by participant, views its details, and then cross-references signals to extract action items.
+
+<Steps>
+
+1. **Search for meetings with a specific participant**
+
+   ```bash
+   indigo meetings search "alice@example.com" --past --limit 5 --json
+   ```
+
+   Parse the JSON response to identify the relevant meeting by title or date. Extract the `_id` field.
+
+2. **View full meeting details**
+
+   ```bash
+   indigo meetings view 507f1f77bcf86cd799439011 --json
+   ```
+
+   Read the `summary` field for a high-level overview. Note the `meeting_title` for the next step.
+
+3. **Search signals for action items from that meeting**
+
+   ```bash
+   indigo signals search "Weekly Product Sync" --type action --json
+   ```
+
+   This returns action items (tasks, follow-ups) that Indigo extracted from that meeting.
+
+4. **Optionally, retrieve decisions from the same meeting**
+
+   ```bash
+   indigo signals search "Weekly Product Sync" --type decision --json
+   ```
+
+   Combine action items and decisions to build a complete picture of meeting outcomes.
+
+</Steps>
+
+### Full scripted example
+
+```bash
+#!/bin/bash
+# Find action items from recent meetings with a specific person
+
+PARTICIPANT="alice@example.com"
+
+# Step 1: Get recent meetings with this participant
+MEETINGS=$(indigo meetings search "$PARTICIPANT" --past --limit 3 --json)
+
+# Step 2: Extract meeting titles
+TITLES=$(echo "$MEETINGS" | jq -r '.[].meeting_title')
+
+# Step 3: For each meeting, find action items
+while IFS= read -r title; do
+  echo "=== Action items from: $title ==="
+  indigo signals search "$title" --type action --json | jq -r '.[].content'
+  echo ""
+done <<< "$TITLES"
+```
+
+## Piping and transformation with jq
+
+<Tabs>
+  <TabItem label="List attendees">
+    ```bash
+    indigo meetings view 507f1f77bcf86cd799439011 --json \
+      | jq '[.participants[] | {name: .displayName, email: .email}]'
+    ```
+  </TabItem>
+  <TabItem label="Meeting titles only">
+    ```bash
+    indigo meetings list --past --json | jq -r '.[].meeting_title'
+    ```
+  </TabItem>
+  <TabItem label="Completed meetings">
+    ```bash
+    indigo meetings list --past --json \
+      | jq '[.[] | select(.status == "completed")]'
+    ```
+  </TabItem>
+  <TabItem label="Meetings with summaries">
+    ```bash
+    indigo meetings list --past --json \
+      | jq '[.[] | select(.summary != null) | {title: .meeting_title, summary: .summary}]'
+    ```
+  </TabItem>
+</Tabs>
+
+## Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | Success |
+| `1` | General error |
+| `2` | Authentication required — run `indigo auth login` |
+| `3` | API unreachable — check internet connection |
+| `4` | Configuration error — calendar not connected |
+| `5` | Validation error — invalid ID format or empty query |
+| `6` | Not found — meeting ID does not exist |
+
+## Related skills
+
+- [Signals](/cli/commands/signals/) — query the decisions, actions, and key facts extracted from meetings
+- [Auth](/cli/commands/auth/) — manage authentication required for all meeting commands
+- [Skills overview](/cli/skills/overview/) — full list of agent-facing skill categories
+- [Automation](/cli/automation/) — exit codes, scripting patterns, and CI/CD integration
