@@ -80,6 +80,10 @@ export default defineConfig({
           ],
         },
         {
+          label: "Indigo Skills",
+          items: [{ slug: "skills/overview" }],
+        },
+        {
           label: "Indigo HQ",
           items: [
             {
