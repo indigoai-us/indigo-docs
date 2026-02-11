@@ -80,7 +80,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "CLI Skills",
+          label: "Indigo Skills",
           items: [{ slug: "skills/overview" }],
         },
         {
