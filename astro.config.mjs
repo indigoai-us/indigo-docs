@@ -69,11 +69,8 @@ export default defineConfig({
               label: "Skills",
               items: [
                 { slug: "cli/skills/overview" },
-                { slug: "cli/skills/authentication" },
-                { slug: "cli/skills/signals" },
-                { slug: "cli/skills/meetings" },
-                { slug: "cli/skills/setup" },
-                { slug: "cli/skills/workflows" },
+                { slug: "cli/skills/getting-started" },
+                { slug: "cli/skills/available-skills" },
               ],
             },
             { slug: "cli/automation" },

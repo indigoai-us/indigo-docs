@@ -1,130 +1,97 @@
 ---
-title: Skills Overview
-description: Agent-discoverable CLI capabilities — structured reference documentation that helps AI agents use the Indigo CLI effectively.
+title: Skills for AI Agents
+description: Give your AI agent deep knowledge of the Indigo CLI so it can work with your meeting intelligence data.
 ---
 
-import { Card, CardGrid, Aside, Tabs, TabItem } from "@astrojs/starlight/components";
+import { Card, CardGrid, Aside, Steps } from "@astrojs/starlight/components";
 
-Indigo Skills are agent-facing reference pages that describe what the Indigo CLI can do, when to use it, and how to invoke each command correctly. They turn the CLI into a discoverable toolset for AI agents working alongside you.
+You can give your AI agent full knowledge of the Indigo CLI by adding a single reference file — `SKILLS.md` — to its context. Once loaded, your agent understands every command, output format, error code, and multi-step workflow without guessing or parsing help text.
 
-## What are Indigo Skills?
+## Two approaches to agent integration
 
-A **skill** is a documented CLI capability — a specific task an AI agent can accomplish by running Indigo CLI commands. Each skill page provides the structured context an agent needs: what the command does, which flags to use, what output to expect, and how to chain commands together.
-
-Skills are not a new CLI feature. They are a documentation layer on top of the existing CLI that makes it easy for agents to understand and use Indigo without guesswork.
-
-<Aside type="tip">
-Think of Skills as a menu for AI agents. Instead of parsing `--help` output or guessing at flags, an agent reads a skill page and knows exactly how to accomplish a task.
-</Aside>
-
-## CLI vs MCP: when to use each
-
-Indigo offers two interfaces for AI agents — the CLI and the [MCP server](/mcp/overview/). They serve different purposes and work best in different situations.
-
-<Tabs>
-  <TabItem label="Use the CLI when">
-    - You need **high-level operations** — authentication, configuration, calendar setup
-    - You are working in a **terminal or shell environment** (CI/CD, scripts, automation)
-    - You need **structured exit codes** for conditional logic in workflows
-    - You want to **pipe output** to other Unix tools (`jq`, `grep`, `curl`)
-    - The task involves **account management** — login, logout, credential sharing
-  </TabItem>
-  <TabItem label="Use MCP when">
-    - You need **direct data queries** — filtering signals, searching meetings, aggregating results
-    - You are working inside **Claude Desktop or Claude Code** with MCP support
-    - You want **natural language access** to meeting intelligence data
-    - The task is **read-heavy** — browsing collections, running analytics, exploring data
-    - You need **fine-grained query control** — projections, sorting, pagination at the database level
-  </TabItem>
-</Tabs>
-
-| Capability | CLI | MCP |
-|------------|-----|-----|
-| Authentication | `indigo auth login/logout/status` | Uses CLI credentials |
-| Signal queries | `indigo signals list/search/view` | `query_collection` with filters |
-| Meeting queries | `indigo meetings list/search/view` | `query_collection` with filters |
-| Configuration | `indigo config setup` | Not available |
-| MCP setup | `indigo setup mcp` | Not applicable |
-| Aggregations | Pipe to `jq` | `aggregate_collection` |
-| Output format | JSON (`--json`) or human-readable | Structured JSON responses |
-| Best for | Automation, setup, account ops | Data exploration, analytics |
-
-<Aside type="note">
-The CLI and MCP complement each other. A typical workflow uses the CLI for initial setup and authentication, then switches to MCP for ongoing data queries inside an AI client.
-</Aside>
-
-## Skill categories
-
-Skills are organized around the CLI's command groups. Each category maps to a set of related operations an agent can perform.
+Indigo offers two ways to connect AI agents to your meeting intelligence. You can use either or both.
 
 <CardGrid>
-  <Card title="Auth" icon="approve-check">
-    Login, check status, and manage credentials. The starting point for any CLI session.
-    [Auth skills](/cli/commands/auth/)
+  <Card title="MCP Server" icon="puzzle">
+    Your agent gets direct database access through structured query tools. Best for data exploration, filtering, and aggregation inside Claude Desktop or Claude Code.
+    [MCP overview](/mcp/overview/)
   </Card>
-  <Card title="Signals" icon="list-format">
-    List, search, and view meeting intelligence — decisions, actions, accomplishments, and key facts.
-    [Signals skills](/cli/commands/signals/)
-  </Card>
-  <Card title="Meetings" icon="comment-alt">
-    Browse upcoming and past meetings, search by title or attendee, and view details.
-    [Meetings skills](/cli/commands/meetings/)
-  </Card>
-  <Card title="Setup & Config" icon="setting">
-    Configure AI model providers (BYOK), connect calendars, and set up the MCP server.
-    [Config skills](/cli/commands/config/)
+  <Card title="Skills (SKILLS.md)" icon="open-book">
+    Your agent reads a reference file that teaches it every CLI command and workflow. Best for terminal-based automation, account management, and scripting.
   </Card>
 </CardGrid>
 
-## How agents should use skills
+| | MCP | Skills |
+|--|-----|--------|
+| How it works | Agent calls query tools directly | Agent runs CLI commands in a shell |
+| Best for | Data queries, analytics, exploration | Automation, setup, account ops, scripting |
+| Requires | MCP-compatible client (Claude Desktop/Code) | Any agent with shell access |
+| Data access | Direct database queries with filters | CLI output (JSON or human-readable) |
 
-When an AI agent needs to interact with Indigo, it should follow this workflow:
+<Aside type="note">
+Most setups benefit from both. Use Skills for authentication and configuration, then MCP for ongoing data queries.
+</Aside>
 
-1. **Check authentication** — Run `indigo auth status --json` to verify credentials are valid. If not authenticated, run `indigo auth login`.
+## What's in SKILLS.md
 
-2. **Identify the right skill** — Determine which command group handles the task (signals, meetings, config, or auth).
+The file is a single structured reference covering everything your agent needs to use the CLI:
 
-3. **Read the skill page** — Each skill page documents the exact commands, flags, and expected output formats.
+- **CLI command reference** — auth, signals, meetings, setup, and config commands with flags and usage
+- **JSON output formats** — exact schemas for every command's `--json` output
+- **Exit codes and error handling** — what each code means and how to recover
+- **Multi-step workflows** — first-time setup, daily meeting prep, action tracking, intelligence search
+- **Decision guidance** — when to use CLI vs MCP for a given task
 
-4. **Use `--json` for parsing** — Always pass the `--json` flag when the output will be processed programmatically. Human-readable output is for display only.
+Your agent reads this once and can then run any Indigo CLI workflow independently.
 
-5. **Check exit codes** — Use [exit codes](/cli/automation/#exit-codes) to handle errors gracefully. Code `2` means authentication failed; code `3` means the API is unreachable.
+## Quick start
 
-```bash
-# Example: Agent retrieves recent decisions
-indigo auth status --json > /dev/null 2>&1 || indigo auth login
-indigo signals list --type decision --limit 10 --json
-```
+<Steps>
 
-## Quick command reference
+1. **Get the SKILLS.md file**
 
-| Command | Purpose |
-|---------|---------|
-| `indigo auth login` | Authenticate via browser OAuth |
-| `indigo auth status` | Check current auth state |
-| `indigo auth logout` | Remove stored credentials |
-| `indigo signals list` | List signals with optional type filter |
-| `indigo signals search <query>` | Full-text search across signals |
-| `indigo signals view <id>` | View a specific signal |
-| `indigo meetings list` | List upcoming and past meetings |
-| `indigo meetings search <query>` | Search meetings by title or attendee |
-| `indigo meetings view <id>` | View meeting details |
-| `indigo config setup` | Interactive configuration wizard |
-| `indigo setup mcp` | Configure MCP server for Claude |
+   The file lives in the [indigo-nx repository root](https://github.com/nicholasgriffintn/indigo-nx). Download or copy `SKILLS.md` to your project.
+
+   ```bash
+   curl -o SKILLS.md https://raw.githubusercontent.com/nicholasgriffintn/indigo-nx/main/SKILLS.md
+   ```
+
+2. **Add it to your agent's context**
+
+   How you do this depends on your AI tool:
+
+   - **Claude Desktop** — Add `SKILLS.md` as project knowledge
+   - **Claude Code** — Reference it from your `CLAUDE.md` file
+   - **Cursor** — Add it to your `.cursorrules` or project context
+   - **Other agents** — Include the file in your system prompt or knowledge base
+
+3. **Try an example prompt**
+
+   Ask your agent something like:
+
+   > "Check if I'm authenticated with Indigo, then show me the last 5 decisions from my meetings."
+
+   Your agent will run `indigo auth status --json`, check the result, then call `indigo signals list --type decision --limit 5 --json` — all without you specifying the commands.
+
+</Steps>
 
 ## Next steps
 
 <CardGrid>
-  <Card title="Getting started" icon="right-arrow">
-    Install the CLI and authenticate for the first time.
-    [Get started](/cli/getting-started/)
+  <Card title="Available skills" icon="right-arrow">
+    See what your agent can do with each command group — auth, signals, meetings, and workflows.
+    [Authentication](/cli/skills/authentication/)
   </Card>
-  <Card title="Automation" icon="right-arrow">
-    Build scripts and pipelines using CLI output.
-    [Automation guide](/cli/automation/)
+  <Card title="Multi-step workflows" icon="right-arrow">
+    Pre-built command chains for meeting prep, action tracking, and intelligence search.
+    [Workflows](/cli/skills/workflows/)
   </Card>
-  <Card title="MCP Server" icon="right-arrow">
-    Set up direct data access through the Model Context Protocol.
-    [MCP overview](/mcp/overview/)
+  <Card title="MCP overview" icon="right-arrow">
+    Give your agent direct database access as an alternative or complement to Skills.
+    [MCP server](/mcp/overview/)
+  </Card>
+  <Card title="CLI commands" icon="right-arrow">
+    Full reference for every Indigo CLI command.
+    [Commands](/cli/commands/auth/)
   </Card>
 </CardGrid>
