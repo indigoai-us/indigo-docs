@@ -1,54 +1,39 @@
 ---
 title: Roadmap Overview
-description: Current status of HQ development and priority order for upcoming work.
+description: What has shipped across the HQ ecosystem and the forward priorities per product.
 ---
 
 ## Current Status
 
-HQ has **shipped**. The original `indigoai-us/hq` monorepo has been split into individual repos (the monorepo is archived), and the install flow works end-to-end via `npx create-hq`.
+HQ has **shipped**. It now runs as a split ecosystem of independently versioned repos (see the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/)), installed end-to-end via `npx create-hq` and synced through the cloud engine and the menubar app.
 
-| Component | Status |
-|-----------|--------|
-| create-hq (installer) | ✅ Shipped — `npx create-hq` |
-| @indigoai-us/hq-cli | ✅ Shipped |
-| @indigoai-us/hq-cloud | ✅ Shipped — bidirectional cloud sync |
-| AWS infrastructure | ✅ Deployed |
+| Product | Status |
+|---------|--------|
+| hq-core (`npx create-hq` scaffold) | ✅ Shipped — `hqVersion 12.x` |
+| `@indigoai-us/hq-cli` | ✅ Shipped — the `hq` CLI (5.x) |
+| `@indigoai-us/hq-cloud` | ✅ Shipped — bidirectional S3 sync engine |
+| hq-sync (menubar app) | ✅ Shipped — Tauri 2 desktop app with auto-update |
+| hq-console (admin UI) | ✅ Shipped — Next.js admin surface |
+| hq-deploy (artifact platform) | ✅ Shipped — subdomain hosting + deploy API |
+| hq-pro (vault + teams) | ✅ Shipped — vault, identity, team platform |
+| hq-packages (content packs) | ✅ Shipped — `hq install @indigoai-us/hq-pack-*` |
 | Documentation | ✅ Live on Vercel |
-| Template | ✅ Shipped (skills, workers, knowledge bases) |
 
-## Priority Order
+## Forward Priorities
 
-### Phase 1: v5 Launch (npm + GitHub)
+The launch checklist is done. Priorities now are per-product depth and the surfaces that are newest:
 
-Get packages published and the install flow working end-to-end. This is the critical path — nothing else matters until `npx create-hq` works.
+1. **Desktop sync polish (hq-sync)** — conflict-resolution UX, richer per-file progress, broader platform coverage.
+2. **Team platform depth (hq-pro + hq-console)** — membership management, usage visibility, and admin workflows.
+3. **Deploy platform hardening (hq-deploy)** — SSR flows, custom domains, enterprise init.
+4. **Content-pack ecosystem (hq-packages)** — more first-party packs and a smoother authoring/install loop.
+5. **Capability coverage (hq-secrets, hq-share)** — documentation and ergonomics for the CLI capability surfaces.
 
-### Phase 2: Cloud Sync GA
-
-Deploy AWS infrastructure, enable auth flow, stress-test the sync daemon. This unlocks mobile access.
-
-### Phase 3: PWA Improvements
-
-Offline support, push notifications, inline editing. Make the mobile experience production-grade.
-
-### Phase 4: Future
-
-Homebrew tap, worker marketplace, team features, real-time collaboration.
-
-## Timeline
-
-This is a small team project. No hard deadlines — quality over speed.
-
-- **Phase 1**: Target completion in 1-2 weeks
-- **Phase 2**: Target completion in 3-4 weeks
-- **Phase 3**: Ongoing improvements
-- **Phase 4**: Long-term vision
+> Effort is sized by scope and risk, not by calendar dates. HQ runs at agent velocity with many concurrent sessions, so "how long" is better expressed as sessions of work than weeks.
 
 ## How to Read This Section
 
-Each page in this section is a **specification** with acceptance criteria. They're designed to be executable by AI workers via the Ralph methodology — feed a spec to `/execute-task` and the worker implements it.
-
-Pages:
-- **v5 Launch** — npm org, first publish, template verification
-- **Cloud Sync GA** — AWS deployment, auth E2E, daemon testing
-- **PWA Improvements** — Offline, notifications, editor, responsive
-- **Future** — Longer-term vision and ideas
+- **[Shipped & Next](/hq/roadmap/2-shipped-and-next/)** — what the split launch delivered and the near-term per-product priorities.
+- **[Cloud Sync GA](/hq/roadmap/3-cloud-sync-ga/)** — the cloud sync rollout.
+- **[PWA Improvements](/hq/roadmap/4-pwa-improvements/)** — mobile/PWA enhancements.
+- **[Future](/hq/roadmap/5-future/)** — longer-term vision and ideas.
