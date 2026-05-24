@@ -43,6 +43,20 @@ export default defineConfig({
           autogenerate: { directory: "hq/guide" },
         },
         {
+          label: "Products",
+          items: [
+            { label: "hq-core", link: "/hq/products/hq-core/" },
+            { label: "hq-cli", link: "/hq/products/hq-cli/" },
+            { label: "hq-cloud", link: "/hq/products/hq-cloud/" },
+            { label: "hq-sync", link: "/hq/products/hq-sync/" },
+            { label: "hq-console", link: "/hq/products/hq-console/" },
+            { label: "hq-deploy", autogenerate: { directory: "hq/products/hq-deploy" } },
+            { label: "hq-pro", autogenerate: { directory: "hq/products/hq-pro" } },
+            { label: "hq-packages", autogenerate: { directory: "hq/products/hq-packages" } },
+            { label: "Capabilities", autogenerate: { directory: "hq/products/capabilities" } },
+          ],
+        },
+        {
           label: "Architecture",
           autogenerate: { directory: "hq/architecture" },
         },
