@@ -5,17 +5,16 @@ description: Current status of HQ development and priority order for upcoming wo
 
 ## Current Status
 
-HQ v5.0.0 is **built but not yet published**. The monorepo at `indigoai-us/hq` contains:
+HQ has **shipped**. The original `indigoai-us/hq` monorepo has been split into individual repos (the monorepo is archived), and the install flow works end-to-end via `npx create-hq`.
 
 | Component | Status |
 |-----------|--------|
-| create-hq (installer) | ✅ Built, not published to npm |
-| @indigoai/hq-cli | ✅ Built, not published to npm |
-| @indigoai/hq-cloud | ✅ Built, not published to npm |
-| PWA dashboard | ✅ Built, not deployed |
-| AWS infrastructure | ✅ Defined, not deployed |
-| Documentation | ✅ Built, deploying to Vercel |
-| Template | ✅ Complete (17 commands, 26 workers, 8 knowledge bases) |
+| create-hq (installer) | ✅ Shipped — `npx create-hq` |
+| @indigoai-us/hq-cli | ✅ Shipped |
+| @indigoai-us/hq-cloud | ✅ Shipped — bidirectional cloud sync |
+| AWS infrastructure | ✅ Deployed |
+| Documentation | ✅ Live on Vercel |
+| Template | ✅ Shipped (skills, workers, knowledge bases) |
 
 ## Priority Order
 

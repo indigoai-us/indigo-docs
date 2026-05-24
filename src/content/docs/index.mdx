@@ -1,29 +1,27 @@
 ---
 title: Welcome
-description: Documentation for Indigo Desktop, Indigo CLI, and Indigo HQ.
+description: Documentation for Indigo HQ — the OS for AI workers.
 ---
 
-Indigo is the Executive Intelligence OS. These docs cover all three products.
+Indigo HQ is the operating system for AI workers — a shared context layer over Claude Code, Cursor, and Codex that syncs knowledge, skills, policies, and capabilities across your team. It scales from a solo builder to an enterprise.
 
-## Products
-
-| Product | Description | Install |
-|---------|-------------|---------|
-| [Indigo Desktop](/desktop/overview/) | Native macOS & Windows app for real-time meeting intelligence | [getindigo.ai](https://getindigo.ai) |
-| [Indigo CLI](/cli/overview/) | Terminal access to signals, meetings, and config | `npm install -g indigo-cli` |
-| [Indigo HQ](/hq/guide/1-what-is-hq/) | Personal OS for AI workers with cloud sync | `npx create-hq` |
-
-## Quick start
+## Get started
 
 ```bash
-# Desktop — download from getindigo.ai
-
-# CLI
-npm install -g indigo-cli
-indigo auth login
-
-# HQ
 npx create-hq
 cd hq && claude
 /setup
 ```
+
+Then dive into the docs:
+
+- [What is HQ?](/hq/guide/1-what-is-hq/) — the product, the model, and why it exists.
+- [Getting started](/hq/guide/2-getting-started/) — install, set up, and run your first session.
+- [Core concepts](/hq/guide/3-core-concepts/) — companies, workers, knowledge, policies, projects.
+- [Architecture](/hq/architecture/1-overview/) — how HQ is built under the hood.
+
+For a high-level tour of the broader HQ platform, see the [HQ Platform docs](https://github.com/indigoai-us).
+
+## Meetings & signals
+
+Meeting intelligence and signals now live inside HQ as company skills and a synced signals store, surfaced through the `hq` CLI and HQ workers. This capability is being rebuilt on HQ — documentation will return here once it ships.
