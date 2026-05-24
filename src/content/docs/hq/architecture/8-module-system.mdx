@@ -5,6 +5,8 @@ description: How HQ manages knowledge bases, workers, and shared content through
 
 HQ uses a module system to manage external knowledge bases, worker definitions, and shared content. Each module maps a git repository (or a subdirectory within one) to one or more targets inside the HQ directory. A declarative manifest defines what modules exist, and a lock file pins them to specific commits for reproducible syncs.
 
+> The module system is how the split repos of the [HQ ecosystem](/hq/architecture/2-ecosystem/) and external knowledge plug into a single instance.
+
 ## Manifest
 
 The module manifest lives at `modules/modules.yaml` in the HQ root. It declares every module, its source repository, sync strategy, and where it should appear in the local directory tree.
