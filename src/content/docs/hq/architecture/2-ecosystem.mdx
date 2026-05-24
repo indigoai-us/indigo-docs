@@ -53,7 +53,7 @@ graph TD
 - **The CLI owns sync; the engine does the work.** `hq-cli` depends on `@indigoai-us/hq-cloud` and lazily imports it only when a `hq sync` subcommand runs. `hq-cloud` ships a `hq-sync-runner` binary that emits ndjson sync events.
 - **The menubar app is a GUI over the same engine.** `hq-sync` (Tauri 2) spawns `hq-sync-runner` and renders its progress events. It is distinct from the engine itself — see [hq-sync](/hq/products/hq-sync/) and [hq-cloud](/hq/products/hq-cloud/).
 - **One identity, many apps.** `hq-pro` provisions the shared Cognito pool and the vault. `hq-console` authenticates against it (NextAuth/OIDC) and `hq-deploy` trusts JWTs minted by it — neither owns its own user store.
-- **Capabilities install as packs.** Rich add-ons (design styles, Slack bots, etc.) live in `hq-packages` and install via `hq install @indigoai-us/hq-pack-*` — see [hq-packages](/hq/products/hq-packages/).
+- **Capabilities install as packs.** Rich add-ons (design styles, Slack bots, etc.) live in `hq-packages` and install via `hq install @indigoai-us/hq-pack-*` — see [hq-packages](/hq/products/hq-packages/overview/).
 
 ## Versioning
 

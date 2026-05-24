@@ -13,7 +13,7 @@ A brand-new Mac user can double-click `hq-installer.dmg` and reach a working HQ 
 - **HQ power users** who want a faster onboarding than `npx create-hq`.
 - **Indigo sales** as a trust artifact — a signed binary users can run without warning dialogs.
 
-HQ power users who prefer the CLI can still use [create-hq](/create-hq/overview/). Both paths produce the same final directory layout; a nightly regression gate diffs the two to keep them aligned.
+HQ power users who prefer the CLI can still use [create-hq](/hq/products/hq-core/). Both paths produce the same final directory layout; a nightly regression gate diffs the two to keep them aligned.
 
 ## What It Does
 

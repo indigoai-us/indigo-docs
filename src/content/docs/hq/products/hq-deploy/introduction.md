@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-> Part of the split [HQ ecosystem](/hq/architecture/2-ecosystem/). HQ Deploy is the `hq-deploy` data plane; deployments are visible in the [hq-console](/hq/products/hq-console/) admin UI, and it trusts the shared identity provisioned by [hq-pro](/hq/products/hq-pro/).
+> Part of the split [HQ ecosystem](/hq/architecture/2-ecosystem/). HQ Deploy is the `hq-deploy` data plane; deployments are visible in the [hq-console](/hq/products/hq-console/) admin UI, and it trusts the shared identity provisioned by [hq-pro](/hq/products/hq-pro/about/).
 
 HQ Deploy is a **platform-as-a-service** built on AWS that lets you deploy web applications with a single CLI command. It supports both static sites (S3 + CloudFront) and server-rendered apps (ECS Fargate + ALB).
 

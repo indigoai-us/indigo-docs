@@ -8,7 +8,7 @@ description: The HQ Console — a Next.js 15 admin UI for HQ deployments, teams,
 ## What it is
 
 - A **Next.js 15 / React 19** application styled with Tailwind v4.
-- Authenticated with **NextAuth v5** via OIDC against the shared AWS Cognito identity pool (the same pool provisioned by [hq-pro](/hq/products/hq-pro/)) — the console does **not** run its own user store.
+- Authenticated with **NextAuth v5** via OIDC against the shared AWS Cognito identity pool (the same pool provisioned by [hq-pro](/hq/products/hq-pro/about/)) — the console does **not** run its own user store.
 - Uses AWS SDK v3 (Cognito, S3, Secrets Manager, STS) and recharts for usage visualizations.
 
 ## Who uses it
@@ -17,8 +17,8 @@ Administrators and team owners. The console is the human-facing window into the 
 
 ## Key surfaces
 
-- **Deployments** — visibility into HQ web-artifact deploys managed by [hq-deploy](/hq/products/hq-deploy/).
-- **Team** — membership and team administration backed by the [hq-pro](/hq/products/hq-pro/) team platform, including the invite-acceptance flow (`/invite/[token]` → `/api/invites/claim`).
+- **Deployments** — visibility into HQ web-artifact deploys managed by [hq-deploy](/hq/products/hq-deploy/introduction/).
+- **Team** — membership and team administration backed by the [hq-pro](/hq/products/hq-pro/about/) team platform, including the invite-acceptance flow (`/invite/[token]` → `/api/invites/claim`).
 - **Usage** — usage and activity charts.
 
 ## How it relates to the rest of the ecosystem
@@ -30,7 +30,7 @@ graph TD
     pro -->|provisions identity| console
 ```
 
-The console is a **read/manage surface** over capabilities owned elsewhere: identity, vault, and teams live in [hq-pro](/hq/products/hq-pro/); artifact hosting lives in [hq-deploy](/hq/products/hq-deploy/). It composes them into one admin experience rather than implementing them itself.
+The console is a **read/manage surface** over capabilities owned elsewhere: identity, vault, and teams live in [hq-pro](/hq/products/hq-pro/about/); artifact hosting lives in [hq-deploy](/hq/products/hq-deploy/introduction/). It composes them into one admin experience rather than implementing them itself.
 
 ## Operational notes
 

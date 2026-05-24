@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-> Part of the split [HQ ecosystem](/hq/architecture/2-ecosystem/). HQ Pro is the cloud backend that the [hq-console](/hq/products/hq-console/) admin UI and the [hq-deploy](/hq/products/hq-deploy/) data plane both build on.
+> Part of the split [HQ ecosystem](/hq/architecture/2-ecosystem/). HQ Pro is the cloud backend that the [hq-console](/hq/products/hq-console/) admin UI and the [hq-deploy](/hq/products/hq-deploy/introduction/) data plane both build on.
 
 **HQ Pro** is the team and identity backend for HQ. It provisions the shared identity, stores secrets and files in an encrypted vault, and runs the team platform that turns a solo HQ into a multi-member organization. It is an SST v3 application on AWS.
 
