@@ -6,9 +6,9 @@ export default defineConfig({
   integrations: [
     starlight({
       plugins: [starlightClientMermaid()],
-      title: "Indigo Docs",
+      title: "Indigo HQ Docs",
       description:
-        "Documentation for Indigo Desktop, Indigo CLI, and Indigo HQ",
+        "Documentation for Indigo HQ — the OS for AI workers.",
       logo: {
         src: "./src/assets/logo.svg",
         replacesTitle: true,
@@ -35,70 +35,20 @@ export default defineConfig({
       customCss: ["./src/styles/custom.css"],
       sidebar: [
         {
-          label: "Indigo Desktop",
-          items: [
-            { slug: "desktop/overview" },
-            { slug: "desktop/getting-started" },
-            {
-              label: "Features",
-              items: [
-                { slug: "desktop/transcription" },
-                { slug: "desktop/decisions-and-actions" },
-                { slug: "desktop/ai-chat" },
-              ],
-            },
-            { slug: "desktop/pricing" },
-          ],
+          label: "Product Guide",
+          autogenerate: { directory: "hq/guide" },
         },
         {
-          label: "Indigo CLI",
-          items: [
-            { slug: "cli/overview" },
-            { slug: "cli/getting-started" },
-            {
-              label: "Commands",
-              items: [
-                { slug: "cli/commands/auth" },
-                { slug: "cli/commands/signals" },
-                { slug: "cli/commands/meetings" },
-                { slug: "cli/commands/config" },
-                { slug: "cli/commands/mcp" },
-              ],
-            },
-            { slug: "cli/automation" },
-          ],
+          label: "Architecture",
+          autogenerate: { directory: "hq/architecture" },
         },
         {
-          label: "MCP Server",
-          items: [
-            { slug: "mcp/overview" },
-            { slug: "mcp/collections" },
-            { slug: "mcp/tools" },
-            { slug: "mcp/queries" },
-            { slug: "mcp/use-cases" },
-            { slug: "mcp/troubleshooting" },
-          ],
+          label: "Development",
+          autogenerate: { directory: "hq/development" },
         },
         {
-          label: "Indigo HQ",
-          items: [
-            {
-              label: "Product Guide",
-              autogenerate: { directory: "hq/guide" },
-            },
-            {
-              label: "Architecture",
-              autogenerate: { directory: "hq/architecture" },
-            },
-            {
-              label: "Development",
-              autogenerate: { directory: "hq/development" },
-            },
-            {
-              label: "Roadmap",
-              autogenerate: { directory: "hq/roadmap" },
-            },
-          ],
+          label: "Roadmap",
+          autogenerate: { directory: "hq/roadmap" },
         },
       ],
     }),
