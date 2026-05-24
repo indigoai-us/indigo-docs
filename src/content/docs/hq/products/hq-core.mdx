@@ -1,0 +1,44 @@
+---
+title: hq-core
+description: The HQ scaffold and starter kit — the create-hq seed that bootstraps a new HQ instance.
+---
+
+**hq-core** is the HQ scaffold: the starter kit copied into a new HQ instance by `npx create-hq`. It is the seed that every HQ directory grows from.
+
+## What it is
+
+- The **create-hq scaffold** — distributed as a seed, not as an npm package. Its version is tracked as `hqVersion` in `core.yaml` (currently **12.x**).
+- Tagline: *"HQ by Indigo — Personal OS for AI Workers."* A minimal scaffold for orchestrating autonomous AI workers (execute / learn / scale / survive across sessions).
+- Ships **minimal on purpose** — rich capabilities install separately as `@indigoai-us/hq-pack-*` content packs.
+
+## Who uses it / when
+
+Anyone standing up a new HQ instance. You touch hq-core once at install time; afterward you operate the instance with the [`hq` CLI](/hq/products/hq-cli/) and upgrade with `/update-hq`.
+
+## Key flows
+
+```bash
+# scaffold a new HQ instance
+npx create-hq ~/my-hq
+
+# full vs minimal install
+npx create-hq ~/my-hq --full      # prompts to install recommended packs
+npx create-hq ~/my-hq --minimal   # bare scaffold
+```
+
+`create-hq` scaffolds the directory, runs `setup.sh`, and can install the recommended packs declared in `core.yaml`. Prerequisites: Claude Code and the GitHub CLI are required; qmd, Codex, the Vercel CLI, and ggshield are optional/recommended.
+
+### What the scaffold contains
+
+`core.yaml` defines the rule tiers (locked / reviewable / open) and recommended packages. The scaffold lays down the `.claude/` command + skill tree, `modules/`, `companies/`, and `workers/` — the structure the rest of the ecosystem plugs into via the [module system](/hq/architecture/8-module-system/).
+
+## Composition
+
+- The scaffold **seeds, it does not run** — after `npx create-hq`, hq-core has no runtime dependency on the other repos. Upgrades flow through `/update-hq`.
+- Capabilities arrive as packs — see [hq-packages](/hq/products/hq-packages/) and install them with `hq install`.
+
+## Related
+
+- [create-hq architecture](/hq/architecture/3-create-hq/) — the installer internals
+- [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/) — how the seed relates to the other repos
+- [hq-cli](/hq/products/hq-cli/) — the CLI you use after scaffolding
