@@ -1,105 +1,87 @@
 ---
 title: Publishing Packages
-description: npm publishing workflow for HQ packages, including manual and CI/CD approaches.
+description: Per-repo npm + release workflow for the HQ ecosystem packages.
 ---
 
-## npm Organization
+Each HQ package ships from its **own** repo on its **own** version — there is no shared version and no single tag that publishes everything. See the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/) for the full topology.
 
-All packages publish under the `@indigoai` npm scope (except `create-hq` which is unscoped for `npx` convenience).
+## npm organization
 
-| Package | npm Name | Scoped |
-|---------|----------|--------|
-| packages/create-hq | create-hq | No |
-| packages/hq-cli | @indigoai/hq-cli | Yes |
-| packages/hq-cloud | @indigoai/hq-cloud | Yes |
+The CLI and sync engine publish under the `@indigoai-us` npm scope. Content packs publish as `@indigoai-us/hq-pack-*`. The desktop and cloud apps are not npm packages — they release as a signed app or a cloud deploy.
+
+| Repo | Ships as | Scoped | Release mechanism |
+|------|----------|--------|-------------------|
+| hq-cli | `@indigoai-us/hq-cli` | Yes | `npm publish` from the repo |
+| hq-cloud | `@indigoai-us/hq-cloud` | Yes | `npm publish` from the repo |
+| hq-packages | `@indigoai-us/hq-pack-*` | Yes | `npm publish` per pack |
+| hq-core | `npx create-hq` scaffold | — | latest scaffold pulled by `create-hq` |
+| hq-sync | macOS app | — | `v*` tag → signed DMG + `latest.json` |
+| hq-console / hq-pro / hq-deploy | cloud apps | — | Vercel / SST deploy |
 
 ## Prerequisites
 
-- npm account with publish access to `@indigoai` org
-- `NPM_TOKEN` secret set in GitHub repo settings
-- Two-factor authentication enabled on npm account
+- npm account with publish access to the `@indigoai-us` org
+- `NPM_TOKEN` secret set in the target repo's GitHub settings
+- Two-factor authentication enabled on the npm account
 
-## Manual Publishing
+## Publishing an npm package (hq-cli, hq-cloud)
 
-### 1. Bump version
+Work in the relevant repo. Each is standalone — bump only that repo's version.
 
-All packages use unified versioning. Update version in all three package.json files:
-
-```bash
-# packages/create-hq/package.json
-# packages/hq-cli/package.json
-# packages/hq-cloud/package.json
-# Also update root package.json
-```
-
-### 2. Build
+### 1. Bump the version
 
 ```bash
-npm run build
+cd hq-cli           # or hq-cloud
+npm version patch   # or minor / major
 ```
 
-### 3. Publish (order matters)
+### 2. Build, typecheck, test
 
 ```bash
-cd packages/hq-cloud && npm publish --access public
-cd packages/hq-cli && npm publish --access public
-cd packages/create-hq && npm publish --access public
+npm run build && npm run typecheck && npm test
 ```
 
-hq-cloud first (hq-cli depends on it), then hq-cli, then create-hq.
+### 3. Publish
 
-## Automated Publishing (CI/CD)
+```bash
+npm publish --access public
+```
 
-The `publish.yml` workflow triggers on version tags:
+> **Dependency note:** `hq-cli` depends on a published `@indigoai-us/hq-cloud`. When a change spans both, publish `hq-cloud` first, then bump `hq-cli`'s dependency range and publish `hq-cli`.
+
+## Automated publishing (CI/CD)
+
+Each package repo has its own release workflow that triggers on a version tag pushed **in that repo**:
 
 ```yaml
-# Triggered by: git tag v5.0.0 && git push --tags
 on:
   push:
     tags: ['v*']
 ```
 
-Workflow steps:
+Typical steps: checkout → setup Node → `npm ci` → build → typecheck → `npm publish`. Because the repos are independent, a tag in `hq-cli` publishes only `hq-cli`; it never touches `hq-cloud` or the apps.
 
-1. Checkout code
-2. Setup Node.js 18 with npm registry
-3. `npm ci` — install all deps
-4. `npm run build` — build all packages
-5. `npm run typecheck` — verify types
-6. Publish hq-cloud → hq-cli → create-hq (in order)
+## Releasing the scaffold (hq-core)
 
-### Creating a release
+`hq-core` is the `create-hq` seed, not an npm package. Users always pull the latest scaffold via `npx create-hq`, so "releasing" means landing changes on the repo's main branch and bumping `hqVersion` in `core.yaml`. Existing instances upgrade with `/update-hq`.
 
 ```bash
-# After merging to main:
-git tag v5.1.0
-git push --tags
+# scaffold a throwaway instance to test changes
+npx create-hq ~/test-hq
 ```
 
-This triggers the publish workflow automatically.
+## Releasing the desktop app (hq-sync)
 
-## Template Bundling
+The menubar app releases by pushing a `v*` tag, which runs the sign/notarize/DMG workflow and publishes `latest.json` for auto-update. Bump the version in `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json` together before tagging.
 
-The `create-hq` package includes the `template/` directory in its published bundle. The package.json `files` field controls what's included:
+## Releasing a content pack (hq-packages)
 
-```json
-{
-  "files": ["dist", "template"]
-}
-```
+Each pack carries its own `version` in `package.yaml` and publishes as `@indigoai-us/hq-pack-<name>`. Users install with `hq install @indigoai-us/hq-pack-<name>` — see [hq-packages](/hq/products/hq-packages/).
 
-When users run `npx create-hq`, npm downloads the package including the template, and scaffold.ts copies it to their chosen directory.
+## Version strategy (per package)
 
-### Updating the template
+- **Major**: breaking changes to the package's interface
+- **Minor**: new features / commands
+- **Patch**: bug fixes, content updates
 
-1. Make changes in `template/` directory
-2. Test locally: `node packages/create-hq/dist/index.js ~/test-hq`
-3. Bump version and publish
-
-## Version Strategy
-
-- **Major**: Breaking changes to CLI interface or template structure
-- **Minor**: New features, new commands, new workers
-- **Patch**: Bug fixes, content updates, documentation
-
-All packages share the same version number for simplicity. A single `git tag` triggers publishing of all three packages.
+Each repo versions independently, so compatibility is expressed through dependency ranges (e.g. `hq-cli` declaring `@indigoai-us/hq-cloud` `~5.25.0`) rather than a shared release train.

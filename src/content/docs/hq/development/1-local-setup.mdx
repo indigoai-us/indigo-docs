@@ -1,104 +1,112 @@
 ---
 title: Local Setup
-description: Clone and run the HQ monorepo locally for development and testing.
+description: Clone and run the individual HQ ecosystem repos locally for development and testing.
 ---
+
+HQ is split across several independently versioned repos. There is no single clone — pick the repo for the surface you're working on. See the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/) for the full list.
 
 ## Prerequisites
 
-- **Node.js 18+**
-- **npm 9+** (ships with Node 18)
-- **Git**
-- **AWS CLI v2** — for infrastructure deployment (`infra/` stack)
-- **Claude Code CLI** — for template testing and worker development
+- **Node.js 20+** (the `hq-cli` repo requires Node ≥22)
+- **npm 9+** (ships with Node) or **pnpm 10** (used by `hq-console` / `hq-pro`)
+- **Git** and the **GitHub CLI** (`gh`)
+- **Claude Code CLI** — for scaffold/worker development
+- **Rust toolchain** — only if you're building the `hq-sync` desktop app
+- **AWS CLI v2** — only for the cloud apps (`hq-pro`, `hq-deploy`)
 - **qmd** — for search testing (`brew install tobi/tap/qmd`)
 
-## Clone & Install
+## Clone the repo you need
+
+Each repo stands alone — clone just the one you're working on.
 
 ```bash
-git clone https://github.com/indigoai-us/hq.git
-cd hq
-npm ci
+# the hq CLI
+gh repo clone indigoai-us/hq-cli && cd hq-cli && npm ci
+
+# the sync engine
+gh repo clone indigoai-us/hq-cloud && cd hq-cloud && npm ci
+
+# the scaffold / starter kit
+gh repo clone indigoai-us/hq-core && cd hq-core
+
+# the menubar app
+gh repo clone indigoai-us/hq-sync && cd hq-sync && npm ci
 ```
 
-`npm ci` installs all workspaces automatically via the root `package.json` workspaces config.
+## Build & typecheck
 
-## Build All Packages
+Inside a TypeScript package repo (e.g. `hq-cli`, `hq-cloud`):
 
 ```bash
-npm run build
+npm run build       # tsc → dist/
+npm run typecheck   # tsc --noEmit
+npm test            # Vitest
 ```
 
-This runs `npm run build --workspaces --if-present` — builds `create-hq`, `hq-cli`, `hq-cloud`, `web`, and `docs`.
+`hq-cli` depends on the published `@indigoai-us/hq-cloud`. To develop the two together, use `npm link` (or an `overrides`/`file:` reference) to point `hq-cli` at your local `hq-cloud` checkout rather than the npm version.
 
-Build order matters: `hq-cloud` must build before `hq-cli` (dependency). npm workspaces handles this automatically.
+## Run individual surfaces
 
-## Typecheck
-
-```bash
-npm run typecheck
-```
-
-## Run Individual Packages
-
-### create-hq (test installer)
+### hq-cli (the `hq` command)
 
 ```bash
-cd packages/create-hq
-npm run build
-node dist/index.js ~/test-hq
-```
-
-### hq-cli (test CLI)
-
-```bash
-cd packages/hq-cli
+cd hq-cli
 npm run build
 node dist/index.js modules list
 ```
 
 ### hq-cloud (library — no standalone run)
 
-Build only. Consumed by `hq-cli`.
+Build only; consumed by `hq-cli` and driven by the `hq-sync` app via its `hq-sync-runner` binary.
 
-### PWA (dev server)
-
-```bash
-npm run dev --workspace apps/web
-# Opens at http://localhost:5173
-```
-
-Requires API backend running (or use mock). Set environment variables:
-
-- `VITE_API_URL` — API Gateway endpoint
-- `VITE_USER_POOL_ID` — Cognito user pool ID
-- `VITE_USER_POOL_CLIENT_ID` — Cognito client ID
-
-### Docs (dev server)
+### hq-core (test the scaffold)
 
 ```bash
-npm run dev --workspace apps/docs
-# Opens at http://localhost:4321
+# from anywhere, scaffold a throwaway HQ instance
+npx create-hq ~/test-hq
 ```
 
-## Environment Variables
+### hq-sync (desktop dev)
 
-| Variable | Package | Description |
-|----------|---------|-------------|
-| `VITE_API_URL` | `apps/web` | API Gateway endpoint URL |
-| `VITE_USER_POOL_ID` | `apps/web` | Cognito User Pool ID |
-| `VITE_USER_POOL_CLIENT_ID` | `apps/web` | Cognito Client ID |
-| `AWS_PROFILE` | `infra` | AWS credentials profile |
-| `AWS_REGION` | `infra` | AWS region (default: `us-east-1`) |
+```bash
+cd hq-sync
+npm run tauri dev   # launches the menubar app with HMR
+```
 
-Create `.env` files locally (they are gitignored).
+### hq-console / hq-pro / hq-deploy (cloud apps)
 
-## Project Structure Reference
+```bash
+cd hq-console && pnpm dev      # Next.js admin UI on :3400
+cd hq-pro && pnpm sst dev      # SST dev against your AWS stage
+cd hq-deploy && npm run dev    # Hono API via tsx watch
+```
 
-| Workspace | Path | Purpose | Dev Command | Build Output |
-|-----------|------|---------|-------------|--------------|
-| `create-hq` | `packages/create-hq` | Project scaffolder / installer | — | `dist/` |
-| `hq-cli` | `packages/hq-cli` | CLI for modules, sync, cloud | — | `dist/` |
-| `hq-cloud` | `packages/hq-cloud` | Cloud SDK (library) | — | `dist/` |
-| `web` | `apps/web` | PWA dashboard | `npm run dev --workspace apps/web` | `dist/` |
-| `docs` | `apps/docs` | Documentation site (Starlight) | `npm run dev --workspace apps/docs` | `dist/` |
-| `infra` | `infra/` | AWS CDK infrastructure | — | `cdk.out/` |
+### This docs site (indigo-docs)
+
+```bash
+gh repo clone indigoai-us/indigo-docs && cd indigo-docs && npm ci
+npm run dev   # Starlight on http://localhost:4321
+```
+
+## Environment variables
+
+Each repo declares its own config. The cloud apps read AWS + Cognito settings; the desktop and CLI tools read sync credentials provisioned by `hq-pro`. Create `.env` files locally (they are gitignored), or use `hq run` / `hq secrets exec` to inject schema-defined secrets without printing them.
+
+| Variable | Repo | Description |
+|----------|------|-------------|
+| `AWS_PROFILE` | hq-pro, hq-deploy | AWS credentials profile |
+| `AWS_REGION` | hq-pro, hq-deploy | AWS region (default: `us-east-1`) |
+| `NEXTAUTH_*` / Cognito IDs | hq-console | OIDC against the shared identity pool |
+
+## Repo reference
+
+| Repo | Ships as | Dev command | Build output |
+|------|----------|-------------|--------------|
+| `hq-core` | `npx create-hq` scaffold | — | scaffold seed |
+| `hq-cli` | `@indigoai-us/hq-cli` | `npm run build` | `dist/` |
+| `hq-cloud` | `@indigoai-us/hq-cloud` | `npm run build` | `dist/` |
+| `hq-sync` | macOS app | `npm run tauri dev` | DMG / `latest.json` |
+| `hq-console` | Next.js app | `pnpm dev` | `.next/` |
+| `hq-pro` | SST app | `pnpm sst dev` | SST stack |
+| `hq-deploy` | AWS data plane | `npm run dev` | Lambda bundle |
+| `indigo-docs` | this site | `npm run dev` | `dist/` (Astro) |

@@ -1,13 +1,15 @@
 ---
 title: Contributing
-description: Contribution guidelines for the HQ monorepo — how to fork, branch, commit, and submit pull requests.
+description: Contribution guidelines for the HQ ecosystem repos — how to fork, branch, commit, and submit pull requests.
 ---
 
 ## Getting Started
 
-1. Fork the repo: `gh repo fork indigoai-us/hq`
-2. Clone your fork: `git clone https://github.com/YOUR-USERNAME/hq.git`
-3. Install dependencies: `npm ci`
+HQ is split across several repos (see the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/)). Contribute to the specific repo that owns the surface you're changing — e.g. `indigoai-us/hq-cli` for the CLI, `indigoai-us/hq-core` for the scaffold, `indigoai-us/hq-cloud` for the sync engine.
+
+1. Fork the target repo: `gh repo fork indigoai-us/hq-cli` (or `hq-core`, `hq-cloud`, …)
+2. Clone your fork and `cd` into it
+3. Install dependencies: `npm ci` (or `pnpm install` for `hq-console` / `hq-pro`)
 4. Build: `npm run build`
 5. Create a branch: `git checkout -b feature/my-feature`
 
@@ -24,22 +26,22 @@ description: Contribution guidelines for the HQ monorepo — how to fork, branch
 
 ### Code changes
 
-1. Make changes in the appropriate package under `packages/` or `apps/`
-2. Build the affected package: `npm run build --workspace packages/hq-cloud`
+1. Make changes inside the repo that owns the surface (e.g. `hq-cli`, `hq-cloud`)
+2. Build it: `npm run build`
 3. Run typecheck: `npm run typecheck`
 4. Test your changes locally (see Testing guide)
-5. Commit with clear, descriptive message
+5. Commit with a clear, descriptive message
 
-### Template changes
+### Scaffold changes (hq-core)
 
-1. Edit files in `template/`
-2. Test by running the installer locally: `node packages/create-hq/dist/index.js ~/test-hq`
+1. Edit the scaffold seed in the `hq-core` repo
+2. Test by scaffolding a throwaway instance: `npx create-hq ~/test-hq`
 3. Verify the change works in a fresh HQ instance
 
-### Documentation changes
+### Documentation changes (this site)
 
-1. Edit MDX files in `apps/docs/src/content/docs/`
-2. Preview locally: `npm run dev --workspace apps/docs`
+1. Edit MDX files in `indigo-docs` under `src/content/docs/`
+2. Preview locally: `npm run dev`
 3. Verify at http://localhost:4321
 
 ## Commit Messages
