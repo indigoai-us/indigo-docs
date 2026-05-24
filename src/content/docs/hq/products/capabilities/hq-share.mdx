@@ -1,0 +1,68 @@
+---
+title: hq-share
+description: Mint single-use share-session links for HQ vault paths — a browser ACL picker that grants multiple recipients per-recipient read/write in one batch.
+sidebar:
+  order: 2
+---
+
+> **hq-share is a capability of the [`hq` CLI](/hq/products/hq-cli/), not a standalone repo.** It grants access to prefixes in the [hq-pro](/hq/products/hq-pro/) vault.
+
+**hq-share** mints an encrypted, single-use **share-session link** for one or more HQ vault prefixes. The CLI opens a share-session page in your browser where you pick recipients (members, groups, or "Share with All") with per-recipient read/write, then submits every grant in one round-trip.
+
+## Usage
+
+```
+/hq-share <path>... [--company <slug>] [--no-open]
+```
+
+```bash
+/hq-share reports/q3/
+/hq-share reports/q3/ docs/handbook/ --company indigo
+/hq-share announcements/ --no-open      # print URL only (headless contexts)
+```
+
+Under the hood this runs `hq files share <paths...>`, which mints the token and opens the picker.
+
+## How it works
+
+1. **Auth check** — requires a signed-in session (`~/.hq/cognito-tokens.json`); run sign-in first if absent.
+2. **Confirm scope** — the resolved paths and company are echoed back before minting, because granting on the wrong company is hard to undo.
+3. **Mint + open** — the CLI prints the share-session URL, the normalized paths, and an `Expires:` timestamp, and opens the picker page.
+4. **Pick recipients** — choose members/groups/"Share with All" and per-recipient `read`/`write`; all grants submit in one batch.
+
+Default token TTL is **15 minutes** (bounded 60s–7d).
+
+## Single-use capability URLs
+
+A share-session URL is a live, encrypted, **single-use** capability: any holder can redeem it to write ACLs in the issuer's name. Handle it accordingly:
+
+- At mint time it is surfaced **once**, only as a Markdown inline link whose label carries purpose + expiry and whose href carries the token — never as bare visible text.
+- It is **never** echoed again in any later turn, summary, commit message, PR body, journal, or other persisted artifact. Everywhere after minting, use the redacted form `https://hq.{co}.com/share-session/<TOKEN_REDACTED>`.
+- Tokens are single-use — if a recipient hits `expired` (403) or `nonce_already_claimed` (409), mint a fresh link rather than extending the old one.
+
+> This page intentionally shows only the redacted placeholder. Real share-session tokens never appear in documentation.
+
+## Direct grants vs. the browser flow
+
+For a single recipient or scripted grants, prefer the direct form:
+
+```bash
+hq files share <prefix> --with <principal> --permission <read|write>
+hq files share <prefix> --with @all --permission read   # company-wide
+```
+
+The browser flow is the better fit when granting **multiple** recipients at once. Widening anyone to `write` is a privilege escalation — confirm with a human first.
+
+## Who can mint
+
+Owners and admins resolve to `admin` on any prefix and can always mint. Members and guests need an explicit grant on each requested path, or the server returns `403 Forbidden`. A mint failure for an admin usually means a stale auth session — re-authenticate before assuming a permission gap.
+
+## Requires
+
+`@indigoai-us/hq-cli` ≥ 5.12.x for the batch browser flow. Check `hq --version`.
+
+## Related
+
+- [hq-cli](/hq/products/hq-cli/) — the CLI that ships this capability
+- [hq-pro](/hq/products/hq-pro/) — the vault whose prefixes you're sharing
+- [hq-secrets](/hq/products/capabilities/hq-secrets/) — schema-driven secret access
