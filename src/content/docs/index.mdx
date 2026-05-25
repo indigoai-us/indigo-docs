@@ -1,9 +1,13 @@
 ---
 title: Welcome
-description: Documentation for Indigo HQ — the OS for AI workers.
+description: Documentation for Indigo HQ — the OS for AI workers and its product ecosystem.
 ---
 
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
 Indigo HQ is the operating system for AI workers — a shared context layer over Claude Code, Cursor, and Codex that syncs knowledge, skills, policies, and capabilities across your team. It scales from a solo builder to an enterprise.
+
+HQ ships as a **split ecosystem** of independently versioned products rather than one combined repository. This site is the comprehensive user + technical reference for all of them. For how they compose, see the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/).
 
 ## Get started
 
@@ -13,14 +17,37 @@ cd hq && claude
 /setup
 ```
 
-Then dive into the docs:
-
 - [What is HQ?](/hq/guide/1-what-is-hq/) — the product, the model, and why it exists.
 - [Getting started](/hq/guide/2-getting-started/) — install, set up, and run your first session.
 - [Core concepts](/hq/guide/3-core-concepts/) — companies, workers, knowledge, policies, projects.
-- [Architecture](/hq/architecture/1-overview/) — how HQ is built under the hood.
 
-For a high-level tour of the broader HQ platform, see the [HQ Platform docs](https://github.com/indigoai-us).
+## The HQ ecosystem
+
+<CardGrid>
+  <LinkCard title="hq-core" href="/hq/products/hq-core/" description="The create-hq scaffold — the starter kit that seeds a new HQ instance." />
+  <LinkCard title="hq-cli" href="/hq/products/hq-cli/" description="The hq command — module management and cloud sync from the terminal." />
+  <LinkCard title="hq-cloud" href="/hq/products/hq-cloud/" description="The bidirectional S3 sync engine behind the CLI and the menubar app." />
+  <LinkCard title="hq-sync" href="/hq/products/hq-sync/" description="The macOS menubar app — a GUI over sync for non-technical users." />
+  <LinkCard title="hq-console" href="/hq/products/hq-console/" description="The Next.js admin UI for deployments, teams, and usage." />
+  <LinkCard title="hq-deploy" href="/hq/products/hq-deploy/introduction/" description="A PaaS for deploying static and SSR web apps to AWS." />
+  <LinkCard title="hq-pro" href="/hq/products/hq-pro/about/" description="The vault, team platform, and shared Cognito identity." />
+  <LinkCard title="hq-packages" href="/hq/products/hq-packages/overview/" description="Content packs installed into any HQ instance via hq install." />
+</CardGrid>
+
+### Capabilities
+
+<CardGrid>
+  <LinkCard title="hq-secrets" href="/hq/products/capabilities/hq-secrets/" description="Schema-driven secret access — inject secrets into commands without ever printing them." />
+  <LinkCard title="hq-share" href="/hq/products/capabilities/hq-share/" description="Single-use vault share-session links with a browser ACL picker." />
+</CardGrid>
+
+## Architecture & development
+
+- [Architecture](/hq/architecture/1-overview/) — how HQ is built under the hood.
+- [Development](/hq/development/1-local-setup/) — clone and run the individual repos.
+- [Roadmap](/hq/roadmap/1-overview/) — what's shipped and what's next.
+
+For the basic-user quickstart, see the [HQ quickstart site](https://github.com/indigoai-us). This site is the comprehensive reference.
 
 ## Meetings & signals
 

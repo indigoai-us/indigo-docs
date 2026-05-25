@@ -1,35 +1,32 @@
 ---
 title: Architecture Overview
-description: System architecture of the HQ monorepo — package graph, data flow, infrastructure, and technology choices.
+description: System architecture of the HQ ecosystem — the split repos, data flow, infrastructure, and technology choices.
 ---
 
 ## System Architecture
 
-HQ is a monorepo that ships five packages, a documentation site, and cloud infrastructure. The user interacts with HQ through Claude Code locally, and optionally through a PWA dashboard on mobile. Cloud sync bridges the two.
+HQ ships as a set of independently versioned repos — a CLI, a cloud sync engine, a scaffold, desktop and admin apps, and shared cloud infrastructure — rather than one combined repository. The user interacts with HQ through Claude Code locally, and optionally through a desktop menubar app and an admin console. Cloud sync bridges local and cloud. See the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/) for how the repos compose.
 
 ```mermaid
 graph TD
-    subgraph repo["indigoai-us/hq monorepo"]
+    subgraph local["Local + distribution"]
         direction TB
-        subgraph packages["packages/"]
-            createhq["create-hq"]
-            hqcli["hq-cli"]
-            hqcloud["hq-cloud"]
-        end
-        subgraph apps["apps/"]
-            web["web (PWA)"]
-            docs["docs"]
-        end
-        subgraph infra["infra/"]
-            sst["SST stack<br/>AWS infra"]
-        end
-        subgraph template["template/"]
-            starter["HQ starter kit<br/>copied on install"]
-        end
+        createhq["create-hq scaffold<br/>(hq-core)"]
+        hqcli["hq-cli<br/>(the hq CLI)"]
+        hqcloud["hq-cloud<br/>(sync engine)"]
+        hqsync["hq-sync<br/>(menubar app)"]
+        hqcli -->|imports| hqcloud
+        hqsync -->|drives| hqcloud
     end
-    packages --> npm["npm registry"]
-    apps --> hosting["Vercel / static host"]
-    infra --> aws["AWS<br/>Cognito + S3 + API Gateway<br/>Lambda + CloudFront"]
+    subgraph cloudapps["Cloud apps"]
+        console["hq-console<br/>(admin UI)"]
+        deploy["hq-deploy<br/>(artifact deploys)"]
+        pro["hq-pro<br/>(vault + teams)"]
+    end
+    createhq --> npm["npm / GitHub Releases"]
+    hqcli --> npm
+    cloudapps --> aws["AWS<br/>Cognito + S3 + CloudFront<br/>Lambda + API Gateway"]
+    hqcloud --> aws
 ```
 
 ### Runtime Flow
@@ -99,7 +96,7 @@ Sync is selective — only workspace state, reports, and social drafts are synce
 
 ### 5. Mobile
 
-The PWA dashboard (`apps/web`) provides read access to:
+The PWA dashboard provides read access to:
 - Active threads and checkpoints
 - Reports and social drafts
 - Worker status and project progress
@@ -107,34 +104,38 @@ The PWA dashboard (`apps/web`) provides read access to:
 
 Authentication flows through AWS Cognito. Content is served from S3 via CloudFront.
 
-## Package Graph
+## Repo Graph
+
+Each surface is its own repo and ships on its own cadence. For the full breakdown, see the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/).
 
 ```mermaid
 graph TD
-    subgraph ws["npm workspaces"]
-        createhq["create-hq<br/><i>npx create-hq</i><br/>One-time installer<br/>Copies template/, runs setup"]
-        hqcli["hq-cli<br/><i>@indigoai/hq-cli</i><br/>Ongoing management"]
-        hqcloud["hq-cloud<br/><i>@indigoai/hq-cloud</i><br/>S3 sync engine"]
-        hqcli -->|imports| hqcloud
-        appsweb["apps/web<br/>PWA dashboard<br/>React 19, Vite"]
-        appsdocs["apps/docs<br/>Astro Starlight"]
-        infrabox["infra/<br/>SST (Serverless Stack)<br/>Cognito, S3 + CF,<br/>API GW, Lambda"]
-        templatebox["template/<br/>HQ starter kit<br/>CLAUDE.md, commands/,<br/>workers/, knowledge/"]
-    end
+    createhq["hq-core<br/><i>npx create-hq</i><br/>Scaffold / starter kit"]
+    hqcli["hq-cli<br/><i>@indigoai-us/hq-cli</i><br/>Ongoing management"]
+    hqcloud["hq-cloud<br/><i>@indigoai-us/hq-cloud</i><br/>S3 sync engine"]
+    hqsync["hq-sync<br/>Tauri menubar app"]
+    hqcli -->|imports| hqcloud
+    hqsync -->|spawns runner| hqcloud
+    console["hq-console<br/>Next.js admin UI"]
+    deploy["hq-deploy<br/>artifact data plane"]
+    pro["hq-pro<br/>vault + teams (SST)"]
+    packs["hq-packages<br/>@indigoai-us/hq-pack-*"]
+    console --> pro
+    deploy --> pro
 ```
 
 ### Dependency Direction
 
 ```mermaid
 graph LR
-    createhq["create-hq"] -->|"copies files at install"| template["template/"]
+    createhq["hq-core scaffold"] -->|"npx create-hq copies the seed"| inst["new HQ instance"]
     hqcli["hq-cli"] -->|"imports sync engine"| hqcloud["hq-cloud"]
-    appsweb["apps/web"] -->|"reads synced data via API"| hqcloud2["hq-cloud"]
-    infrabox["infra/"] --- standalone1["(standalone)"]
-    appsdocs["apps/docs"] --- standalone2["(standalone)"]
+    hqsync["hq-sync"] -->|"spawns hq-sync-runner"| hqcloud2["hq-cloud"]
+    console["hq-console"] -->|"trusts Cognito + APIs"| pro["hq-pro"]
+    deploy["hq-deploy"] -->|"trusts shared identity"| pro2["hq-pro"]
 ```
 
-Packages are loosely coupled. `create-hq` only touches `template/` at install time and has no runtime dependency on other packages. `hq-cli` is the primary user-facing package and depends on `hq-cloud` for sync operations.
+The repos are loosely coupled. `create-hq` only seeds a new instance at install time and has no runtime dependency on the others. `hq-cli` is the primary user-facing package and depends on `hq-cloud` for sync; the `hq-sync` menubar app drives the same engine by spawning its `hq-sync-runner`. The cloud apps (`hq-console`, `hq-deploy`) own no identity of their own — they trust the shared Cognito pool provisioned by `hq-pro`.
 
 ## Technology Stack
 
@@ -142,28 +143,37 @@ Packages are loosely coupled. `create-hq` only touches `template/` at install ti
 
 | Technology | Purpose | Rationale |
 |---|---|---|
-| **Node.js 18+** | Runtime | Universal JS runtime, native in Claude Code environments |
-| **TypeScript** | Language | Type safety across all packages, better IDE support |
-| **npm workspaces** | Monorepo | Zero-config workspace management, native to npm |
+| **Node.js 20+** | Runtime | Universal JS runtime, native in Claude Code environments (hq-cli requires Node ≥22) |
+| **TypeScript** | Language | Type safety across every repo, better IDE support |
+| **ESM + NodeNext** | Module system | Modern ESM conventions shared across the CLI and cloud packages |
 
-### Packages
+### CLI + sync packages
 
 | Technology | Package | Rationale |
 |---|---|---|
-| **Commander.js** | create-hq, hq-cli | Standard Node.js CLI framework |
+| **Commander.js** | hq-cli | Standard Node.js CLI framework |
 | **AWS SDK v3** | hq-cloud | Modular AWS client, tree-shakeable |
 | **zod** | hq-cli, hq-cloud | Runtime schema validation for configs |
+| **chokidar** | hq-cloud | File-change detection for sync |
 
-### Frontend (apps/web)
+### Desktop (hq-sync)
 
 | Technology | Purpose | Rationale |
 |---|---|---|
-| **React 19** | UI framework | Latest React with concurrent features |
-| **Vite** | Build tool | Fast HMR, native ESM, minimal config |
-| **Tailwind CSS** | Styling | Utility-first, consistent design system |
-| **PWA** | Mobile access | Installable on any device, no app store required |
+| **Tauri 2** | App shell | Native macOS menubar app with a small Rust backend |
+| **Svelte 5** | UI framework | Reactive runes, tiny runtime |
+| **Vite** | Build tool | Fast HMR, native ESM |
 
-### Documentation (apps/docs)
+### Admin + cloud apps (hq-console, hq-pro, hq-deploy)
+
+| Technology | Purpose | Rationale |
+|---|---|---|
+| **Next.js 15 / React 19** | hq-console UI | Admin surface over HQ Cloud |
+| **NextAuth v5** | Auth | OIDC over the shared Cognito pool |
+| **SST v3** | hq-pro IaC | TypeScript-native infrastructure on AWS |
+| **Hono on Lambda** | hq-deploy API | Lightweight deploy-management API |
+
+### Documentation (this site)
 
 | Technology | Purpose | Rationale |
 |---|---|---|
@@ -171,23 +181,21 @@ Packages are loosely coupled. `create-hq` only touches `template/` at install ti
 | **Starlight** | Theme | Purpose-built for documentation, search included |
 | **MDX** | Content | Markdown with component support |
 
-### Infrastructure (infra/)
+### Shared infrastructure
 
 | Technology | Purpose | Rationale |
 |---|---|---|
-| **SST** | IaC framework | TypeScript-native, live Lambda debugging |
-| **AWS Cognito** | Auth | Managed user pools, JWT tokens |
-| **AWS S3** | Storage | Encrypted file storage, per-user prefixes |
-| **API Gateway** | API layer | RESTful endpoints for PWA |
-| **Lambda** | Compute | Serverless functions for API handlers |
-| **CloudFront** | CDN | Global edge caching for PWA assets and API |
+| **AWS Cognito** | Auth | One managed identity pool shared across the cloud apps |
+| **AWS S3** | Storage | Encrypted file storage, per-entity prefixes |
+| **Lambda + API Gateway** | Compute / API | Serverless endpoints for sync, deploy, and vault |
+| **CloudFront** | CDN | Global edge caching for assets and APIs |
 
 ### Why These Choices
 
-**npm workspaces over Turborepo/Nx:** HQ is a modest monorepo (5 packages). npm workspaces provide native workspace linking and script orchestration without adding a build system dependency. If the repo grows significantly, Turborepo can be layered on top without migration.
+**Split repos over one combined repository:** Each surface (CLI, sync engine, scaffold, desktop app, admin/cloud apps) ships on its own cadence and version. Splitting the former combined repo lets a CLI release go out without touching the desktop app, and keeps each repo's CI lean. The repos compose through published npm packages and a shared Cognito identity rather than through workspace links.
 
 **SST over CDK/Terraform:** SST wraps AWS CDK with TypeScript-native constructs and provides live Lambda debugging during development. This aligns with the all-TypeScript stack and reduces the feedback loop for infrastructure changes.
 
 **Astro Starlight over Docusaurus/Nextra:** Starlight is purpose-built for documentation. It ships with search, navigation, and i18n out of the box. Astro's partial hydration means zero JS ships to the client by default.
 
-**PWA over native app:** HQ's mobile needs are read-heavy (view reports, approve posts). A PWA provides installable mobile access without app store overhead, and shares the same React codebase.
+**Tauri over Electron for the desktop app:** the `hq-sync` menubar app uses a small Rust backend instead of bundling Chromium, keeping the download small for a background sync agent.

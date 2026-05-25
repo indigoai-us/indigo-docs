@@ -3,6 +3,10 @@ import starlight from "@astrojs/starlight";
 import starlightClientMermaid from "@pasqal-io/starlight-client-mermaid";
 
 export default defineConfig({
+  redirects: {
+    "/hq/architecture/2-monorepo/": "/hq/architecture/2-ecosystem/",
+    "/hq/roadmap/2-v5-launch/": "/hq/roadmap/2-shipped-and-next/",
+  },
   integrations: [
     starlight({
       plugins: [starlightClientMermaid()],
@@ -37,6 +41,20 @@ export default defineConfig({
         {
           label: "Product Guide",
           autogenerate: { directory: "hq/guide" },
+        },
+        {
+          label: "Products",
+          items: [
+            { label: "hq-core", link: "/hq/products/hq-core/" },
+            { label: "hq-cli", link: "/hq/products/hq-cli/" },
+            { label: "hq-cloud", link: "/hq/products/hq-cloud/" },
+            { label: "hq-sync", link: "/hq/products/hq-sync/" },
+            { label: "hq-console", link: "/hq/products/hq-console/" },
+            { label: "hq-deploy", autogenerate: { directory: "hq/products/hq-deploy" } },
+            { label: "hq-pro", autogenerate: { directory: "hq/products/hq-pro" } },
+            { label: "hq-packages", autogenerate: { directory: "hq/products/hq-packages" } },
+            { label: "Capabilities", autogenerate: { directory: "hq/products/capabilities" } },
+          ],
         },
         {
           label: "Architecture",

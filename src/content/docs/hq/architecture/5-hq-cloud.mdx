@@ -1,14 +1,16 @@
 ---
 title: hq-cloud
-description: Deep dive into @indigoai/hq-cloud — the S3 sync engine that powers bidirectional file synchronization between a local HQ instance and IndigoAI cloud storage.
+description: Deep dive into @indigoai-us/hq-cloud — the S3 sync engine that powers bidirectional file synchronization between a local HQ instance and IndigoAI cloud storage.
 ---
 
-`@indigoai/hq-cloud` is the most complex package in the HQ monorepo. It handles authentication with IndigoAI, bidirectional file synchronization to S3, background daemon management, file change detection, and conflict resolution via a local journal. The CLI delegates all sync operations to this package.
+`@indigoai-us/hq-cloud` is the most involved package in the HQ ecosystem. It handles authentication with IndigoAI, bidirectional file synchronization to S3, background daemon management, file change detection, and conflict resolution via a local journal. The CLI delegates all sync operations to this package.
+
+> One repo in the split [HQ ecosystem](/hq/architecture/2-ecosystem/) — published as `@indigoai-us/hq-cloud`; also driven by the [hq-sync](/hq/products/hq-sync/) menubar app.
 
 ## Source Layout
 
 ```
-packages/hq-cloud/src/
+hq-cloud/src/
 ├── types.ts          # Shared type definitions
 ├── auth.ts           # OAuth flow + credential management
 ├── s3.ts             # AWS SDK v3 operations (upload, download, list, delete)

@@ -1,0 +1,45 @@
+---
+title: "Shipped & Next"
+description: "What the split launch delivered and the near-term per-product priorities."
+---
+
+The original combined repository has been split into independently versioned products, all live. This page records what shipped and what's next per product. For how the repos compose, see the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/).
+
+## What shipped
+
+`npx create-hq` installs a fully functional HQ on any machine with Node.js, and the ecosystem is published and deployed:
+
+- **Scaffold** — `hq-core` (`hqVersion 12.x`) seeds new instances; existing ones upgrade via `/update-hq`.
+- **CLI + sync** — `@indigoai-us/hq-cli` (the `hq` command) and `@indigoai-us/hq-cloud` (the S3 sync engine) are published to npm and version independently.
+- **Desktop** — the `hq-sync` Tauri menubar app ships signed/notarized with `latest.json` auto-update.
+- **Cloud apps** — `hq-console` (admin UI), `hq-deploy` (artifact data plane), and `hq-pro` (vault + teams + shared Cognito identity) are deployed on AWS/Vercel.
+- **Content packs** — `hq-packages` distributes `@indigoai-us/hq-pack-*` add-ons via `hq install`.
+
+## Near-term priorities per product
+
+### hq-sync (desktop)
+- Conflict-resolution UX in the menubar
+- Richer per-file progress and notifications
+- Broader platform coverage beyond macOS
+
+### hq-pro + hq-console (teams)
+- Membership management and role workflows
+- Usage and deployment visibility in the admin UI
+- Tighter vault / capability-grant ergonomics
+
+### hq-deploy (artifacts)
+- SSR deploy flows alongside static
+- Custom domains and DNS automation
+- Enterprise init / CloudFormation polish
+
+### hq-cli + hq-cloud
+- Sync reliability and resumability
+- Schema-driven secret access ergonomics (see [hq-secrets](/hq/products/capabilities/hq-secrets/))
+
+### hq-packages
+- More first-party packs
+- Smoother pack authoring + install loop
+
+## How priorities are sized
+
+Work is scoped by complexity and risk (S/M/L/XL), not by wall-clock dates. HQ runs at agent velocity with many concurrent sessions, so effort is expressed as sessions of work and concurrency rather than weeks. Genuine external deadlines, when they exist, are tracked separately.

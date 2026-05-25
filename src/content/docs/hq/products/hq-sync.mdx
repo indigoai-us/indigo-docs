@@ -1,0 +1,41 @@
+---
+title: hq-sync
+description: The HQ Sync menubar app — a macOS Tauri 2 desktop GUI that drives bidirectional S3 sync for your HQ instance.
+---
+
+**hq-sync** is the HQ Sync menubar app: a native macOS menu-bar agent that keeps your local HQ directory synced with the cloud, without living in the terminal. It wraps the same sync engine the `hq` CLI uses behind a friendly GUI aimed at non-technical users.
+
+## What it is
+
+- A **Tauri 2** desktop app (small Rust backend + Svelte 5 UI), distributed as a signed/notarized macOS app.
+- Identifier `ai.indigo.hq-sync-menubar`, productName "HQ Sync".
+- A system-tray agent with per-workspace sync rows, real per-file progress, a Stop button, conflict resolution, new-file notifications, and Connect diagnostics.
+
+## Who uses it / when
+
+Use hq-sync when you want HQ kept in sync in the background without running `hq sync` commands by hand — especially on a workstation where a non-technical operator just wants a menubar toggle. Power users who live in the terminal can keep using the [`hq` CLI](/hq/products/hq-cli/) directly; both drive the same engine.
+
+## How it works
+
+hq-sync is a **GUI over the engine, not its own sync implementation**. It spawns the `hq-sync-runner` binary shipped by [`@indigoai-us/hq-cloud`](/hq/products/hq-cloud/), reads the ndjson sync events that runner emits, and renders them as live progress in the menubar. The actual bidirectional S3 transfer, journaling, and conflict detection all happen in the cloud engine.
+
+```mermaid
+graph LR
+    tray["hq-sync<br/>(menubar UI)"] -->|spawns| runner["hq-sync-runner<br/>(@indigoai-us/hq-cloud)"]
+    runner <-->|bidirectional sync| s3["AWS S3<br/>(per-entity prefix)"]
+    runner -->|ndjson events| tray
+```
+
+> **Distinction:** "hq-sync" is the menubar **app**. The sync **engine** is `@indigoai-us/hq-cloud`, and the same engine is also invoked by `hq sync` from the CLI. The app does not contain its own sync logic.
+
+## Install & updates
+
+hq-sync ships through GitHub Releases as a signed, notarized macOS DMG (minimum macOS 13.0). It auto-updates via a published `latest.json` manifest — once installed, new versions are offered automatically.
+
+Releases are cut by pushing a `v*` git tag, which runs the sign/notarize/DMG workflow. The current version is **0.1.98** (version is kept in lockstep across `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json`).
+
+## Related
+
+- [hq-cloud](/hq/products/hq-cloud/) — the sync engine hq-sync drives
+- [hq-cli](/hq/products/hq-cli/) — `hq sync` runs the same engine from the terminal
+- [Cloud sync architecture](/hq/architecture/5-hq-cloud/) — engine internals

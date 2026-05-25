@@ -1,6 +1,6 @@
 ---
 title: Testing
-description: Testing strategy and QA processes across the HQ monorepo.
+description: Testing strategy and QA processes across the HQ ecosystem repos.
 ---
 
 ## Testing Strategy
@@ -8,9 +8,9 @@ description: Testing strategy and QA processes across the HQ monorepo.
 HQ testing is organized in three tiers:
 
 ### Tier 1: Unit Tests
-Package-level tests for individual functions and modules.
+Per-repo tests for individual functions and modules. Each repo runs its own Vitest suite in its own CI.
 
-| Package | What to Test |
+| Repo | What to Test |
 |---------|-------------|
 | create-hq | scaffold flow, dependency checks, template copying |
 | hq-cli | manifest parsing, module registration, strategy execution |
@@ -20,11 +20,9 @@ Package-level tests for individual functions and modules.
 Framework: Vitest (recommended for TypeScript + ESM).
 
 ```bash
-# Run all tests
+# inside a given repo (e.g. hq-cloud)
+cd hq-cloud
 npm test
-
-# Run tests for a specific package
-npm test --workspace packages/hq-cloud
 ```
 
 ### Tier 2: Integration Tests
@@ -117,10 +115,10 @@ describe("journal", () => {
 
 ## CI Pipeline
 
-The `ci.yml` workflow runs on every PR and push to main:
+Each repo has its own `ci.yml` workflow that runs on every PR and push to main:
 1. `npm ci` — install deps
-2. `npm run build` — build all packages
+2. `npm run build` — build that repo
 3. `npm run typecheck` — TypeScript checking
-4. `npm test` — run all tests (when added)
+4. `npm test` — run that repo's tests
 
-Tests must pass before merging to main.
+Tests must pass before merging to that repo's main.
