@@ -26,8 +26,8 @@ For one-off recipient grants to a known person, prefer [hq-share](/hq/products/c
 The create wizard has four fields:
 
 1. **Name** — what this connection is for. Surfaces in the list view, audit events, and revoke confirmation.
-2. **Allowed prefixes** — an allowlist of patterns the connection can read. Type a pattern, press **Enter** (or click **Add**), and it becomes a removable chip. Patterns from your existing company vault appear as one-click **Suggestions from your vault**. At least one pattern is required.
-   - Wildcards: trailing `*` matches anything under the prefix. A bare `knowledge/` is auto-normalized to `knowledge/*`.
+2. **Allowed prefixes** — an allowlist of patterns the connection can read. Type a pattern, press **Enter** (or click **Add**), and it becomes a removable chip. A row of one-click **Quick-add suggestions** sits beneath the input with the standard HQ vault prefixes — `*` (everything), `knowledge/*`, `projects/*`, `workers/*`, `skills/*`. `knowledge/*` is pre-added on mount as a safe default; remove it if you want a different scope. At least one pattern is required.
+   - Wildcards: trailing `*` matches anything under the prefix. A bare `knowledge/` is auto-normalized to `knowledge/*`. The lone `*` grants the whole company vault.
    - Validation rejects `..`, leading `/`, non-ASCII characters, and mid-string `*`.
 3. **Permission** — always **read** in v1, shown read-only. Read-write is a fast-follow.
 4. **Auth mechanism** — pick one (see below).
