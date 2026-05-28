@@ -9,6 +9,14 @@ sidebar:
 
 HQ Packages let you distribute and install specialty content — workers, commands, skills, knowledge bases, policies, and hooks — into any HQ instance. Packs publish as `@indigoai-us/hq-pack-*` and install via `hq install`. The system went through two major iterations.
 
+### First-party packs
+
+The `indigoai-us/hq-packages` repo ships the official packs, including `hq-pack-design-styles`, `hq-pack-design-quality`, `hq-pack-gemini`, `hq-pack-gstack`, and (as of hq-core v15.0.0) `hq-pack-engineering`. The engineering pack carries the coding toolkit that used to live inside core: 17 dev skills (`/tdd`, `/review`, `/execute-task`, `/run-project`, and more), 6 workers (qa-tester, security-scanner, and others), 4 knowledge bases, and 4 policies. Upgraders to v15 get it auto-installed by `/update-hq`; fresh installs add it on demand:
+
+```bash
+hq install github:indigoai-us/hq-packages#packages/hq-pack-engineering
+```
+
 ## What's in a Package?
 
 A package is a tarball containing any combination of:

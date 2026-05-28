@@ -9,11 +9,46 @@ The original combined repository has been split into independently versioned pro
 
 `npx create-hq` installs a fully functional HQ on any machine with Node.js, and the ecosystem is published and deployed:
 
-- **Scaffold** — `hq-core` (`hqVersion 12.x`) seeds new instances; existing ones upgrade via `/update-hq`.
+- **Scaffold** — `hq-core` (`hqVersion 15.x`) seeds new instances; existing ones upgrade via `/update-hq`.
 - **CLI + sync** — `@indigoai-us/hq-cli` (the `hq` command) and `@indigoai-us/hq-cloud` (the S3 sync engine) are published to npm and version independently.
 - **Desktop** — the `hq-sync` Tauri menubar app ships signed/notarized with `latest.json` auto-update.
 - **Cloud apps** — `hq-console` (admin UI), `hq-deploy` (artifact data plane), and `hq-pro` (vault + teams + shared Cognito identity) are deployed on AWS/Vercel.
 - **Content packs** — `hq-packages` distributes `@indigoai-us/hq-pack-*` add-ons via `hq install`.
+
+## hq-core 15.0.0
+
+The 15.0.0 release reshapes the scaffold around a clean split: vanilla `hq-core` is now a pure orchestration layer, and the coding toolkit moves into an optional pack. The upgrade is engineered to be invisible for existing coding installs.
+
+### Engineering surface extracted to a pack
+
+17 dev skills (`/tdd`, `/review`, `/execute-task`, `/run-project`, `/architect`, `/diagnose`, `/land`, and more), 6 workers (`qa-tester`, `security-scanner`, `accessibility-auditor`, `frontend-designer`, `performance-benchmarker`, `site-builder`), 4 knowledge bases, and 4 policies left shipped `core/` and now live in [`hq-pack-engineering`](/hq/products/hq-packages/overview/). The default scaffold stays minimal for founders, ops, and knowledge-work teams who never touch a repo.
+
+Upgrading is transparent. `/update-hq` auto-installs the pack before removing the inline copies, then symlinks every capability back to its original path, so existing commands keep working with no prompts. If the install cannot reach the pack, inline copies are kept and a retry command is shown. Fresh `npx create-hq` installs stay lean and add the pack on demand:
+
+```bash
+hq install github:indigoai-us/hq-packages#packages/hq-pack-engineering
+```
+
+### Safer and smarter defaults
+
+- **Plan mode by default.** New sessions start in Plan mode, so HQ proposes before it acts. Nothing changes on disk until the plan is approved. Auto mode remains available in the picker.
+- **Opus 4.8 default model.** Sessions and subagents run on Opus 4.8; the 1M-context variant stays opt-in per command.
+- **Plain-language routing.** Requests phrased in plain English route to the right skill, with the company and its policies bound first and an explicit stop before anything heavy or irreversible.
+
+### New capabilities
+
+- **`/humanize`** runs a pass over any human-facing prose so it does not read like generated text, and runs automatically before HQ delivers finished writing.
+- **`/work-broadcast`** composes right-sized team announcements with a draft-confirm step before sending.
+- **`/hq-heal`** triages a Claude Code or Codex error mid-session, proposes a fix, and files a bug for recurring classes.
+- **`/ontology`** is the runtime interface to the hq-pro ontology gardener (entity graph and situational-awareness brief per company).
+- **`/hq-share`** now drafts a short, factual note describing what is being shared, prefilled for the sender to review.
+
+### Reliability and structure
+
+- `hq-sync` reindexes search after any sync that pulled files, so freshly-synced knowledge is searchable immediately.
+- Codex reaches permission-deny parity with Claude, and its hook surface consolidates to three status rows with no loss of coverage.
+- `/setup` drives real first-session momentum, capturing pain points and systems of record and keeping them in front of HQ every session.
+- Top-level directories are trimmed to `companies/`, `core/`, `personal/`, `repos/`, and `workspace/`; public HQ docs moved to `core/docs/hq/`; `core/core.yaml` is the only shipped version manifest.
 
 ## Near-term priorities per product
 

@@ -7,9 +7,19 @@ description: The HQ scaffold and starter kit — the create-hq seed that bootstr
 
 ## What it is
 
-- The **create-hq scaffold** — distributed as a seed, not as an npm package. Its version is tracked as `hqVersion` in `core.yaml` (currently **12.x**).
-- Tagline: *"HQ by Indigo — Personal OS for AI Workers."* A minimal scaffold for orchestrating autonomous AI workers (execute / learn / scale / survive across sessions).
+- The **create-hq scaffold** — distributed as a seed, not as an npm package. Its version is tracked as `hqVersion` in `core.yaml` (currently **15.x**).
+- A minimal scaffold for orchestrating autonomous AI workers across sessions. HQ is a team AI operating system that scales from solo operator to enterprise.
 - Ships **minimal on purpose** — rich capabilities install separately as `@indigoai-us/hq-pack-*` content packs.
+
+### v15.0.0: engineering surface is now a pack
+
+As of v15.0.0, the engineering toolkit no longer ships inside core. The dev skills (`/tdd`, `/review`, `/execute-task`, `/run-project`, `/architect`, `/diagnose`, `/land`, and more), the coding workers (qa-tester, security-scanner, and others), plus their knowledge bases and policies now live in the installable `hq-pack-engineering` pack. Vanilla core is a pure orchestration layer that founders, ops, and knowledge-work tenants can use without coding tooling they will never touch.
+
+Upgrading is transparent. `/update-hq` auto-installs `hq-pack-engineering` and symlinks every capability back to its original path before removing the inline copies, so existing commands keep working with no prompts. Fresh `npx create-hq` installs stay lean; add the pack on demand:
+
+```bash
+hq install github:indigoai-us/hq-packages#packages/hq-pack-engineering
+```
 
 ## Who uses it / when
 
