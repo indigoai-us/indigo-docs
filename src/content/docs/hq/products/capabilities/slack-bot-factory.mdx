@@ -1,0 +1,138 @@
+---
+title: Slack Bot Factory
+description: The fastest way to get HQ into a Slack workspace — connect a workspace once, then mint per-bot Slack apps on demand. Multi-tenant, vault-backed, and idempotent on re-auth.
+sidebar:
+  order: 4
+---
+
+> **The Slack Bot Factory is a managed surface of [hq-pro](/hq/products/hq-pro/about/), driven by two `hq` skills (`/hq-slack-connect`, `/hq-new-bot`) and the [hq-packages](/hq/products/hq-packages/) `hq-pack-slack-bot` runtime.** It mints real, per-bot Slack apps on demand and lands their tokens in your company vault.
+
+**The Slack Bot Factory** is how you get HQ into Slack. Connect a workspace once, and from then on anyone in it can stand up a named HQ bot with a single slash command. Each bot is its own Slack app, minted on demand, scoped to the company that owns it. The factory is multi-tenant by design: every workspace points at the same shared factory endpoint, but each one verifies against its own signing secret and mints apps with its own config tokens, so one company's bots never touch another's.
+
+## The three moving parts
+
+| Part | Who runs it | What it does |
+|---|---|---|
+| **Connect a workspace** | A company admin or owner, once | Registers the Slack workspace with the factory and seeds its capability secrets into the company vault. |
+| **Mint a bot** | Anyone in a connected workspace | `/hq-new-bot <name> <company>` mints a per-bot Slack app, lands its token in the vault, and arms the watcher. |
+| **Run a bot** | The bot's creator, ongoing | An `@`-mention spawns an autonomous worker that answers in-thread. |
+
+## One-time workspace connect
+
+Connecting a workspace is an **admin/owner-only** setup that happens once per Slack workspace. Run:
+
+```
+/hq-slack-connect [--company <slug>]
+```
+
+The skill resolves the company you're connecting the workspace to, confirms you hold an `admin` or `owner` role in it (the gate runs before any vault write), and then walks you through four steps.
+
+### 1. Create the bridge app from a manifest
+
+The skill emits a **bridge-app manifest** with your company's display names filled in. The bridge app is the entry point: it owns the `/hq-new-bot` slash command and the install OAuth redirect, both already wired to the shared HQ factory. Take the emitted manifest to [api.slack.com/apps](https://api.slack.com/apps), choose **Create New App → From a manifest**, pick the target workspace, paste it, create the app, and **install it to the workspace**.
+
+The manifest wires the load-bearing parts for you — you only fill in display names:
+
+- the `/hq-new-bot` slash command → `https://hqapi.getindigo.ai/slack-apps/create`
+- the OAuth redirect → `https://hqapi.getindigo.ai/slack-apps/install-callback`
+- the bot and user scopes, which mirror exactly what the factory mints (including `users:read.email`, which the factory uses to map the caller to their HQ identity)
+
+Do not change those fields — if they drift, `/hq-new-bot` breaks or the bridge app's grant surface no longer matches the bots it creates.
+
+### 2. Collect the four values
+
+Once the app exists and is installed, gather four values from the Slack app console:
+
+| Value | Where to find it | Shape |
+|---|---|---|
+| **Signing secret** | Basic Information → App Credentials | verifies every `/hq-new-bot` request |
+| **Bot token** | OAuth & Permissions → Bot User OAuth Token (only after install) | `xoxb-…`, carries `users:read.email` |
+| **App config access token** | api.slack.com/apps → Your Apps → App Configuration Tokens | `xoxe.xoxp-…` |
+| **App config refresh token** | same page (workspace-level, not per-app) | `xoxe-…` |
+
+### 3. Submit the values into the vault
+
+The skill mints a one-time submission link for each value. You open each link, paste the value, and it goes straight into the company vault — **the agent never sees it.** The links are single-use capabilities and expire quickly; if one lapses, the skill re-mints it.
+
+The four values land under a `team_id`-namespaced prefix in the company vault, by **name** only:
+
+```
+SLACK/{TEAM_ID}/SIGNING_SECRET
+SLACK/{TEAM_ID}/CONFIG_ACCESS_TOKEN
+SLACK/{TEAM_ID}/CONFIG_REFRESH_TOKEN
+SLACK/{TEAM_ID}/BOT_TOKEN
+```
+
+### 4. Register the workspace
+
+Finally the skill writes a **workspace registry row**, keyed by the Slack `team_id`. The row holds only the owning company, the registering operator, a lifecycle status, and the vault key **names** above — never the secret bytes. Resolving a workspace to a usable token is always a two-step lookup: registry row → vault key name → vault read.
+
+Once this completes, the skill confirms with key **names** only, and the workspace is live: anyone in it can mint bots.
+
+## Minting a bot
+
+After connect, minting is open to **any member** of the connected workspace. In Slack, run the bridge app's slash command:
+
+```
+/hq-new-bot <name> <company>
+```
+
+The factory verifies the request against the workspace's signing secret, confirms the caller's email resolves to a member of the owning company, then mints a per-bot Slack app via the company's config tokens, installs it to the workspace, and lands its bot token in the resolved company vault scope. The `<company>` argument is derived from the workspace when omitted; an explicit slug that doesn't match the workspace's owner is rejected.
+
+The minted bot token lands at a per-operator, per-workspace vault key:
+
+```
+<personUid>/HQ_SLACK_BOT_TOKEN_<NAME>_<WORKSPACE>
+```
+
+The workspace component lets the same bot name live in multiple workspaces, and the operator prefix lets one shared company vault hold the same bot name under different creators without colliding.
+
+## Running a bot
+
+A minted bot answers when it is `@`-mentioned. The `hq-pack-slack-bot` runtime arms a per-bot watcher that polls the channels the bot belongs to; each new mention spawns an autonomous worker that owns that one thread end-to-end — it reads the thread, answers **in-thread**, and keeps replying to follow-ups until the conversation goes idle.
+
+```bash
+# arm the watcher for a minted bot
+bash core/packages/hq-pack-slack-bot/scripts/watch.sh <bot-slug> -c <company> -w <workspace> --check
+```
+
+A few behaviors worth knowing:
+
+- **Channel mentions are open; DM mentions are gated.** The bot answers `@`-mentions in any channel it's in, but in a direct message it only responds to its **creator**.
+- **Newly added channels start polling automatically** on the next refresh tick — no restart needed.
+- **One worker per thread.** Re-mentioning the bot in a live thread doesn't spawn a second worker; the in-flight worker picks it up.
+
+For the full runtime — dispatch modes, channel lifecycle, and creator inference — see the `hq-pack-slack-bot` package.
+
+## Rotation and re-auth
+
+Slack app config tokens expire, and signing secrets are sometimes rotated. To refresh a connected workspace, simply **re-run `/hq-slack-connect` for the same workspace.** It is idempotent on the `team_id`:
+
+- the registry write upserts on the `team_id` primary key — no duplicate row;
+- the four vault writes overwrite the same key names — no orphaned secrets;
+- if the workspace had been flagged as having a broken token chain, re-registration clears the status back to active.
+
+There is exactly one row and one key set per workspace, before and after.
+
+## Security model
+
+The signing secret, the two app config tokens, and the bot token are **capabilities, not configuration values:**
+
+- The **signing secret** authenticates every inbound `/hq-new-bot` request — anyone holding it can forge factory requests for the workspace.
+- The **config access and refresh tokens** let the holder create and modify Slack apps in the workspace.
+- The **bot token** lets the holder act as the bridge app's bot user, including reading user emails.
+
+Three rules follow, and they are enforced end-to-end:
+
+| Rule | What it means in practice |
+|---|---|
+| **Vault-side, never agent-side** | The four values are collected through one-time submission links and written straight into the vault. The agent never sees a value, never captures a `set` command's output, and never reads a value back to "verify" it. |
+| **Names, never bytes** | Success is confirmed with vault key **names** only. The registry row stores only key names plus identifiers — the secret bytes live exclusively in the vault. |
+| **Company-scoped** | The four secrets are written to the owning company's vault scope and governed by per-secret ACLs, which is why the admin/owner gate runs before any write. The factory verifies and mints strictly within that company. |
+
+## Related
+
+- [hq-pro](/hq/products/hq-pro/about/) — the vault and identity the factory operates against
+- [hq-packages](/hq/products/hq-packages/) — home of the `hq-pack-slack-bot` runtime watcher
+- [hq-secrets](/hq/products/capabilities/hq-secrets/) — the schema-driven secret access the vault writes use
+- [hq-share](/hq/products/capabilities/hq-share/) — single-use capability links, the same pattern the connect flow uses for value submission
