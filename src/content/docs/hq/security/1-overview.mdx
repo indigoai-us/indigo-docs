@@ -142,6 +142,22 @@ State these plainly during review:
 - Automated dependency-vulnerability scanning and SBOM generation are planned but not yet fully implemented.
 - Some internal administrative functions retain broader permissions than the steady-state customer data path; they are restricted and audited.
 
+## Detailed topics
+
+This overview is the summary. Deeper, reviewer-oriented detail lives in the rest of this section:
+
+- [Tenant Isolation](/hq/security/3-tenant-isolation/) — per-company bucket + key, scoped STS, fail-closed
+- [Data Security & Encryption](/hq/security/4-data-security-encryption/) — classification, keys, retention, deletion
+- [Identity & Access Management](/hq/security/5-identity-access-management/) — SSO, PKCE, tokens, RBAC, staff access
+- [Infrastructure & Network Security](/hq/security/6-infrastructure-network-security/) — AWS region, VPC, IaC, secrets
+- [Application Security & SDLC](/hq/security/7-application-security-sdlc/) — CI gates, dependencies, signed builds
+- [Shared Responsibility](/hq/security/8-shared-responsibility/) — what Indigo secures vs. the customer
+- [Subprocessors](/hq/security/2-subprocessors/) — third parties that process customer data
+- [Business Continuity & Incident Response](/hq/security/9-business-continuity-incident-response/) — backups, recovery, breach notification
+- [Compliance Roadmap](/hq/security/10-compliance-roadmap/) — SOC 2 / ISO / GDPR / CCPA status
+- [Vulnerability Disclosure](/hq/security/11-vulnerability-disclosure/) — how to report, scope, safe harbor
+- [CAIQ Questionnaire](/hq/security/12-caiq-questionnaire/) — pre-filled cloud-control answers
+
 ## Reporting and contact
 
 Security questions, documentation requests, vulnerability reports, and privacy requests go to **security@getindigo.ai**. For sensitive vulnerability details, request an encrypted channel in your first message.
