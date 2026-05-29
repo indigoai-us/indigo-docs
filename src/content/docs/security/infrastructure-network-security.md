@@ -1,0 +1,75 @@
+---
+title: "Infrastructure & Network Security"
+description: "AWS region and residency, infrastructure as code, compute, VPC isolation, cloud IAM, secrets, and monitoring."
+---
+
+**Last reviewed:** 2026-05-28  ·  **Document status:** Published
+
+This document describes the cloud infrastructure HQ runs on, how it is provisioned, and how it is isolated, monitored, and operated.
+
+## 1. Cloud provider & region
+
+- **Provider:** Amazon Web Services (AWS).
+- **Region:** `us-east-1` (Northern Virginia, United States), used exclusively. There is no multi-region data replication, so **customer data resides in the United States**.
+- HQ inherits AWS's physical and environmental data-center controls (AWS holds SOC 1/2/3, ISO 27001, and other certifications for the underlying infrastructure).
+
+## 2. Infrastructure as code
+
+All cloud infrastructure is defined declaratively as **infrastructure-as-code** (primarily SST / Pulumi, with AWS CloudFormation for a few resource types). This makes environments reproducible and auditable, and makes infrastructure changes reviewable in version control alongside application code.
+
+## 3. Compute model
+
+HQ uses managed and serverless compute to minimize the host-level attack surface and patching burden:
+
+- **AWS Lambda** behind **Amazon API Gateway** is the dominant compute model for the API and most services — there are no long-lived application servers to harden or patch for these paths.
+- **Containers (Amazon ECS)** run specific long-running agent workloads, isolated within the private network.
+- **Managed edge compute** (Amazon CloudFront + Lambda@Edge) serves and gates static-artifact delivery.
+- Some auxiliary web front-ends run on managed hosting (Vercel / OpenNext-on-Lambda).
+
+## 4. Network architecture
+
+HQ's data plane runs inside a **dedicated VPC** designed for strong network isolation:
+
+- **Private subnets only.** Application compute has no direct inbound internet exposure.
+- **No NAT gateway.** Rather than routing egress out to the internet, services reach AWS APIs through **VPC endpoints** (for example, Amazon S3, AWS Secrets Manager, Amazon SES, and Amazon Bedrock). This sharply limits both inbound and outbound exposure.
+- **Tight security groups.** Interface-endpoint, database, and mount-target security groups permit only the specific required ports from within the VPC CIDR (e.g., 443 to endpoints; the database port only from the application security group).
+- **Databases are not publicly accessible.** Managed PostgreSQL is private to the VPC; DynamoDB is reached over the AWS network.
+- **Internet-facing surfaces** are limited to the managed, hardened entry points: API Gateway, the Cognito hosted sign-in UI, and CloudFront/Lambda@Edge.
+- **Honest note:** a small number of egress security-group rules are broader than strictly necessary (all-outbound) although they sit in private, no-NAT subnets; tightening these to least-privilege egress is on the roadmap.
+
+## 5. Identity & access management (cloud IAM)
+
+HQ applies least privilege to its own AWS roles:
+
+- A baseline vault-access role acts as a **ceiling**; each customer request is served by a **per-request STS session** whose policy is narrowed to a single tenant's resources (see [Tenant Isolation](/security/tenant-isolation/)).
+- The role that can assume the vault role is restricted to the specific service function, with KMS usage gated by resource tag.
+- CloudTrail data-event logging covers all customer storage.
+- **Honest note:** a few internal administrative/maintenance functions hold broader permissions (for example, the ability to decrypt across per-tenant keys, compensated for by storage-level controls and audit logging). Narrowing these with tag conditions and scoped policies is tracked on the roadmap.
+
+## 6. Secrets management
+
+- Secrets are stored in **AWS SSM Parameter Store (SecureString)** and **AWS Secrets Manager**, never in source control.
+- In the primary application, secret values are bound at deploy time and runtime roles are not granted broad parameter-read permissions; third-party API keys are read at cold start through private VPC endpoints.
+- Human-held secrets are sourced from **HQ Secrets** (HQ's own encrypted secrets-management system) and referenced, not embedded.
+
+## 7. Logging, monitoring & observability
+
+- **Application logs & metrics:** Amazon CloudWatch (structured logs, custom metrics, and alarms that notify via Amazon SNS).
+- **Error tracking:** Sentry on the primary application, with an event scrubber that strips authentication tokens and home-directory paths before transmission.
+- **Audit:** AWS CloudTrail (with log-file validation) plus an application audit trail of credential issuance and administrative actions.
+- **Credential hygiene in logs:** embedded credentials are redacted from values (e.g., repository URLs) before logging.
+- **Honest note:** error tracking is not yet uniformly deployed across every service; extending it is on the roadmap.
+
+## 8. Change & configuration management
+
+- Infrastructure changes flow through version control and code review as code.
+- Production deploys are performed through the deployment toolchain by authorized operators.
+- **Honest note:** mandatory approval gates and required-status-check enforcement on every production deployment path are being formalized as part of the SOC 2 change-management program (see [Application Security & SDLC](/security/application-security-sdlc/)).
+
+## 9. Physical security
+
+HQ operates entirely on AWS managed infrastructure and does not run its own data centers. Physical and environmental security is provided by AWS under its certified controls.
+
+---
+
+*This document is a point-in-time description of HQ's infrastructure and network controls as of the date above, provided for security evaluation.*

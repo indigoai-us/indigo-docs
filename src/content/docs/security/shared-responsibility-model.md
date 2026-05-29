@@ -1,0 +1,67 @@
+---
+title: "Shared Responsibility Model"
+description: "What Indigo secures versus what the customer secures — important because HQ runs on customer machines."
+---
+
+**Last reviewed:** 2026-05-28  ·  **Document status:** Published
+
+Security of HQ is a partnership. Indigo secures the HQ platform; the customer secures how they configure, populate, and operate it. This boundary matters more than usual for HQ because **HQ runs agents on the customer's own machines and acts across the customer's own repositories and tools** — so some controls live on the customer side by design.
+
+This document makes the division explicit.
+
+## Three layers
+
+| Layer | Owner | Notes |
+|---|---|---|
+| **Cloud infrastructure** (data centers, hardware, hypervisor, region) | **AWS** | Covered by AWS's certified controls. |
+| **The HQ platform** (service code, tenant isolation, encryption, access brokering, availability) | **Indigo** | The subject of the rest of this security packet. |
+| **Customer configuration & usage** (who is invited, what data is connected, endpoint security, IdP policy) | **Customer** | Detailed below. |
+
+## What Indigo secures
+
+- **Tenant isolation** — dedicated per-tenant storage and encryption keys, and per-request scoped credentials (see [Tenant Isolation](/security/tenant-isolation/)).
+- **Encryption** — at rest (per-tenant KMS keys) and in transit (enforced TLS).
+- **Platform access control** — authentication via Cognito/SSO, JWT authorization on every route, role- and path-based permissions.
+- **Infrastructure security** — private-network architecture, least-privilege cloud IAM, secrets management, monitoring, and audit logging.
+- **Application security** — secure SDLC, CI security gates including tenant-isolation tests, signed and notarized desktop builds and updates.
+- **Availability & durability** — operating the managed services, S3 versioning, database point-in-time recovery.
+- **Incident response** — detection, investigation, and customer breach notification for incidents affecting the platform (see [Business Continuity & Incident Response](/security/business-continuity-incident-response/)).
+- **Subprocessor management** — vetting and disclosing the third parties that process customer data (see [Subprocessor List](/security/subprocessors/)).
+
+## What the customer secures
+
+Because HQ amplifies what a team can do, customer-side configuration is a real part of the security posture:
+
+- **Identity provider & MFA.** HQ federates to your Google Workspace SSO. **You** enforce MFA strength, conditional access, and session policy, and you **deprovision departing users** through your IdP. (HQ honors SSO deprovisioning; you must perform it.)
+- **Who you invite, and at what role.** You control membership and assign roles (admin / contributor / read-only). Granting `admin` broadly, or inviting the wrong person, is a customer-side risk. Review membership periodically.
+- **What you grant and share.** You decide which paths are shared, with whom, and whether to issue external capability links. Treat share-session links as **bearer capabilities** — anyone holding an unexpired link can use it within its pinned scope.
+- **The data you put in HQ.** You are the controller of the content you sync. Avoid placing secrets in synced knowledge; HQ excludes credential/settings/dataset/worker directories from sync by default, but you remain responsible for what you author into synced locations.
+- **The tools and repositories you connect.** HQ agents act with the permissions of the credentials you provide them. Scope those credentials to least privilege, and review what the agents are allowed to touch.
+- **Endpoint security.** HQ runs locally on your machines. **You** are responsible for device security — disk encryption, OS patching, screen lock, anti-malware, and physical control of machines where HQ and its tokens reside. HQ stores desktop tokens in the OS keychain, but the security of the device itself is yours.
+- **Local credential hygiene.** Protect the `~/.hq` directory and any credentials you configure for agents on your machines.
+- **Acceptable use & oversight of AI actions.** You are responsible for reviewing and approving the actions AI agents take on your behalf, consistent with your own policies.
+
+## Gray areas, made explicit
+
+- **AI model inputs.** When you use HQ's AI capabilities, the content you provide is sent to the model provider to produce a result. Indigo ensures this goes only to vetted subprocessors that do not train on it (see [Subprocessor List](/security/subprocessors/)); **you** decide what content to submit.
+- **Externally shared artifacts.** Indigo secures the sharing mechanism (single-use, expiring, scoped tokens); **you** decide what to share and with whom, and revoke by letting links expire or removing the underlying grant.
+
+## Summary table
+
+| Control | Indigo | Customer |
+|---|:---:|:---:|
+| Physical/data-center security (via AWS) | ● | |
+| Tenant isolation & encryption | ● | |
+| Platform authentication & authorization | ● | |
+| Service availability & backups | ● | |
+| Platform incident response | ● | |
+| MFA enforcement & SSO deprovisioning | | ● |
+| Membership & role assignment | | ● |
+| What data is synced / shared | | ● |
+| Credentials granted to agents | | ● |
+| Endpoint / device security | | ● |
+| Oversight of AI agent actions | | ● |
+
+---
+
+*This document is a point-in-time description of the HQ shared-responsibility model as of the date above, provided for security evaluation.*

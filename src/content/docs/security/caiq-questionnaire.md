@@ -1,0 +1,168 @@
+---
+title: "Pre-filled Security Questionnaire (CAIQ-style)"
+description: "Pre-filled CAIQ-style answers across the CSA cloud-control domains, plus AI governance."
+---
+
+**Last reviewed:** 2026-05-28  ·  **Document status:** Published
+
+This document pre-answers the common questions a security reviewer asks, organized by the **Cloud Security Alliance Cloud Controls Matrix (CCM v4) domains** (the basis of the CAIQ). Answers are **Yes / Partial / No / N/A** with a short note. It is designed to collapse the back-and-forth of a vendor security review; for questionnaire formats we don't cover here (SIG, VSA, a customer's bespoke form), contact security@getindigo.ai.
+
+**Legend:** ✅ Yes · 🟡 Partial / in progress · ❌ No / not yet · ➖ N/A
+
+---
+
+## A&A — Audit & Assurance
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Do you hold SOC 2 / ISO 27001? | ❌ | Not yet certified. Controls designed to align with SOC 2 TSC; SOC 2 on roadmap. ([Compliance Roadmap](/security/compliance-roadmap/)) |
+| Do you maintain audit logs of access to customer data? | ✅ | CloudTrail data events (with log-file validation) + application audit trail of every credential issuance and admin action. |
+| Will you support a customer security review / questionnaire? | ✅ | This packet, plus direct responses via security@getindigo.ai. |
+
+## AIS — Application & Interface Security
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Is every API request authenticated and authorized? | ✅ | API Gateway JWT authorizer (issuer + audience) on every route; then per-request scoped credentials. |
+| Do you follow a secure SDLC with code review? | ✅ | All changes peer-reviewed in Git; CI gates (typecheck/lint/test). ([AppSec](/security/application-security-sdlc/)) |
+| Do you test for multi-tenant isolation flaws? | ✅ | **Blocking** cross-tenant isolation E2E tests in CI. |
+| Do you perform SAST/DAST? | 🟡 | Type-checking + linting + adversarial internal testing today; dedicated SAST/DAST tooling on roadmap. |
+
+## BCR — Business Continuity & Operational Resilience
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Are customer data backups maintained? | ✅ | S3 object versioning; database point-in-time recovery on primary tables. |
+| Do you have published RPO/RTO targets? | ❌ | Not yet published; on roadmap. ([BC/IR](/security/business-continuity-incident-response/)) |
+| Is there a tested DR plan / multi-region failover? | 🟡 | IaC enables deterministic rebuild; single-region today, no automated regional failover; tested DR runbook on roadmap. |
+
+## CCC — Change Control & Configuration Management
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Are changes version-controlled and reviewed? | ✅ | Git + pull-request review; infrastructure as code. |
+| Are environments separated (dev/stage/prod)? | ✅ | Separated; production access restricted. |
+| Are required status checks enforced on merges? | 🟡 | CI gates exist (incl. isolation tests); required-status-check enforcement being finalized across all repos. |
+
+## DSP — Data Security & Privacy Lifecycle
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Is customer data segregated per tenant? | ✅ | Dedicated S3 bucket **and** KMS key per tenant. ([Tenant Isolation](/security/tenant-isolation/)) |
+| Is data classified and minimized? | ✅ | Classification defined; credentials/datasets/workers excluded from sync by default with first-push protection. |
+| Can customers export and delete their data? | 🟡 | Export and deletion supported on request; automated hard-delete offboarding on roadmap (soft-tombstone today). |
+| Do you use customer data to train AI models? | ❌ (we do **not**) | No model training on customer data; model provider (Anthropic) does not train on API data. ([Subprocessors](/security/subprocessors/)) |
+
+## DCS — Datacenter Security
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Where is data hosted? | ✅ | AWS `us-east-1` (US). Indigo runs no own data centers. |
+| Are physical controls in place? | ✅ | Provided by AWS under its SOC/ISO-certified physical controls. |
+
+## CEK — Cryptography, Encryption & Key Management
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Is data encrypted at rest? | ✅ | SSE-KMS (AES-256), per-tenant customer-managed key, annual rotation. |
+| Is data encrypted in transit? | ✅ | TLS enforced; storage denies non-TLS requests. |
+| Are encryption keys managed securely? | ✅ | AWS KMS; per-tenant CMKs tagged + IAM-gated; deletion protection. |
+| Customer-managed keys (BYOK) / end-to-end encryption? | ❌ | Keys are Indigo-managed; no BYOK/E2E today (on roadmap). Stated plainly in [Tenant Isolation](/security/tenant-isolation/). |
+| Is a minimum TLS version pinned everywhere? | 🟡 | TLS enforced; uniform minimum-version pinning across all surfaces on roadmap. |
+
+## GRC — Governance, Risk & Compliance
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Do you have security policies? | ✅ | Engineering operates under machine-enforced policies (e.g., credential isolation, repo-write discipline); formal policy set being documented for SOC 2. |
+| Is there a named security contact/owner? | ✅ | security@getindigo.ai. |
+| Do you perform risk assessments? | 🟡 | Informal today; formalized risk-assessment cadence part of SOC 2 program. |
+
+## HRS — Human Resources Security
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Is internal access least-privilege? | ✅ | Staff admin access restricted and audit-logged; impersonation recorded. |
+| Background checks / security training / onboarding-offboarding? | 🟡 | Being formalized as documented, evidenced processes under SOC 2. |
+
+## IAM — Identity & Access Management
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Is SSO supported? | ✅ | Google Workspace SSO (OIDC) is the primary path. ([IAM](/security/identity-access-management/)) |
+| Is MFA enforced? | 🟡 | Enforced at the IdP (Google Workspace); native in-platform MFA on roadmap. |
+| Is access role-based and least-privilege? | ✅ | Roles (admin/contributor/read-only) + path-scoped grants compiled into per-request scoped credentials. |
+| How fast does deprovisioning take effect? | ✅ | Credentials recomputed per request, never cached → next request; SSO deprovisioning honored. |
+| Are machine/agent identities scoped? | ✅ | Per-connection scoped identities; API keys stored only as SHA-256 hashes. |
+
+## IVS — Infrastructure & Virtualization Security
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Is the network segmented/isolated? | ✅ | Dedicated VPC, private subnets only, no NAT, VPC endpoints; private databases. |
+| Is compute hardened / patched? | ✅ | Predominantly serverless/managed (AWS-patched); containers isolated in private network. |
+| Are security groups least-privilege? | 🟡 | Ingress tightly scoped; a few egress rules broader than necessary (private/no-NAT) being tightened. |
+
+## IPY — Interoperability & Portability
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Can customers get their data out? | ✅ | Data export on request; content is standard files. |
+| Are open formats / APIs used? | ✅ | Content is plain files (e.g., Markdown/JSON); documented APIs. |
+
+## LOG — Logging & Monitoring
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Are security-relevant events logged? | ✅ | CloudTrail data events + application audit trail; hash-chained log for agreements. |
+| Is monitoring/alerting in place? | ✅ | CloudWatch metrics/alarms → SNS; Sentry error tracking (token/path-scrubbed). |
+| Are logs protected from tampering? | ✅ | CloudTrail log-file validation; hash-chained agreement audit log. |
+| Is error tracking everywhere? | 🟡 | Primary app covered; extending to all services on roadmap. |
+
+## SEF — Security Incident Management & Forensics
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Do you have an incident-response process? | 🟡 | Defined lifecycle in operation; written, role-assigned, tested runbook being formalized. ([BC/IR](/security/business-continuity-incident-response/)) |
+| Will you notify customers of a breach? | ✅ | Commit to notifying affected customers of confirmed breaches without undue delay; can enter into a DPA covering these terms. |
+| Are audit logs available to support investigations? | ✅ | CloudTrail + application audit trail. |
+
+## STA — Supply Chain, Transparency & Accountability
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Do you disclose subprocessors? | ✅ | Maintained, dated [Subprocessor List](/security/subprocessors/). |
+| Do you provide subprocessor change notice? | ✅ | Advance notice (target ≥30 days) under a DPA. |
+| Are dependencies controlled? | 🟡 | Lockfile-pinned, frozen installs; automated dependency vulnerability scanning + SBOM on roadmap. |
+
+## TVM — Threat & Vulnerability Management
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Do you have a vulnerability disclosure channel? | ✅ | [VDP](/security/vulnerability-disclosure-policy/) + security@getindigo.ai. |
+| Do you run automated vulnerability scanning? | 🟡 | Internal review + adversarial testing today; automated SCA/dependency scanning on roadmap. |
+| Have you had a third-party penetration test? | ❌ | Not yet; planned with published summary. |
+| Are software builds integrity-protected? | ✅ | Code-signed + notarized desktop apps; signed (Ed25519) auto-updates. |
+
+## UEM — Universal Endpoint Management
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Are Indigo employee endpoints managed/secured? | 🟡 | Baseline practices (disk encryption, OS keychain for secrets); formal MDM/endpoint policy being documented under SOC 2. |
+| Where do client-side credentials live? | ✅ | Desktop tokens in OS keychain (primary), file-fallback owner-only (`0600`); scrubbed from telemetry. |
+| Note on customer endpoints | ➖ | HQ runs on customer machines; endpoint security of those devices is the customer's responsibility ([Shared Responsibility](/security/shared-responsibility-model/)). |
+
+---
+
+## AI governance (supplemental — increasingly requested for AI vendors)
+
+| Question | Resp. | Notes |
+|---|:--:|---|
+| Is customer data used to train models? | ❌ (we do **not**) | No training on customer data by Indigo or its model provider's API. |
+| Which model provider is used? | ✅ | Anthropic (Claude API). See [Subprocessors](/security/subprocessors/). |
+| Is there human oversight of AI actions? | ✅ (customer-side) | Customers review/approve agent actions; HQ surfaces decisions and risky/irreversible actions for confirmation. |
+| Is AI input/output logged or retained? | 🟡 | Processed to deliver the capability; provider retention per Anthropic API terms; Indigo does not retain inputs for training. |
+
+---
+
+*Responses are accurate to the best of our knowledge as of the date above and are provided for security evaluation. They do not constitute a warranty or contract unless incorporated by Indigo in writing. For anything not covered, contact security@getindigo.ai.*

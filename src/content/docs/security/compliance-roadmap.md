@@ -1,0 +1,75 @@
+---
+title: "Compliance Roadmap"
+description: "Honest framework posture (SOC 2, ISO, GDPR, CCPA) — what's in place today versus in progress or planned."
+---
+
+**Last reviewed:** 2026-05-28  ·  **Document status:** Published
+
+Indigo is an early-stage company. This document states our compliance posture **honestly**: what we align to today, what we are actively building, and what is planned. We do not claim certifications we have not earned.
+
+## Framework posture (at a glance)
+
+| Framework | Status | What this means |
+|---|---|---|
+| **SOC 2 (Type II)** | **Designing toward; not yet audited** | Our controls are designed to align with the Trust Services Criteria (Security, Availability, Confidentiality). We have not completed a SOC 2 examination and do not claim to be "SOC 2 compliant." |
+| **ISO 27001** | **Not certified** | Considered as a later milestone after SOC 2. |
+| **ISO 42001 (AI management)** | **Monitoring** | Increasingly requested of AI products; under evaluation given HQ is an AI platform. |
+| **GDPR** | **Supported** | We design data handling to support GDPR obligations and can sign a DPA with EU Standard Contractual Clauses. (Note: customer data currently resides in the US — see residency below.) |
+| **CCPA/CPRA** | **Supported** | We support service-provider obligations and data-subject requests. |
+| **NIST CSF** | **Reference framework** | Used as an internal reference for control coverage. |
+
+> **Honesty principle.** "Compliant" and "certified" are reserved for states we can evidence with a report or certificate. Where we are not there yet, we say "designed to align with," "in progress," or "planned," with target timing where we can commit to it.
+
+## What is already in place
+
+These controls are implemented today and are documented in the supporting security documents:
+
+- **Tenant isolation** — dedicated per-tenant S3 bucket and KMS key; per-request scoped STS credentials; **test-enforced** in CI. ([Tenant Isolation](/security/tenant-isolation/))
+- **Encryption at rest** — SSE-KMS (AES-256) with per-tenant customer-managed keys and annual rotation. ([Data Security](/security/data-security-encryption/))
+- **Encryption in transit** — enforced TLS; storage denies non-TLS requests.
+- **Authentication** — Cognito + Google Workspace SSO (OIDC); MFA enforced at the IdP; JWT authorization on every route. ([Identity & Access Management](/security/identity-access-management/))
+- **Network isolation** — dedicated VPC, private subnets only, no NAT, VPC endpoints, private databases. ([Infrastructure](/security/infrastructure-network-security/))
+- **Audit logging** — CloudTrail data events with log-file validation; application audit trail of credential issuance and admin actions.
+- **Secure SDLC** — code review; lockfile-pinned dependencies; CI type-check/lint/test plus **blocking cross-tenant isolation tests**. ([Application Security](/security/application-security-sdlc/))
+- **Signed software** — code-signed, notarized desktop apps and signed auto-updates.
+- **Capability-based sharing** — encrypted, single-use, time-limited, scope-pinned share tokens.
+- **Subprocessor management** — maintained, dated subprocessor list with a no-model-training stance. ([Subprocessors](/security/subprocessors/))
+- **Vulnerability disclosure** — published policy and `security@getindigo.ai` contact. ([VDP](/security/vulnerability-disclosure-policy/))
+
+## What we are actively working on (Now / Next)
+
+| Item | Domain | Target horizon |
+|---|---|---|
+| SOC 2 Type II readiness & examination | Compliance | In progress → near-term |
+| Required-status-check enforcement across all repos | AppSec / change mgmt | In progress |
+| CI credentials fully migrated to short-lived OIDC (retire static keys) | AppSec / IAM | In progress |
+| Uniform KMS-CMK encryption + PITR across all metadata/audit tables | Data security | In progress |
+| Formal, tested incident-response runbook | Resilience | In progress |
+| Native (in-platform) MFA, independent of upstream IdP | IAM | Planned |
+| Refresh-token rotation; keychain-only desktop token storage | IAM | Planned |
+| Automated dependency/vulnerability scanning (SCA) + SBOM | AppSec / supply chain | Planned (near-term) |
+| Independent third-party penetration test + published summary | AppSec | Planned |
+| Documented, tested backup-restore + DR runbook; published RPO/RTO | Resilience | Planned |
+| Public status / uptime page | Resilience | Planned |
+| Automated hard-delete tenant offboarding | Data lifecycle | Planned |
+| `security.txt` (RFC 9116) at HQ web domains | Disclosure | Planned (quick win) |
+| Minimum TLS version pinned uniformly across edge/API | Data in transit | Planned |
+| Data Processing Addendum (DPA) template published | Privacy | Planned |
+
+## Data residency
+
+All customer data currently resides in **AWS `us-east-1` (United States)**. For EU customers, transfers are handled under appropriate mechanisms (e.g., SCCs in a DPA). EU/other-region data residency is not offered today; it can be discussed for specific enterprise needs.
+
+## Privacy & data-subject rights
+
+- We support data **export** and **deletion** on request (see [Data Security](/security/data-security-encryption/) §10).
+- We will sign a **DPA** addressing controller/processor roles, subprocessor change notice, security measures, breach notification, audit rights, and deletion/return on termination.
+- For privacy inquiries and data-subject requests: security@getindigo.ai.
+
+## How to get current status
+
+This roadmap is a point-in-time snapshot. For the latest status, certifications, or to request gated documents (e.g., a future SOC 2 report under NDA), contact **security@getindigo.ai**.
+
+---
+
+*This document is a point-in-time description of Indigo's compliance posture for HQ as of the date above. Forward-looking items are plans, not commitments to specific dates unless stated in a contract.*
