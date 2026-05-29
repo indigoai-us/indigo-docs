@@ -61,6 +61,10 @@ export default defineConfig({
           autogenerate: { directory: "hq/architecture" },
         },
         {
+          label: "Security",
+          autogenerate: { directory: "hq/security" },
+        },
+        {
           label: "Development",
           autogenerate: { directory: "hq/development" },
         },
