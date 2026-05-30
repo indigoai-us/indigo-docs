@@ -5,6 +5,8 @@ description: CLI-native team onboarding — admin creation and member invite acc
 
 Team onboarding is built into `create-hq`, providing two distinct journeys depending on whether you're creating a team or joining one.
 
+Access to HQ is demo-gated — both journeys below begin once access has been granted through the demo flow. See [Requesting Access](/hq/products/hq-pro/access/).
+
 ## Admin Journey
 
 When an admin runs `create-hq` and has no pending invites:
