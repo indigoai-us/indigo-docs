@@ -48,6 +48,16 @@ Key properties:
 - **No DM is ever lost** — the durable store is the source of truth and MQTT is only the wake signal. If the real-time connection is unavailable, delivery falls back to the existing periodic poll with no loss and no regression.
 - **Nothing to configure** — the real-time path is automatic for signed-in users; DM notifications can be turned off in HQ Sync settings.
 
+## Manage packages
+
+HQ ships capabilities as **packs** (engineering, design, and more). From **Settings → Packages → Manage…**, HQ Sync opens a dedicated Packages window where you can browse, install, update, and uninstall packs without touching the terminal:
+
+- **Installed** packs show their version, an "update available" badge, and a warning if any of their links are broken — each with **Update** and **Uninstall** actions.
+- **Available** shows the curated pack catalog plus any registry packages you're entitled to, each with an **Install** action.
+- Installs and updates stream live progress; uninstalls cleanly remove a pack's wiring and archive it.
+
+Like everything else in HQ Sync, the window is a GUI over the `hq` CLI — it wraps the `hq packs` commands (see [hq-cli](/hq/products/hq-cli/)) so the CLI and the app share one implementation.
+
 ## Install & updates
 
 hq-sync ships through GitHub Releases as a signed, notarized macOS DMG (minimum macOS 13.0). It auto-updates via a published `latest.json` manifest — once installed, new versions are offered automatically.
