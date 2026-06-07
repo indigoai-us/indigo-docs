@@ -45,6 +45,7 @@ export default defineConfig({
         {
           label: "Products",
           items: [
+            { label: "HQ in Chat", link: "/hq-in-chat/" },
             { label: "hq-core", link: "/hq/products/hq-core/" },
             { label: "hq-cli", link: "/hq/products/hq-cli/" },
             { label: "hq-cloud", link: "/hq/products/hq-cloud/" },
