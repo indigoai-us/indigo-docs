@@ -1,0 +1,46 @@
+---
+title: Subprocessors
+description: The third parties Indigo engages to process customer data when providing HQ, what they do, the data involved, and where they process it.
+---
+
+A subprocessor is a third party that Indigo engages to process customer data in the course of providing HQ. This page lists the current subprocessors, what they do, the category of data involved, and where they process it. For the broader posture, see [Security & Trust](/hq/security/1-overview/).
+
+:::note[AI training stance]
+HQ's cloud-side AI runs on **AWS Bedrock** (Claude models hosted inside AWS), which does **not** train on data submitted through it. Indigo does **not** use customer data to train any models. Local agent tools run on your machine using your own model-provider account — that is a customer-connected tool, not an Indigo subprocessor.
+:::
+
+## Core subprocessors (all customers)
+
+| Subprocessor | Purpose | Data processed | Region |
+|---|---|---|---|
+| **Amazon Web Services (AWS)** | Primary cloud hosting — compute, storage (S3), databases (DynamoDB), KMS, networking, and **Bedrock** for cloud-side AI inference. | Customer content and metadata stored in HQ; content submitted to cloud AI features. | United States (`us-east-1`) |
+| **Google** (Workspace / Identity) | Federated sign-in (OIDC SSO) — the primary authentication path. | User identity data: email address and basic profile from the customer's Google account. | United States / global |
+
+> **Anthropic** is the model provider behind the Claude models that HQ runs through AWS Bedrock. With Bedrock, the data path stays inside AWS rather than reaching Anthropic's own API. Anthropic does not train its models on data submitted through the API. It is listed here for reviewer clarity.
+
+## Feature-specific subprocessors (only if you use the feature)
+
+| Subprocessor | Purpose | Data processed | Engaged when |
+|---|---|---|---|
+| **Sentry** | Application error and performance monitoring. | Operational telemetry and diagnostic context. Authentication tokens and home-directory paths are scrubbed before transmission; designed to exclude customer content. | Always (platform monitoring). |
+| **Recall.ai** | Meeting capture and transcription. | Meeting audio/transcripts and participant metadata. | When meeting-intelligence features are used. |
+| **Slack** | Messaging integration. | Message content and metadata sent or read on your behalf. | When you connect and use the Slack integration. |
+| **Vercel** | Managed hosting for certain web front-ends. | Request metadata for the hosted web surfaces. | When a Vercel-hosted HQ web surface is used. |
+
+## Customer-connected tools (not Indigo subprocessors)
+
+When you connect your own accounts or run local agents with your own credentials, HQ acts on your behalf using credentials you supply. These are **your** systems, governed by your agreements with those providers — not subprocessors engaged by Indigo:
+
+- **Your model providers** — Claude Code, Cursor, and Codex run locally with your own Anthropic, OpenAI, or other provider credentials. Indigo does not call those APIs on the server side.
+- **Your GitHub** — when you connect your own repositories, HQ uses the credentials you provide.
+
+## How we manage subprocessors
+
+- New subprocessors that will process customer data are reviewed for security and privacy posture before engagement.
+- This page is the authoritative, dated record and is updated when subprocessors change.
+- Under a Data Processing Addendum (DPA), Indigo provides advance notice of new subprocessors that process customer personal data (target: at least 30 days), giving customers an opportunity to object. Contact **security@getindigo.ai** to subscribe to change notifications or to discuss DPA terms.
+
+## Notes
+
+- Processing **region** reflects each subprocessor's configuration under HQ's current setup; consult each provider's own documentation for authoritative residency details.
+- This is a point-in-time list provided for security evaluation.

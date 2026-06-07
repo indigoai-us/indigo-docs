@@ -9,7 +9,7 @@ description: The HQ Sync menubar app — a macOS Tauri 2 desktop GUI that drives
 
 - A **Tauri 2** desktop app (small Rust backend + Svelte 5 UI), distributed as a signed/notarized macOS app.
 - Identifier `ai.indigo.hq-sync-menubar`, productName "HQ Sync".
-- A system-tray agent with per-workspace sync rows, real per-file progress, a Stop button, conflict resolution, new-file notifications, and Connect diagnostics.
+- A system-tray agent with per-workspace sync rows, real per-file progress, a Stop button, conflict resolution, new-file notifications, instant DM notifications, a notification history window, and Connect diagnostics.
 
 ## Who uses it / when
 
@@ -28,11 +28,53 @@ graph LR
 
 > **Distinction:** "hq-sync" is the menubar **app**. The sync **engine** is `@indigoai-us/hq-cloud`, and the same engine is also invoked by `hq sync` from the CLI. The app does not contain its own sync logic.
 
+## Instant DM delivery
+
+HQ Sync also receives **direct messages** — sent with `hq dm` or the `/dm` command — and surfaces them as native macOS notifications, with one-click "Copy prompt" and "Open details" actions and an inline reply. "Open details" opens the full **two-way conversation thread** — your messages and theirs, in order — not just the single notification, so a DM reads as a conversation rather than a one-off alert.
+
+As of **0.3.0**, DMs arrive **near-instantly** (p95 under 3 seconds, end-to-end) instead of waiting on a polling interval. HQ Sync subscribes to a per-user topic on an AWS IoT Core (MQTT-over-WebSockets) real-time fabric; the moment a DM is stored, a lightweight wake event is published to the recipient's topic and the menubar fetches and shows it immediately.
+
+```mermaid
+graph LR
+    send["hq dm"] -->|store write| store["DM store<br/>(durable)"]
+    store -->|publish wake| iot["AWS IoT Core<br/>(MQTT-over-WSS)"]
+    iot -->|instant wake| tray["HQ Sync<br/>(menubar)"]
+    tray -->|fetch + notify| notif["macOS notification"]
+```
+
+Key properties:
+
+- **Per-identity isolation** — each client connects with short-lived, scoped credentials and can only subscribe to its own DM topic; cross-user topics are denied at the broker.
+- **No DM is ever lost** — the durable store is the source of truth and MQTT is only the wake signal. If the real-time connection is unavailable, delivery falls back to the existing periodic poll with no loss and no regression.
+- **Nothing to configure** — the real-time path is automatic for signed-in users; DM notifications can be turned off in HQ Sync settings.
+
+## Manage packages
+
+HQ ships capabilities as **packs** (engineering, design, and more). From **Settings → Packages → Manage…**, HQ Sync opens a dedicated Packages window where you can browse, install, update, and uninstall packs without touching the terminal:
+
+- **Installed** packs show their version, an "update available" badge, and a warning if any of their links are broken — each with **Update** and **Uninstall** actions.
+- **Available** shows the curated pack catalog plus any registry packages you're entitled to, each with an **Install** action.
+- Installs and updates stream live progress; uninstalls cleanly remove a pack's wiring and archive it.
+
+Like everything else in HQ Sync, the window is a GUI over the `hq` CLI — it wraps the `hq packs` commands (see [hq-cli](/hq/products/hq-cli/)) so the CLI and the app share one implementation.
+
+## Notification history
+
+Notifications in HQ Sync are normally transient — a DM banner or a new-file alert appears and then it's gone. As of **0.6.0**, a bell button in the popover header opens a **Notifications** window: a single, reverse-chronological timeline (grouped by day) of everything HQ Sync has surfaced for you, so nothing you dismissed is lost.
+
+It brings three notification types into one view:
+
+- **Direct messages** you've received — click through to the full conversation thread and reply.
+- **Files shared with you** — click through to the share details.
+- **New files** synced to your drive — the files teammates added, attributed to whoever added them.
+
+Direct messages and shared files show their full history (the server retains them). New-file history fills in across sessions as your `hq` CLI updates to the version that reports them — within a session, the current sync's new files always appear.
+
 ## Install & updates
 
 hq-sync ships through GitHub Releases as a signed, notarized macOS DMG (minimum macOS 13.0). It auto-updates via a published `latest.json` manifest — once installed, new versions are offered automatically.
 
-Releases are cut by pushing a `v*` git tag, which runs the sign/notarize/DMG workflow. The current version is **0.1.98** (version is kept in lockstep across `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json`).
+Releases are cut by pushing a `v*` git tag, which runs the sign/notarize/DMG workflow. The version is kept in lockstep across `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json`.
 
 ## Related
 

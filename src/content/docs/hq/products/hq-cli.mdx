@@ -31,10 +31,17 @@ hq sync start               # start background sync
 hq sync status              # health
 hq sync stop                # stop background sync
 
-# capabilities
+# packs (content packs)
 hq install @indigoai-us/hq-pack-<name>   # install a content pack
+hq packs list                            # installed packs + the curated catalog
+hq packs update [name]                   # re-install the latest (--check-only to peek)
+hq packs uninstall <name>                # un-wire + archive a pack cleanly
+
+# capabilities
 hq run / hq secrets exec                 # schema-driven secret access
 ```
+
+Pack commands accept `--json` for machine-readable output — the [hq-sync](/hq/products/hq-sync/) menubar app uses this to power its Packages window.
 
 ## How it composes
 
