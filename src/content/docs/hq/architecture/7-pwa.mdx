@@ -19,12 +19,12 @@ The PWA dashboard (`apps/web`) provides mobile and desktop access to HQ content 
 
 ## App Structure
 
-`App.tsx` defines a `BrowserRouter` with five routes:
+The dashboard defines a route tree with a public sign-in entry point and authenticated application routes:
 
 ```tsx
 <BrowserRouter>
   <Routes>
-    <Route path="/login" element={<Login />} />
+    <Route path="/signin" element={<SignIn />} />
     <Route element={<ProtectedRoute />}>
       <Route path="/" element={<Dashboard />} />
       <Route path="/files/*" element={<FileBrowser />} />
@@ -39,26 +39,23 @@ The PWA dashboard (`apps/web`) provides mobile and desktop access to HQ content 
 
 ## Authentication
 
-Authentication lives in `lib/auth.tsx` and uses React context to provide auth state across the app.
+Authentication is backed by Cognito. The public sign-in page presents provider choices for Google and Microsoft, then redirects through Cognito Hosted UI so the resulting session is still a Cognito session for the rest of the app and API.
 
 ### AuthProvider
 
 ```tsx
 const AuthProvider = ({ children }) => {
-  // CognitoUserPool initialized from environment config
-  // Checks session on mount via cognitoUser.getSession()
-  // Provides: signIn, signUp, signOut, getToken
+  // Reads the current Cognito-backed session
+  // Provides: signOut, getToken, and authenticated user state
 };
 ```
 
 | Method | Description |
 |---|---|
-| `signIn(email, password)` | Authenticates against Cognito user pool |
-| `signUp(email, password)` | Creates a new Cognito user |
 | `signOut()` | Clears the local session |
 | `getToken()` | Extracts the JWT from the current session for API calls |
 
-On mount, the provider checks for an existing session by calling `cognitoUser.getSession()`. If a valid session exists, the user is automatically signed in without re-entering credentials.
+On mount, the provider checks for an existing session. If a valid session exists, the user is automatically signed in without choosing a provider again.
 
 ## API Client
 
@@ -77,7 +74,7 @@ Each function checks the response status and throws on non-2xx responses, allowi
 
 ### Login
 
-Email and password form with a toggle to switch between sign-in and sign-up modes. Displays error messages from Cognito (invalid credentials, user not confirmed, etc.) inline below the form.
+The sign-in page shows Google and Microsoft provider buttons and preserves the destination the user was trying to reach. Invite and access flows use the same provider-neutral sign-in surface.
 
 ### Dashboard
 
@@ -138,7 +135,7 @@ Key PWA properties:
 ## Route Map
 
 ```
-/login          Public — email/password authentication
+/signin         Public — Google or Microsoft sign-in through Cognito
 /               Dashboard — recent files, quick access
 /files/*        FileBrowser — directory listing, navigation
 /view/*         FileViewer — markdown, JSON, raw text rendering

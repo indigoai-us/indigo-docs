@@ -3,7 +3,7 @@ title: Infrastructure
 description: AWS infrastructure defined with SST — Cognito auth, S3 storage, API Gateway, and CloudFront distribution.
 ---
 
-HQ Cloud runs on AWS, defined entirely with [SST (Serverless Stack)](https://sst.dev). The infrastructure config at `infra/sst.config.ts` provisions four resources: a Cognito user pool for authentication, an S3 bucket for file storage, an API Gateway for CRUD operations, and a CloudFront distribution for the web dashboard.
+HQ Cloud runs on AWS, defined entirely with [SST (Serverless Stack)](https://sst.dev). The infrastructure config provisions Cognito authentication, S3-backed storage, API Gateway routes, Lambda handlers, and the web delivery layer for the dashboard.
 
 ```mermaid
 graph TD
@@ -19,7 +19,7 @@ graph TD
 
 ## Cognito User Pool
 
-Authentication uses Amazon Cognito with email-based sign-up and sign-in.
+Authentication uses Amazon Cognito as the identity authority for the web dashboard and API tokens. The Console sign-in surface routes users through Cognito Hosted UI with configured external identity providers, including Google and Microsoft for workspace sign-in, while API routes continue to validate Cognito-issued JWTs.
 
 ```ts
 const userPool = new cognito.UserPool(stack, "UserPool", {
@@ -38,8 +38,9 @@ Key settings:
 - **Self-signup enabled** — users register directly without admin invitation.
 - **Auto-verify email** — Cognito sends a verification code on sign-up and confirms the email automatically.
 - **Email as sign-in alias** — users authenticate with their email address, not a separate username.
+- **External providers** — Google and Microsoft identities are federated into the same user pool, so provider choice does not change the downstream JWT issuer or API audience.
 
-The `UserPoolClient` is used by both the web PWA and the CLI for token-based authentication flows.
+The primary Console `UserPoolClient` supports the web sign-in flow. Other product clients use the same Cognito authority only when they are explicitly configured for that surface.
 
 ## S3 Bucket
 
