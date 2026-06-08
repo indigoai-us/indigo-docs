@@ -1,9 +1,9 @@
 ---
-title: HQ in Chat
+title: HQ MCP
 description: Use Indigo HQ from ChatGPT and Claude.ai through the cloud connector.
 ---
 
-HQ in Chat connects ChatGPT and Claude.ai to the same governed HQ context your local agents use: company knowledge, project context, policies, files, and shared workflow skills.
+HQ MCP connects ChatGPT and Claude.ai to the same governed HQ context your local agents use: company knowledge, project context, policies, files, and shared workflow skills.
 
 The connector is built on the Model Context Protocol (MCP). Each request is authenticated with your HQ identity, and vault-service resolves which personal and company vaults you can access before any company lookup, file read, search, fetch, write, or skill review happens.
 
@@ -19,6 +19,7 @@ The cloud connector does not require a local HQ install, local filesystem access
 
 - List the HQ companies your account can access.
 - Browse readable company vault prefixes and fetch allowed files.
+- Share company vault files or prefixes by minting a short-lived share-session link or granting one recipient directly.
 - Search chat-visible personal and company content.
 - Read company knowledge, project records, project status, and policies.
 - Capture notes, journal entries, project updates, and knowledge captures back into allowed prefixes.
@@ -34,7 +35,7 @@ Different chat clients present MCP tools with different UI labels, but the conne
 | Group | Tools |
 | --- | --- |
 | Identity | `hq_whoami`, `hq_companies_list`, `hq_company_ping` |
-| Files | `hq_files_list`, `hq_files_read`, `hq_files_write` |
+| Files | `hq_files_list`, `hq_files_read`, `hq_files_write`, `hq_files_share` |
 | Knowledge | `hq_knowledge_list`, `hq_knowledge_get`, `hq_knowledge_search`, `hq_knowledge_capture` |
 | Projects | `hq_projects_list`, `hq_project_get`, `hq_project_status`, `hq_project_journal_append` |
 | Policies | `hq_policies_list`, `hq_policy_get` |
@@ -47,7 +48,7 @@ Some clients also expose the standard MCP `search` and `fetch` surface. Use that
 
 ## Search And Fetch
 
-HQ in Chat has two search paths:
+HQ MCP has two search paths:
 
 - `search` and `fetch` are the general MCP content discovery pair. Search returns matching chat-visible records, and fetch rechecks permission before returning the canonical content.
 - `hq_knowledge_search` keeps the company-scoped HQ tool shape. In cloud mode, it uses the vault content search service and filters results to the requested company. In local developer mode, it can fall back to `qmd`.
@@ -73,6 +74,16 @@ Writes are limited to explicitly writable areas, including:
 - `knowledge/captures/`
 
 Existing files are not overwritten unless the tool call explicitly confirms the overwrite.
+
+Files written from chat follow the same ownership model as files synced from a local HQ folder: the creator owns the new object first. Other people do not get access just because a chat wrote the file. Share it explicitly when someone else needs to read or edit it.
+
+Use `hq_files_share` to share one or more company vault paths:
+
+- Omit `with` to mint a short-lived share-session URL. The browser flow lets a human pick recipients and per-recipient read/write access.
+- Set `with` to an email, `prs_*` person UID, `grp_*` group ID, or `@all` to grant access directly from the tool call.
+- `permission` defaults to `read`; use `write` only when the recipient should be able to edit the path.
+
+Share-session URLs are bearer capabilities. They should be surfaced only at mint time and redacted everywhere else as `https://hq.{co}.com/share-session/<TOKEN_REDACTED>`.
 
 ## Secrets
 
@@ -105,11 +116,12 @@ Chat cannot write directly to live company skill roots.
 
 ## Security Model
 
-HQ in Chat keeps vault-service as the authority:
+HQ MCP keeps vault-service as the authority:
 
 - The connector forwards the verified bearer token and does not accept client-supplied vault scope.
 - Personal and company entitlements are resolved server-side.
 - Company-scoped tools first confirm membership in the requested company.
+- Chat writes create creator-owned files; sharing is a separate ACL action through the same vault-service rules used by HQ Console and HQ Sync.
 - Search results are hints; fetch rechecks canonical vault, source path, lifecycle, private-prefix, and skill review state.
 - Settings, secrets, and workers paths are excluded.
 - Secret values are never returned to chat.
@@ -124,6 +136,7 @@ Release verification covers:
 - OAuth metadata and connector boot.
 - Company lookup and company ping.
 - Company file listing, read, and write ACL behavior.
+- Company file sharing through share-session minting and direct grant behavior.
 - Knowledge list, get, search, and capture behavior.
 - Project, policy, and personal capture tools.
 - Secret metadata and schema tools.
@@ -143,6 +156,7 @@ If a rollout needs to be reversed, disable skill/content surfacing first, purge 
 | --- | --- |
 | The client can see tool names but every company tool fails | The OAuth token reached MCP, but vault-service could not resolve the account's company membership. Reconnect the client and verify `hq_whoami` and `hq_companies_list`. |
 | `hq_companies_list` works but `hq_files_list` returns not found | The company slug, deployed vault route, or file route bundle is stale. Verify the company slug and reconnect after the latest cloud deployment. |
+| `hq_files_share` is missing from the client tool list | The client probably cached the tool registry before the latest connector deploy. Relaunch or reconnect the chat client, then list tools again. |
 | `hq_knowledge_search` returns an empty array | The cloud service found no matching chat-visible content in that company scope. Try listing knowledge docs or fetching a known path. |
 | A cloud request mentions `qmd` | The client is not using the current production cloud bundle, or it is pointed at a local developer MCP server. |
 | A secret value is missing from the response | This is expected. MCP exposes secret names, schemas, and submission links only. |
