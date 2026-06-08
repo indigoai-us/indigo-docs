@@ -45,7 +45,6 @@ export default defineConfig({
         {
           label: "Products",
           items: [
-            { label: "HQ in Chat", link: "/hq-in-chat/" },
             { label: "hq-core", link: "/hq/products/hq-core/" },
             { label: "hq-cli", link: "/hq/products/hq-cli/" },
             { label: "hq-cloud", link: "/hq/products/hq-cloud/" },
@@ -54,7 +53,16 @@ export default defineConfig({
             { label: "hq-deploy", autogenerate: { directory: "hq/products/hq-deploy" } },
             { label: "hq-pro", autogenerate: { directory: "hq/products/hq-pro" } },
             { label: "hq-packages", autogenerate: { directory: "hq/products/hq-packages" } },
-            { label: "Capabilities", autogenerate: { directory: "hq/products/capabilities" } },
+            {
+              label: "Capabilities",
+              items: [
+                { label: "External Connections", link: "/hq/products/capabilities/external-connections/" },
+                { label: "hq-share", link: "/hq/products/capabilities/hq-share/" },
+                { label: "hq-secrets", link: "/hq/products/capabilities/hq-secrets/" },
+                { label: "Slack Bot Factory", link: "/hq/products/capabilities/slack-bot-factory/" },
+                { label: "HQ MCP", link: "/hq-in-chat/" },
+              ],
+            },
           ],
         },
         {

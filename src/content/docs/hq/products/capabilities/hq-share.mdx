@@ -23,6 +23,16 @@ sidebar:
 
 Under the hood this runs `hq files share <paths...>`, which mints the token and opens the picker.
 
+## From HQ MCP
+
+HQ MCP exposes the same vault sharing backend through the `hq_files_share` MCP tool. Ask ChatGPT or Claude.ai to share a company file or prefix after the connector is installed.
+
+- Omit `with` to mint a short-lived share-session URL for the browser picker.
+- Set `with` to an email, `prs_*` person UID, `grp_*` group ID, or `@all` for a direct grant.
+- `permission` defaults to `read`; use `write` only when the recipient should be able to edit.
+
+See [HQ MCP](/hq-in-chat/) for the full MCP tool surface.
+
 ## How it works
 
 1. **Auth check** — requires a signed-in session (`~/.hq/cognito-tokens.json`); run sign-in first if absent.
