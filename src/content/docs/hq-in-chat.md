@@ -5,6 +5,10 @@ description: Use Indigo HQ from ChatGPT and Claude.ai through the cloud connecto
 
 HQ MCP connects ChatGPT and Claude.ai to the same governed HQ context your local agents use: company knowledge, project context, policies, files, and shared workflow skills.
 
+:::caution[MCP is in beta]
+HQ MCP is currently in beta. The connector is usable today, but ChatGPT and Claude both treat remote MCP/custom connector support as beta surfaces, so setup screens, labels, permissions, and tool refresh behavior may change. Review write actions before approving them.
+:::
+
 The connector is built on the Model Context Protocol (MCP). Each request is authenticated with your HQ identity, and vault-service resolves which personal and company vaults you can access before any company lookup, file read, search, fetch, write, or skill review happens.
 
 For clients that ask for a remote MCP server URL, use:
@@ -14,6 +18,74 @@ https://hq-mcp.getindigo.ai/mcp
 ```
 
 The cloud connector does not require a local HQ install, local filesystem access, or `qmd` on the client. Local and developer MCP runs may still use local HQ files and `qmd` as a fallback, but the production cloud path talks to HQ cloud services directly.
+
+## Connect From ChatGPT
+
+ChatGPT exposes remote MCP through ChatGPT apps/custom connectors. During beta, the exact labels depend on your ChatGPT plan and workspace settings.
+
+Before you start, have these values ready:
+
+| Field | Value |
+| --- | --- |
+| MCP server URL | `https://hq-mcp.getindigo.ai/mcp` |
+| Authentication | OAuth |
+| Client ID | Use the HQ MCP beta Client ID provided by Indigo if ChatGPT asks for one. |
+| Client secret | Leave blank unless Indigo explicitly gives you one for your workspace. |
+| Scopes | `openid`, `email`, `profile`, `hq-mcp/use` |
+
+Setup:
+
+1. Ask a ChatGPT workspace admin or owner to enable developer mode for custom MCP apps. OpenAI currently documents this under **Workspace Settings -> Permissions & Roles -> Connected Data Developer mode / Create custom MCP connectors**.
+2. Enable developer mode for your own account if your plan requires a per-user toggle. OpenAI documents the user toggle under **Settings -> Apps -> Advanced Settings** for eligible Enterprise/Edu users.
+3. Create a custom app from **Workspace Settings -> Apps -> Create** if you are an admin or owner, or from **Settings -> Apps -> Create** if your workspace lets authorized users create apps.
+4. Enter the MCP server URL, choose OAuth authentication, and provide the HQ MCP beta Client ID if ChatGPT asks for one.
+5. Click **Scan Tools**. If ChatGPT opens the HQ authorization flow, sign in with your HQ identity and approve the requested access.
+6. After the scan completes, click **Create**. The app should appear with a developer or draft label until it is published for the workspace.
+7. Open a new chat and select the HQ app from the tools/app menu, or refer to it by name in your prompt.
+
+For write or share actions, ChatGPT may show an approval prompt before running the tool. Treat those prompts as the final human review step before HQ writes a file, grants access, or mints a share-session link.
+
+If the app shows an old tool list, refresh the app's actions or recreate the draft. OpenAI's beta app flow can cache tool definitions after the first scan.
+
+Official OpenAI references:
+
+- [Developer mode and MCP apps in ChatGPT](https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta)
+- [Building MCP servers for ChatGPT Apps and API integrations](https://developers.openai.com/api/docs/mcp)
+
+## Connect From Claude
+
+Claude exposes remote MCP through custom connectors. Anthropic currently marks custom connectors as beta.
+
+Before you start, have these values ready:
+
+| Field | Value |
+| --- | --- |
+| MCP server URL | `https://hq-mcp.getindigo.ai/mcp` |
+| OAuth Client ID | Use the HQ MCP beta Client ID provided by Indigo if Claude asks for one. |
+| OAuth Client Secret | Leave blank unless Indigo explicitly gives you one for your workspace. |
+
+Setup for Team and Enterprise:
+
+1. Ask an owner or primary owner to open **Organization settings -> Connectors**.
+2. Click **Add**, choose **Custom**, then choose **Web**.
+3. Enter the MCP server URL.
+4. Open **Advanced settings** only if Claude asks for OAuth client details, then enter the HQ MCP beta Client ID.
+5. Click **Add**.
+6. Each user then opens **Customize -> Connectors**, finds the custom HQ connector, clicks **Connect**, and completes the HQ OAuth sign-in.
+
+Setup for Pro or Max:
+
+1. Open **Customize -> Connectors**.
+2. Click **+**, then **Add custom connector**.
+3. Enter the MCP server URL.
+4. Open **Advanced settings** only if Claude asks for OAuth client details, then enter the HQ MCP beta Client ID.
+5. Click **Add**, then **Connect**, and complete the HQ OAuth sign-in.
+
+Enable the connector per conversation from the chat composer **+** menu under **Connectors**. If Claude can see the connector but not the newest tools, remove and re-add the connector so Claude scans the current MCP tool registry.
+
+Official Anthropic reference:
+
+- [Get started with custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
 
 ## What You Can Do
 
