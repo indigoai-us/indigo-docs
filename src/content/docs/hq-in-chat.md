@@ -29,7 +29,7 @@ Before you start, have these values ready:
 | --- | --- |
 | MCP server URL | `https://hq-mcp.getindigo.ai/mcp` |
 | Authentication | OAuth |
-| Client ID | Use the HQ MCP beta Client ID provided by Indigo if ChatGPT asks for one. |
+| Client ID | `6gorpnstao6ddli4tk8k5kv9s0` |
 | Client secret | Leave blank unless Indigo explicitly gives you one for your workspace. |
 | Scopes | `openid`, `email`, `profile`, `hq-mcp/use` |
 
@@ -38,7 +38,7 @@ Setup:
 1. Ask a ChatGPT workspace admin or owner to enable developer mode for custom MCP apps. OpenAI currently documents this under **Workspace Settings -> Permissions & Roles -> Connected Data Developer mode / Create custom MCP connectors**.
 2. Enable developer mode for your own account if your plan requires a per-user toggle. OpenAI documents the user toggle under **Settings -> Apps -> Advanced Settings** for eligible Enterprise/Edu users.
 3. Create a custom app from **Workspace Settings -> Apps -> Create** if you are an admin or owner, or from **Settings -> Apps -> Create** if your workspace lets authorized users create apps.
-4. Enter the MCP server URL, choose OAuth authentication, and provide the HQ MCP beta Client ID if ChatGPT asks for one.
+4. Enter the MCP server URL, choose OAuth authentication, and provide the HQ MCP beta Client ID `6gorpnstao6ddli4tk8k5kv9s0` if ChatGPT asks for one.
 5. Click **Scan Tools**. If ChatGPT opens the HQ authorization flow, sign in with your HQ identity and approve the requested access.
 6. After the scan completes, click **Create**. The app should appear with a developer or draft label until it is published for the workspace.
 7. Open a new chat and select the HQ app from the tools/app menu, or refer to it by name in your prompt.
@@ -61,7 +61,7 @@ Before you start, have these values ready:
 | Field | Value |
 | --- | --- |
 | MCP server URL | `https://hq-mcp.getindigo.ai/mcp` |
-| OAuth Client ID | Use the HQ MCP beta Client ID provided by Indigo if Claude asks for one. |
+| OAuth Client ID | `6gorpnstao6ddli4tk8k5kv9s0` |
 | OAuth Client Secret | Leave blank unless Indigo explicitly gives you one for your workspace. |
 
 Setup for Team and Enterprise:
@@ -69,7 +69,7 @@ Setup for Team and Enterprise:
 1. Ask an owner or primary owner to open **Organization settings -> Connectors**.
 2. Click **Add**, choose **Custom**, then choose **Web**.
 3. Enter the MCP server URL.
-4. Open **Advanced settings** only if Claude asks for OAuth client details, then enter the HQ MCP beta Client ID.
+4. Open **Advanced settings** only if Claude asks for OAuth client details, then enter the HQ MCP beta Client ID `6gorpnstao6ddli4tk8k5kv9s0`.
 5. Click **Add**.
 6. Each user then opens **Customize -> Connectors**, finds the custom HQ connector, clicks **Connect**, and completes the HQ OAuth sign-in.
 
@@ -78,7 +78,7 @@ Setup for Pro or Max:
 1. Open **Customize -> Connectors**.
 2. Click **+**, then **Add custom connector**.
 3. Enter the MCP server URL.
-4. Open **Advanced settings** only if Claude asks for OAuth client details, then enter the HQ MCP beta Client ID.
+4. Open **Advanced settings** only if Claude asks for OAuth client details, then enter the HQ MCP beta Client ID `6gorpnstao6ddli4tk8k5kv9s0`.
 5. Click **Add**, then **Connect**, and complete the HQ OAuth sign-in.
 
 Enable the connector per conversation from the chat composer **+** menu under **Connectors**. If Claude can see the connector but not the newest tools, remove and re-add the connector so Claude scans the current MCP tool registry.
