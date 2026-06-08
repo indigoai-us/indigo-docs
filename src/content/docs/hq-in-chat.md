@@ -92,6 +92,7 @@ Official Anthropic reference:
 - List the HQ companies your account can access.
 - Browse readable company vault prefixes and fetch allowed files.
 - Share company vault files or prefixes by minting a short-lived share-session link or granting one recipient directly.
+- Deploy small static sites to hq-deploy from explicit built file contents.
 - Search chat-visible personal and company content.
 - Read company knowledge, project records, project status, and policies.
 - Capture notes, journal entries, project updates, and knowledge captures back into allowed prefixes.
@@ -112,6 +113,7 @@ Different chat clients present MCP tools with different UI labels, but the conne
 | Projects | `hq_projects_list`, `hq_project_get`, `hq_project_status`, `hq_project_journal_append` |
 | Policies | `hq_policies_list`, `hq_policy_get` |
 | Secrets | `hq_secrets_list`, `hq_secrets_schema`, `hq_secrets_generate_link` |
+| Deploy | `hq_deploy_site` |
 | Personal vault | `hq_personal_capture` |
 | Skills | `hq_skill_list`, `hq_skill_get`, `hq_skill_draft` |
 | Diagnostics | `hq_ping`, `hq_version`, `hq_exec_check` |
@@ -157,6 +159,24 @@ Use `hq_files_share` to share one or more company vault paths:
 
 Share-session URLs are bearer capabilities. They should be surfaced only at mint time and redacted everywhere else as `https://hq.{co}.com/share-session/<TOKEN_REDACTED>`.
 
+## Deploy Sites
+
+Use `hq_deploy_site` when you want ChatGPT or Claude to create a small static web page and publish it through hq-deploy.
+
+The tool accepts explicit file contents, not a local project path. The request must include `index.html`; additional assets can be supplied as UTF-8 text or base64. The cloud connector does not run shell commands, package-manager builds, Docker builds, SSR builds, or local filesystem scans.
+
+Supported access modes:
+
+| Mode | Behavior |
+| --- | --- |
+| `public` | Anyone with the deployed URL can open the site. |
+| `password` | The app is password-gated. Provide a password or let HQ generate one. |
+| `company` | The app is restricted through the HQ company access policy for the requested company. |
+
+For protected deploys, the connector wires the requested access gate before creating the new deploy. If hq-deploy cannot confirm the access mode, the tool refuses instead of uploading the new artifact.
+
+This tool is intended for lightweight static pages, previews, readouts, and handoff artifacts. Use the local `/deploy` workflow or hq-deploy CLI for full project builds, SSR apps, Docker images, custom domain operations, or larger production releases.
+
 ## Secrets
 
 Secret values never enter the chat transcript. The MCP connector can list secret names and metadata, parse a project's `.env.schema`, and generate a time-limited submission link for a human to provide a value through HQ. It cannot return raw secret values to the model.
@@ -194,6 +214,7 @@ HQ MCP keeps vault-service as the authority:
 - Personal and company entitlements are resolved server-side.
 - Company-scoped tools first confirm membership in the requested company.
 - Chat writes create creator-owned files; sharing is a separate ACL action through the same vault-service rules used by HQ Console and HQ Sync.
+- Chat deploys call hq-deploy with the verified caller token. Protected deploys fail closed if the requested access mode cannot be confirmed.
 - Search results are hints; fetch rechecks canonical vault, source path, lifecycle, private-prefix, and skill review state.
 - Settings, secrets, and workers paths are excluded.
 - Secret values are never returned to chat.
@@ -209,6 +230,7 @@ Release verification covers:
 - Company lookup and company ping.
 - Company file listing, read, and write ACL behavior.
 - Company file sharing through share-session minting and direct grant behavior.
+- Static hq-deploy site creation and access-mode refusal behavior.
 - Knowledge list, get, search, and capture behavior.
 - Project, policy, and personal capture tools.
 - Secret metadata and schema tools.
@@ -229,6 +251,8 @@ If a rollout needs to be reversed, disable skill/content surfacing first, purge 
 | The client can see tool names but every company tool fails | The OAuth token reached MCP, but vault-service could not resolve the account's company membership. Reconnect the client and verify `hq_whoami` and `hq_companies_list`. |
 | `hq_companies_list` works but `hq_files_list` returns not found | The company slug, deployed vault route, or file route bundle is stale. Verify the company slug and reconnect after the latest cloud deployment. |
 | `hq_files_share` is missing from the client tool list | The client probably cached the tool registry before the latest connector deploy. Relaunch or reconnect the chat client, then list tools again. |
+| `hq_deploy_site` is missing from the client tool list | The client probably cached the tool registry before the latest connector deploy. Relaunch or reconnect the chat client, then list tools again. |
+| `hq_deploy_site` refuses a protected deploy | HQ could not confirm the requested hq-deploy access gate. Retry with a valid company, or use `password`/`public` only when that access mode is intended. |
 | `hq_knowledge_search` returns an empty array | The cloud service found no matching chat-visible content in that company scope. Try listing knowledge docs or fetching a known path. |
 | A cloud request mentions `qmd` | The client is not using the current production cloud bundle, or it is pointed at a local developer MCP server. |
 | A secret value is missing from the response | This is expected. MCP exposes secret names, schemas, and submission links only. |
