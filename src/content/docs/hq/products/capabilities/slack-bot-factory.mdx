@@ -5,7 +5,11 @@ sidebar:
   order: 4
 ---
 
-> **The Slack Bot Factory is a managed surface of [hq-pro](/hq/products/hq-pro/about/), driven by two `hq` skills (`/hq-slack-connect`, `/hq-new-bot`) and the [hq-packages](/hq/products/hq-packages/) `hq-pack-slack-bot` runtime.** It mints real, per-bot Slack apps on demand and lands their tokens in your company vault.
+> **The Slack Bot Factory is a managed surface of [hq-pro](/hq/products/hq-pro/about/): a one-time workspace connect, the in-Slack `/hq-new-bot` command, and the [hq-packages](/hq/products/hq-packages/) `hq-pack-slack-bot` runtime.** It mints real, per-bot Slack apps on demand and lands their tokens in your company vault.
+
+:::caution[Workspace connect is currently white-glove]
+The one-time workspace connect is **not yet self-serve** — there is no `/hq-slack-connect` command in the current HQ release. To connect a Slack workspace, **reach out to the Indigo team** ([hello@getindigo.ai](mailto:hello@getindigo.ai) or your shared Slack channel) and we'll run the connect with you. Once your workspace is connected, minting bots with `/hq-new-bot` and running them with `hq-pack-slack-bot` works exactly as described below. A self-serve connect command is on the roadmap; this page documents the flow it will follow.
+:::
 
 **The Slack Bot Factory** is how you get HQ into Slack. Connect a workspace once, and from then on anyone in it can stand up a named HQ bot with a single slash command. Each bot is its own Slack app, minted on demand, scoped to the company that owns it. The factory is multi-tenant by design: every workspace points at the same shared factory endpoint, but each one verifies against its own signing secret and mints apps with its own config tokens, so one company's bots never touch another's.
 
@@ -19,13 +23,7 @@ sidebar:
 
 ## One-time workspace connect
 
-Connecting a workspace is an **admin/owner-only** setup that happens once per Slack workspace. Run:
-
-```
-/hq-slack-connect [--company <slug>]
-```
-
-The skill resolves the company you're connecting the workspace to, confirms you hold an `admin` or `owner` role in it (the gate runs before any vault write), and then walks you through four steps.
+Connecting a workspace is an **admin/owner-only** setup that happens once per Slack workspace. It is currently **run with the Indigo team** (see the note above) and follows the four steps below. The connect resolves the company you're connecting the workspace to, confirms you hold an `admin` or `owner` role in it (the gate runs before any vault write), and then walks through four steps.
 
 ### 1. Create the bridge app from a manifest
 
@@ -106,7 +104,7 @@ For the full runtime — dispatch modes, channel lifecycle, and creator inferenc
 
 ## Rotation and re-auth
 
-Slack app config tokens expire, and signing secrets are sometimes rotated. To refresh a connected workspace, simply **re-run `/hq-slack-connect` for the same workspace.** It is idempotent on the `team_id`:
+Slack app config tokens expire, and signing secrets are sometimes rotated. To refresh a connected workspace, **re-run the connect with the Indigo team for the same workspace.** It is idempotent on the `team_id`:
 
 - the registry write upserts on the `team_id` primary key — no duplicate row;
 - the four vault writes overwrite the same key names — no orphaned secrets;
