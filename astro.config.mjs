@@ -49,6 +49,7 @@ export default defineConfig({
             { label: "hq-cli", link: "/hq/products/hq-cli/" },
             { label: "hq-cloud", link: "/hq/products/hq-cloud/" },
             { label: "hq-sync", link: "/hq/products/hq-sync/" },
+            { label: "HQ Workspace", link: "/hq/products/hq-workspace/" },
             { label: "hq-console", link: "/hq/products/hq-console/" },
             { label: "hq-deploy", autogenerate: { directory: "hq/products/hq-deploy" } },
             { label: "hq-pro", autogenerate: { directory: "hq/products/hq-pro" } },
