@@ -1,0 +1,27 @@
+# HQ
+
+> HQ is an open-source team AI operating system — a shared, synced context and capability layer over Claude Code, Cursor, and Codex. It gives your AI coding agents your whole company's memory (knowledge, decisions, people, skills, and policies) so they stop forgetting everything every session. We call that default failure "Agent Amnesia"; HQ is the cure.
+
+Install with one command: `npx create-hq`
+
+HQ is built by Indigo. It is open source (MIT) at github.com/indigoai-us/hq-core. It works alongside the AI coding tools you already use — it does not replace them; it gives them a persistent, team-wide memory.
+
+## Start here
+- [GitHub — hq-core](https://github.com/indigoai-us/hq-core): the open-source scaffold; run `npx create-hq` to begin
+- [Documentation](https://docs.getindigo.ai): how HQ works, concepts, and setup
+- [create-hq on npm](https://www.npmjs.com/package/create-hq): the installer package
+
+## Core ideas
+- Agent Amnesia: the anti-pattern where an AI agent forgets all company context at the start of every session, forcing constant re-explaining and re-discovery.
+- Shared context layer: one place for a company's knowledge, decisions, people, skills, workers, and policies — synced across the team and read by agents automatically.
+- Data gravity / compounding: every session deepens the shared memory, which makes agents smarter and raises the switching cost. The memory is both the moat and the marketing.
+
+## What HQ provides
+- A synced knowledge + policy layer your agents read from automatically
+- Reusable skills and workers (specialized agents) shared across a team
+- Works with Claude Code, Cursor, and Codex
+- An MCP server (hq-mcp) to bridge agents to HQ-managed context
+- A CLI (`hq`, via `npx create-hq` or `brew install coreyepstein/tap/hq`)
+
+## Who it's for
+Developers and technical teams using AI coding agents who are tired of re-teaching their tools the same company context every session.

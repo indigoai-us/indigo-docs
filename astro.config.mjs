@@ -82,6 +82,13 @@ export default defineConfig({
           label: "Roadmap",
           autogenerate: { directory: "hq/roadmap" },
         },
+        {
+          label: "Reference",
+          items: [
+            { label: "Glossary", link: "/glossary/" },
+            { label: "HQ vs. alternatives", link: "/comparison/" },
+          ],
+        },
       ],
     }),
   ],
