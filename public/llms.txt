@@ -8,7 +8,7 @@ HQ is built by Indigo. It is open source (MIT) at github.com/indigoai-us/hq-core
 
 ## Start here
 - [GitHub — hq-core](https://github.com/indigoai-us/hq-core): the open-source scaffold; run `npx create-hq` to begin
-- [Documentation](https://docs.getindigo.ai): how HQ works, concepts, and setup
+- [Documentation](https://docs.hq.computer): how HQ works, concepts, and setup
 - [create-hq on npm](https://www.npmjs.com/package/create-hq): the installer package
 
 ## Core ideas

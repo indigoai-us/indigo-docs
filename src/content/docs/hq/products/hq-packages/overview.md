@@ -19,7 +19,7 @@ hq install github:indigoai-us/hq-packages#packages/hq-pack-engineering
 
 ## Creator Marketplace
 
-Every pack can credit a **creator** — the person behind the skills, workers, or knowledge it ships. Creators get a public profile at `getindigo.ai/creators/<handle>` listing the packs they've published, with their bio and links.
+Every pack can credit a **creator** — the person behind the skills, workers, or knowledge it ships. Creators get a public profile at `hqforwork.com/creators/<handle>` listing the packs they've published, with their bio and links.
 
 **Claimable profiles.** HQ grows its catalog by curating the best of the open-source ecosystem, so a creator may have a profile *before they've ever signed up*. When a pack credits an author who hasn't joined yet, their profile renders an **"is this you? Claim it"** state — the real author can claim the handle, which links it to their account and lets them manage their packs, bio, and links from then on. Attribution always points at the true author; nothing is published under someone else's name without crediting them.
 

@@ -14,7 +14,7 @@ The connector is built on the Model Context Protocol (MCP). Each request is auth
 For clients that ask for a remote MCP server URL, use:
 
 ```txt
-https://hq-mcp.getindigo.ai/mcp
+https://hq-mcp.hq.computer/mcp
 ```
 
 The cloud connector does not require a local HQ install, local filesystem access, or `qmd` on the client. Local and developer MCP runs may still use local HQ files and `qmd` as a fallback, but the production cloud path talks to HQ cloud services directly.
@@ -27,7 +27,7 @@ Before you start, have these values ready:
 
 | Field | Value |
 | --- | --- |
-| MCP server URL | `https://hq-mcp.getindigo.ai/mcp` |
+| MCP server URL | `https://hq-mcp.hq.computer/mcp` |
 | Authentication | OAuth |
 | Client ID | `6gorpnstao6ddli4tk8k5kv9s0` |
 | Client secret | Leave blank unless Indigo explicitly gives you one for your workspace. |
@@ -60,7 +60,7 @@ Before you start, have these values ready:
 
 | Field | Value |
 | --- | --- |
-| MCP server URL | `https://hq-mcp.getindigo.ai/mcp` |
+| MCP server URL | `https://hq-mcp.hq.computer/mcp` |
 | OAuth Client ID | `6gorpnstao6ddli4tk8k5kv9s0` |
 | OAuth Client Secret | Leave blank unless Indigo explicitly gives you one for your workspace. |
 

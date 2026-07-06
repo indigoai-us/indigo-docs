@@ -31,8 +31,8 @@ The skill emits a **bridge-app manifest** with your company's display names fill
 
 The manifest wires the load-bearing parts for you — you only fill in display names:
 
-- the `/hq-new-bot` slash command → `https://hqapi.getindigo.ai/slack-apps/create`
-- the OAuth redirect → `https://hqapi.getindigo.ai/slack-apps/install-callback`
+- the `/hq-new-bot` slash command → `https://hqapi.hq.computer/slack-apps/create`
+- the OAuth redirect → `https://hqapi.hq.computer/slack-apps/install-callback`
 - the bot and user scopes, which mirror exactly what the factory mints (including `users:read.email`, which the factory uses to map the caller to their HQ identity)
 
 Do not change those fields — if they drift, `/hq-new-bot` breaks or the bridge app's grant surface no longer matches the bots it creates.
