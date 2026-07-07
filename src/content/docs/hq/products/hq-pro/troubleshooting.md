@@ -19,7 +19,7 @@ The installer surfaces the raw Cognito error message. Common causes:
 
 - **Weak password** — Cognito's policy rejects passwords missing required characters. Use a longer password with mixed case, a digit, and a symbol.
 - **User does not exist** — you're on the Sign in tab but haven't created an account yet. Switch to Sign up.
-- **Incorrect email or password** — double-check; if you forgot your password, reset it via the hq-cloud-api web app at `app.hq.getindigo.ai` (same Cognito pool).
+- **Incorrect email or password** — double-check; if you forgot your password, reset it via the hq-cloud-api web app at `app.hq.computer` (same Cognito pool).
 
 ### "Confirmation failed"
 
