@@ -9,7 +9,7 @@ description: The HQ Sync menubar app — a macOS Tauri 2 desktop GUI that drives
 
 - A **Tauri 2** desktop app (small Rust backend + Svelte 5 UI), distributed as a signed/notarized macOS app.
 - Identifier `ai.indigo.hq-sync-menubar`, productName "HQ Sync".
-- A system-tray agent with per-workspace sync rows, real per-file progress, a Stop button, conflict resolution, new-file notifications, instant DM notifications, a notification history window, and Connect diagnostics.
+- A system-tray agent with per-workspace sync rows, real per-file progress, a Stop button, conflict resolution, new-file notifications, instant DM notifications, a notifications-first popover with full notification history, share reactions, and Connect diagnostics.
 
 ## Who uses it / when
 
@@ -58,17 +58,26 @@ HQ ships capabilities as **packs** (engineering, design, and more). From **Setti
 
 Like everything else in HQ Sync, the window is a GUI over the `hq` CLI — it wraps the `hq packs` commands (see [hq-cli](/hq/products/hq-cli/)) so the CLI and the app share one implementation.
 
-## Notification history
+## Notifications
 
-Notifications in HQ Sync are normally transient — a DM banner or a new-file alert appears and then it's gone. As of **0.6.0**, a bell button in the popover header opens a **Notifications** window: a single, reverse-chronological timeline (grouped by day) of everything HQ Sync has surfaced for you, so nothing you dismissed is lost.
+Notifications in HQ Sync are normally transient — a DM banner or a new-file alert appears and then it's gone. As of **0.9.8**, notifications are the first thing you see: the menubar popover opens to a **Notifications** tab (with a **Workspaces** tab beside it for the sync rows), showing a compact, reverse-chronological feed with an unread badge and a "Mark all read" action. The desktop view gains a matching full-size **Notifications** page with the feed grouped by day. (This supersedes the bell-button Notifications window introduced in 0.6.0.)
 
-It brings three notification types into one view:
+The feed brings three notification types into one view:
 
 - **Direct messages** you've received — click through to the full conversation thread and reply.
 - **Files shared with you** — click through to the share details.
 - **New files** synced to your drive — the files teammates added, attributed to whoever added them.
 
 Direct messages and shared files show their full history (the server retains them). New-file history fills in across sessions as your `hq` CLI updates to the version that reports them — within a session, the current sync's new files always appear.
+
+## Share reactions & messaging the sharer
+
+When someone shares a file with you, the share isn't a dead-end alert (as of **0.9.8**):
+
+- **React with an emoji** — share details and the notification feed carry the same reaction bar DMs use. Reactions are scoped to the share, visible to the sharer and every recipient, and update in near-real-time over the same instant-delivery fabric DMs use.
+- **The sharer hears about it** — reacting to a share automatically sends the sharer a direct message, so a 👍 closes the loop without anyone composing anything.
+- **Message the sharer** — a one-click action opens a DM conversation with the person who shared the file, deep-linked from the share itself.
+- **Share history lives in Messages** — files a person shared with you appear inline in your DM thread with them as share cards, and conversation previews show "Shared a file," so shares and messages read as one conversation.
 
 ## Install & updates
 
