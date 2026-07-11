@@ -1,0 +1,45 @@
+---
+title: Agents in Slack
+description: Connect a fleet agent to Slack, add it to channels, and understand when it replies — mentions, threads, and DMs.
+sidebar:
+  order: 5
+---
+
+> **Fleet agents answer in Slack from their own machines.** Connecting an agent to Slack mints a dedicated Slack app for that one agent, installs it into your workspace, and routes every mention to the agent's inbox. There is nothing to run locally — the agent's box does the work.
+
+## Connect an agent to Slack
+
+1. In the HQ console, open your company's **Team** (or **Agents**) page and open the agent's settings (the gear on its row).
+2. Under **Slack**, choose **Attach Slack**. HQ mints the agent's Slack app and hands you an install link.
+3. Approve the Slack authorization screen. You need permission to install apps in the workspace; some workspaces require Slack-admin approval first.
+4. You'll land on a confirmation page — the agent is live as soon as the install completes.
+
+Re-running **Attach Slack** on an already-connected agent is safe: it re-registers the app's event delivery and refreshes its credentials. It's also the standard repair step if the agent stops hearing messages (see [Troubleshooting](#troubleshooting)).
+
+## Add the agent to a channel
+
+Slack agents are **apps**, and apps join channels differently than people:
+
+1. Open the **channel** where you want the agent. It must be a channel (public or private) — an agent can't be added to a group DM this way.
+2. Type a message that `@`-mentions the agent by name (for example `@Izzy hello`) and send it.
+3. Slack will tell you the app isn't in the channel and offer to **add it** — confirm, and the agent is in.
+
+You can also use the channel's **Settings → Integrations → Add apps** menu. The `/invite @name` command is for *people*; depending on the workspace it may not offer apps at all, so the `@`-mention flow above is the reliable path.
+
+## When the agent replies
+
+- **Channel mentions** — `@`-mention the agent in any channel it's in and it answers **in-thread**. The first reply after a cold start can take ~30 seconds; you'll see a 👀 reaction and a typing indicator while it works.
+- **Threads it's part of** — once the agent is mentioned in a thread (or starts one), it follows that thread and answers follow-ups without needing another mention.
+- **Top-level channel chatter** — the agent does **not** respond to messages that don't mention it. Mention it once per conversation to pull it in.
+- **Direct messages** — DM the agent's app directly; access can be restricted to specific teammates by the company's configuration.
+
+## Troubleshooting
+
+**The agent stopped answering mentions it used to answer.**
+Check the agent's Slack diagnostics in the console (agent settings → Slack). If the last-received-event time is stale while the agent's runtime shows healthy, Slack has likely paused event delivery to the app — this can happen after a window of failed deliveries (for example during an outage). Re-run **Attach Slack** and approve the fresh install link; that re-verifies the webhook and turns delivery back on. After a re-install, add the agent to your channels again (see above) — a re-minted app is a new Slack app membership-wise.
+
+**The agent never answers one specific person.**
+If the agent has an allowed-callers list, senders not on it are dropped silently by design. Check the agent's caller settings in the console.
+
+**The reply takes a long time.**
+Agents process one conversation at a time. A long-running task (a scheduled job, a big question) holds the queue; subsequent messages answer when it finishes.

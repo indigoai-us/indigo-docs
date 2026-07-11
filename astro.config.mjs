@@ -61,6 +61,7 @@ export default defineConfig({
                 { label: "hq-share", link: "/hq/products/capabilities/hq-share/" },
                 { label: "hq-secrets", link: "/hq/products/capabilities/hq-secrets/" },
                 { label: "Slack Bot Factory", link: "/hq/products/capabilities/slack-bot-factory/" },
+                { label: "Agents in Slack", link: "/hq/products/capabilities/agents-in-slack/" },
                 { label: "HQ MCP", link: "/hq-in-chat/" },
               ],
             },
