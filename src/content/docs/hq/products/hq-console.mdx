@@ -19,6 +19,8 @@ Administrators and team owners. The console is the human-facing window into the 
 
 - **Deployments** — visibility into HQ web-artifact deploys managed by [hq-deploy](/hq/products/hq-deploy/introduction/).
 - **Team** — membership and team administration backed by the [hq-pro](/hq/products/hq-pro/about/) team platform, including the invite-acceptance flow (`/invite/[token]` → `/api/invites/claim`).
+- **Agents** — per-agent settings, including an **Owners** panel (list, invite, and revoke agent owners) shown only to an agent's active owners. Agent ownership is what powers owner delegation when an owner messages the agent in [Slack](/hq/products/capabilities/agents-in-slack/).
+- **Personal Integrations** — per-user account links, such as connecting a Slack workspace whose email differs from your HQ login so agents recognize you there (see [Agents in Slack](/hq/products/capabilities/agents-in-slack/)).
 - **Connections** — issue scoped, read-only credentials so external agents and services can read selected prefixes of your company vault. See [External Connections](/hq/products/capabilities/external-connections/).
 - **Usage** — usage and activity charts.
 

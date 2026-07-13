@@ -33,6 +33,27 @@ You can also use the channel's **Settings → Integrations → Add apps** menu. 
 - **Top-level channel chatter** — the agent does **not** respond to messages that don't mention it. Mention it once per conversation to pull it in.
 - **Direct messages** — DM the agent's app directly; access can be restricted to specific teammates by the company's configuration.
 
+## When the agent acts as you (owner delegation)
+
+Every agent has one or more **owners** — starting with whoever created it. When a recognized owner messages their agent in Slack, the agent acts with **that owner's vault access** (a strict subset of it) instead of its own default identity. Ask it to pull a file only you can see and it can; a teammate who isn't an owner gets the agent's own baseline access instead. This is on by default for every company.
+
+A few things worth knowing:
+
+- **Owners are managed in the console.** Open the agent's settings and use the **Owners** panel to see the current owners, invite another owner, or revoke one. The Owners panel is visible only to active owners — if you don't own the agent, you won't see it.
+- **The agent only ever borrows *your own* access.** It never combines several owners' permissions, and it never exceeds what you can already reach yourself. A non-owner never triggers delegation.
+- **If the agent can't recognize who you are, it falls back to its own identity** rather than guessing — so delegation simply doesn't kick in until your identity is linked (below).
+- **A company can turn delegation off.** It's enabled everywhere by default, but each company can opt out in its settings; with delegation off, the agent always acts as itself.
+
+### Link your Slack workspace if your emails differ
+
+The agent recognizes you by matching your Slack identity to your HQ account. If the email on your Slack workspace is the **same** as your HQ login email, this just works. If they **differ**, link the workspace once so the agent knows it's you:
+
+1. In the HQ console, open **Personal Integrations**.
+2. Choose **Connect Slack** and approve the Slack authorization screen for the workspace where you talk to the agent.
+3. That link binds your Slack account in that workspace to your HQ identity. From then on the agent recognizes you there and delegation activates.
+
+Until that link exists (and your emails don't match), the agent can't confirm you're an owner and will act as itself.
+
 ## Troubleshooting
 
 **The agent stopped answering mentions it used to answer.**
@@ -43,3 +64,6 @@ If the agent has an allowed-callers list, senders not on it are dropped silently
 
 **The reply takes a long time.**
 Agents process one conversation at a time. A long-running task (a scheduled job, a big question) holds the queue; subsequent messages answer when it finishes.
+
+**The agent doesn't act as me even though I own it.**
+The agent must be able to match your Slack identity to your HQ account. If your Slack workspace email differs from your HQ login email, link the workspace under **Personal Integrations → Connect Slack** (see [When the agent acts as you](#when-the-agent-acts-as-you-owner-delegation)). Also confirm you're an active owner in the agent's **Owners** panel, and that your company hasn't turned delegation off in its settings. When your identity can't be resolved, the agent acts as itself by design rather than guessing.
