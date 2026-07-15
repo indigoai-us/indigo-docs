@@ -1,54 +1,94 @@
 ---
-title: Welcome
-description: Documentation for Indigo HQ — the OS for AI workers and its product ecosystem.
+title: HQ Documentation
+description: Documentation for Indigo HQ, the operating system for AI workers and its product ecosystem.
+template: splash
+tableOfContents: false
+hero:
+  title: The operating system for AI workers
+  tagline: One shared brain for your whole team across Claude Code, Cursor, and Codex. Knowledge, skills, policies, and capabilities that sync everywhere and compound over time.
+  actions:
+    - text: Get started
+      link: /hq/guide/2-getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: What is HQ?
+      link: /hq/guide/1-what-is-hq/
+      variant: minimal
 ---
 
 import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-Indigo HQ is the operating system for AI workers — a shared context layer over Claude Code, Cursor, and Codex that syncs knowledge, skills, policies, and capabilities across your team. It scales from a solo builder to an enterprise.
+<div class="hq-landing">
 
-HQ ships as a **split ecosystem** of independently versioned products rather than one combined repository. This site is the comprehensive user + technical reference for all of them. For how they compose, see the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/).
+<section class="hq-section">
+  <p class="hq-eyebrow">Quick start</p>
+  <h2 class="hq-h">Up and running in one command</h2>
+  <p class="hq-lead">Scaffold a fresh HQ, open your agent, and run setup. That's it. Your team's context layer is live.</p>
 
-## Get started
+  <div class="hq-terminal">
+    <div class="hq-terminal-bar"><span></span><span></span><span></span></div>
+    ```bash
+    npx create-hq
+    cd hq && claude
+    /setup
+    ```
+  </div>
 
-```bash
-npx create-hq
-cd hq && claude
-/setup
-```
+  <CardGrid>
+    <LinkCard title="What is HQ?" href="/hq/guide/1-what-is-hq/" description="The product, the model, and why it exists." />
+    <LinkCard title="Getting started" href="/hq/guide/2-getting-started/" description="Install, set up, and run your first session." />
+    <LinkCard title="Core concepts" href="/hq/guide/3-core-concepts/" description="Companies, workers, knowledge, policies, projects." />
+  </CardGrid>
+</section>
 
-- [What is HQ?](/hq/guide/1-what-is-hq/) — the product, the model, and why it exists.
-- [Getting started](/hq/guide/2-getting-started/) — install, set up, and run your first session.
-- [Core concepts](/hq/guide/3-core-concepts/) — companies, workers, knowledge, policies, projects.
+<section class="hq-section">
+  <p class="hq-eyebrow">The platform</p>
+  <h2 class="hq-h">One platform, eight products</h2>
+  <p class="hq-lead">HQ ships as a split ecosystem of independently versioned products that snap together. Start with one, grow into all of them. See how they compose in the <a href="/hq/architecture/2-ecosystem/">Ecosystem & Repo Map</a>.</p>
 
-## The HQ ecosystem
+  <CardGrid>
+    <LinkCard title="hq-core" href="/hq/products/hq-core/" description="Your starting point. The create-hq scaffold that seeds a new HQ instance in minutes." />
+    <LinkCard title="hq-cli" href="/hq/products/hq-cli/" description="The hq command. Manage modules and sync with the cloud straight from your terminal." />
+    <LinkCard title="hq-cloud" href="/hq/products/hq-cloud/" description="The bidirectional sync engine that keeps every machine on your team in lockstep." />
+    <LinkCard title="hq-sync" href="/hq/products/hq-sync/" description="The macOS menubar app. All the power of sync, no terminal required." />
+    <LinkCard title="hq-console" href="/hq/products/hq-console/" description="The admin UI for deployments, teams, and usage at a glance." />
+    <LinkCard title="hq-deploy" href="/hq/products/hq-deploy/introduction/" description="Ship static and SSR web apps to AWS with a single command." />
+    <LinkCard title="hq-pro" href="/hq/products/hq-pro/about/" description="The vault, team platform, and shared identity that power HQ for teams." />
+    <LinkCard title="hq-packages" href="/hq/products/hq-packages/overview/" description="Content packs that install new capabilities into any HQ instance." />
+  </CardGrid>
+</section>
 
-<CardGrid>
-  <LinkCard title="hq-core" href="/hq/products/hq-core/" description="The create-hq scaffold — the starter kit that seeds a new HQ instance." />
-  <LinkCard title="hq-cli" href="/hq/products/hq-cli/" description="The hq command — module management and cloud sync from the terminal." />
-  <LinkCard title="hq-cloud" href="/hq/products/hq-cloud/" description="The bidirectional S3 sync engine behind the CLI and the menubar app." />
-  <LinkCard title="hq-sync" href="/hq/products/hq-sync/" description="The macOS menubar app — a GUI over sync for non-technical users." />
-  <LinkCard title="hq-console" href="/hq/products/hq-console/" description="The Next.js admin UI for deployments, teams, and usage." />
-  <LinkCard title="hq-deploy" href="/hq/products/hq-deploy/introduction/" description="A PaaS for deploying static and SSR web apps to AWS." />
-  <LinkCard title="hq-pro" href="/hq/products/hq-pro/about/" description="The vault, team platform, and shared Cognito identity." />
-  <LinkCard title="hq-packages" href="/hq/products/hq-packages/overview/" description="Content packs installed into any HQ instance via hq install." />
-</CardGrid>
+<section class="hq-section">
+  <p class="hq-eyebrow">Capabilities</p>
+  <h2 class="hq-h">Built-in superpowers</h2>
 
-### Capabilities
+  <CardGrid>
+    <LinkCard title="hq-secrets" href="/hq/products/capabilities/hq-secrets/" description="Inject secrets into commands without ever printing them. Schema driven and safe by default." />
+    <LinkCard title="hq-share" href="/hq/products/capabilities/hq-share/" description="Share vault paths through single-use links with a browser ACL picker." />
+  </CardGrid>
+</section>
 
-<CardGrid>
-  <LinkCard title="hq-secrets" href="/hq/products/capabilities/hq-secrets/" description="Schema-driven secret access — inject secrets into commands without ever printing them." />
-  <LinkCard title="hq-share" href="/hq/products/capabilities/hq-share/" description="Single-use vault share-session links with a browser ACL picker." />
-</CardGrid>
+<section class="hq-section">
+  <p class="hq-eyebrow">Go deeper</p>
+  <h2 class="hq-h">Under the hood</h2>
 
-## Architecture & development
+  <CardGrid>
+    <LinkCard title="Architecture" href="/hq/architecture/1-overview/" description="How HQ is built, layer by layer." />
+    <LinkCard title="Development" href="/hq/development/1-local-setup/" description="Clone and run the individual repos locally." />
+    <LinkCard title="Roadmap" href="/hq/roadmap/1-overview/" description="What's shipped and what's next." />
+  </CardGrid>
 
-- [Architecture](/hq/architecture/1-overview/) — how HQ is built under the hood.
-- [Development](/hq/development/1-local-setup/) — clone and run the individual repos.
-- [Roadmap](/hq/roadmap/1-overview/) — what's shipped and what's next.
+  <p class="hq-note">Meeting intelligence and signals now live inside HQ as company skills and a synced signals store, surfaced through the <code>hq</code> CLI and HQ workers. This capability is being rebuilt on HQ. Documentation returns here once it ships.</p>
+</section>
 
-For the basic-user quickstart, see the [HQ quickstart site](https://github.com/indigoai-us). This site is the comprehensive reference.
+<section class="hq-cta">
+  <p class="hq-eyebrow">Ready when you are</p>
+  <h2 class="hq-h">Give your team a shared brain</h2>
+  <p class="hq-lead">Install HQ, connect your tools, and let context compound. It scales from a solo builder to an enterprise.</p>
+  <div class="hq-cta-actions">
+    <a class="hq-btn-primary" href="/hq/guide/2-getting-started/">Get started</a>
+    <a class="hq-btn-ghost" href="/hq/architecture/1-overview/">See the architecture</a>
+  </div>
+</section>
 
-## Meetings & signals
-
-Meeting intelligence and signals now live inside HQ as company skills and a synced signals store, surfaced through the `hq` CLI and HQ workers. This capability is being rebuilt on HQ — documentation will return here once it ships.
+</div>

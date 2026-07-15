@@ -152,6 +152,287 @@ table td, table th {
 a { text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+/* ==========================================================
+   Landing page — brand marketing treatment
+   Palette: near-black base, periwinkle accent (#818cf8) used
+   sparingly, mono uppercase labels, white pill primary CTA.
+   ========================================================== */
+
+:root {
+  --hq-accent: #818cf8;
+  --hq-accent-dim: #6366f1;
+  --hq-accent-glow: rgba(99, 102, 241, 0.1);
+}
+
+/* Hero */
+.hero {
+  padding: 4.5rem 0 2.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(2.25rem, 6vw, 3.5rem) !important;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  font-weight: 500 !important;
+  max-width: 40rem;
+}
+
+.hero .tagline {
+  font-size: 1.0625rem !important;
+  line-height: 1.6;
+  color: var(--sl-color-gray-1);
+  max-width: 36rem;
+}
+
+/* Hero action buttons: white pill primary, quiet ghost secondary */
+.hero .sl-link-button.primary,
+.hero a.action.primary {
+  background: #fafafa;
+  border: 1px solid #fafafa;
+  color: #000000;
+  border-radius: 999px;
+  font-family: var(--sl-font-system-mono);
+  font-size: 0.875rem;
+  padding: 0.625rem 1.5rem;
+  box-shadow: 0 0 24px -6px rgba(255, 255, 255, 0.5);
+  transition: box-shadow 150ms ease, background 150ms ease;
+}
+
+.hero .sl-link-button.primary:hover,
+.hero a.action.primary:hover {
+  background: #ffffff;
+  box-shadow: 0 0 32px -4px rgba(255, 255, 255, 0.7);
+}
+
+.hero .sl-link-button.minimal,
+.hero a.action.minimal {
+  font-family: var(--sl-font-system-mono);
+  font-size: 0.875rem;
+  color: var(--sl-color-gray-1);
+}
+
+.hero .sl-link-button.minimal:hover,
+.hero a.action.minimal:hover {
+  color: var(--sl-color-white);
+}
+
+/* Landing sections */
+.hq-landing .hq-section {
+  margin: 4rem 0;
+}
+
+.hq-eyebrow {
+  font-family: var(--sl-font-system-mono);
+  font-size: 0.6875rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--hq-accent);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem !important;
+}
+
+.hq-eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--hq-accent);
+  display: inline-block;
+}
+
+.hq-landing .hq-h {
+  font-size: 1.625rem !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.02em;
+  margin-top: 0 !important;
+}
+
+.hq-lead {
+  color: var(--sl-color-gray-1);
+  font-size: 0.9375rem !important;
+  line-height: 1.65;
+  max-width: 38rem;
+}
+
+/* Terminal block with accent corner brackets */
+.hq-terminal {
+  position: relative;
+  max-width: 30rem;
+  margin: 1.5rem 0 2rem;
+  border: 1px solid var(--sl-color-gray-4);
+  background: #050505;
+  padding: 0.25rem 1rem 0.5rem;
+}
+
+.hq-terminal::before,
+.hq-terminal::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: var(--hq-accent);
+  border-style: solid;
+}
+
+.hq-terminal::before {
+  top: -1px;
+  left: -1px;
+  border-width: 1px 0 0 1px;
+}
+
+.hq-terminal::after {
+  bottom: -1px;
+  right: -1px;
+  border-width: 0 1px 1px 0;
+}
+
+.hq-terminal-bar {
+  display: flex;
+  gap: 6px;
+  padding: 0.75rem 0 0.25rem;
+}
+
+.hq-terminal-bar span {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--sl-color-gray-4);
+}
+
+.hq-terminal pre {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Expressive Code draws its own terminal chrome; ours replaces it */
+.hq-terminal .expressive-code .frame.is-terminal .header {
+  display: none;
+}
+
+.hq-terminal .expressive-code .frame {
+  box-shadow: none;
+  border: none;
+}
+
+/* Product cards: angular, mono titles, accent hover */
+.hq-landing .sl-link-card {
+  border-radius: 0;
+  border: 1px solid var(--sl-color-gray-4);
+  background: #0a0a0c;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.hq-landing .sl-link-card:hover {
+  border-color: rgba(129, 140, 248, 0.45);
+  box-shadow: 0 0 28px -10px var(--hq-accent-glow), 0 0 0 1px rgba(129, 140, 248, 0.12);
+  background: #0c0c10;
+}
+
+.hq-landing .sl-link-card .title {
+  font-family: var(--sl-font-system-mono);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hq-landing .sl-link-card .title::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  background: var(--hq-accent);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.hq-landing .sl-link-card .description {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--sl-color-gray-1);
+}
+
+.hq-note {
+  font-size: 0.8125rem !important;
+  color: var(--sl-color-gray-2);
+  border-left: 2px solid var(--sl-color-gray-4);
+  padding-left: 1rem;
+  max-width: 38rem;
+  margin-top: 2rem !important;
+}
+
+/* Closing CTA band */
+.hq-cta {
+  margin: 5rem 0 3rem;
+  padding: 3rem 2rem;
+  border: 1px solid var(--sl-color-gray-4);
+  text-align: center;
+  background:
+    radial-gradient(ellipse 60% 80% at 50% 120%, var(--hq-accent-glow), transparent);
+}
+
+.hq-cta .hq-eyebrow {
+  justify-content: center;
+}
+
+.hq-cta .hq-lead {
+  margin: 0.75rem auto 1.75rem;
+}
+
+.hq-cta-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hq-btn-primary {
+  background: #fafafa;
+  border: 1px solid #fafafa;
+  color: #000000 !important;
+  border-radius: 999px;
+  font-family: var(--sl-font-system-mono);
+  font-size: 0.875rem;
+  padding: 0.625rem 1.5rem;
+  box-shadow: 0 0 24px -6px rgba(255, 255, 255, 0.5);
+  transition: box-shadow 150ms ease;
+}
+
+.hq-btn-primary:hover {
+  text-decoration: none;
+  box-shadow: 0 0 32px -4px rgba(255, 255, 255, 0.7);
+}
+
+.hq-btn-ghost {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--sl-color-white) !important;
+  border-radius: 999px;
+  font-family: var(--sl-font-system-mono);
+  font-size: 0.875rem;
+  padding: 0.625rem 1.5rem;
+  transition: background 150ms ease;
+}
+
+.hq-btn-ghost:hover {
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Light theme: keep the landing legible if someone flips the toggle */
+:root[data-theme="light"] .hero .sl-link-button.primary,
+:root[data-theme="light"] .hero a.action.primary {
+  background: #111111;
+  border-color: #111111;
+  color: #ffffff;
+  box-shadow: none;
+}
+:root[data-theme="light"] .hq-terminal { background: #fafafa; }
+:root[data-theme="light"] .hq-landing .sl-link-card { background: #fafafa; }
+:root[data-theme="light"] .hq-landing .sl-link-card:hover { background: #f5f5f7; }
+:root[data-theme="light"] .hq-cta { background: radial-gradient(ellipse 60% 80% at 50% 120%, rgba(99, 102, 241, 0.06), transparent); }
+:root[data-theme="light"] .hq-btn-primary { background: #111111; border-color: #111111; color: #ffffff !important; box-shadow: none; }
+:root[data-theme="light"] .hq-btn-ghost { border-color: rgba(0, 0, 0, 0.2); }
+
 /* Mermaid diagrams — monochrome dark theme */
 .mermaid {
   background: transparent !important;
