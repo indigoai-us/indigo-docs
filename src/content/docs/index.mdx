@@ -1,30 +1,111 @@
 ---
-title: HQ Documentation
-description: Documentation for Indigo HQ, the operating system for AI workers and its product ecosystem.
-template: splash
+title: How can we help?
+description: Documentation and help center for Indigo HQ, the operating system for AI workers.
 tableOfContents: false
-hero:
-  title: The operating system for AI workers
-  tagline: One shared brain for your whole team across Claude Code, Cursor, and Codex. Knowledge, skills, policies, and capabilities that sync everywhere and compound over time.
-  actions:
-    - text: Get started
-      link: /hq/guide/2-getting-started/
-      icon: right-arrow
-      variant: primary
-    - text: What is HQ?
-      link: /hq/guide/1-what-is-hq/
-      variant: minimal
 ---
 
-import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+<div class="hq-help">
 
-<div class="hq-landing">
+<p class="hq-help-sub">Everything about HQ, from your first install to deep architecture. Search the docs or browse by topic below.</p>
 
-<section class="hq-section">
-  <p class="hq-eyebrow">Quick start</p>
-  <h2 class="hq-h">Up and running in one command</h2>
-  <p class="hq-lead">Scaffold a fresh HQ, open your agent, and run setup. That's it. Your team's context layer is live.</p>
+<button class="hq-search" onclick="setTimeout(() => document.querySelector('button[data-open-modal]')?.click(), 0)">
+  <span class="hq-search-icon" aria-hidden="true"></span>
+  <span class="hq-search-label">Search the docs</span>
+  <kbd class="hq-search-kbd">⌘K</kbd>
+</button>
 
+<div class="hq-popular">
+  <span class="hq-popular-label">Popular</span>
+  <a href="/hq/guide/1-what-is-hq/">What is HQ?</a>
+  <a href="/hq/guide/2-getting-started/">Getting started</a>
+  <a href="/hq/guide/8-cloud-sync/">Cloud sync</a>
+  <a href="/hq/products/hq-deploy/introduction/">hq-deploy</a>
+  <a href="/hq/products/capabilities/hq-secrets/">hq-secrets</a>
+  <a href="/glossary/">Glossary</a>
+</div>
+
+<div class="hq-cats">
+
+<div class="hq-cat">
+  <p class="hq-cat-title">Getting started<span class="hq-cat-count">4 guides</span></p>
+  <p class="hq-cat-desc">New to HQ? Start here and be up and running in one command.</p>
+  <ul class="hq-cat-links">
+    <li><a href="/hq/guide/1-what-is-hq/">What is HQ?</a></li>
+    <li><a href="/hq/guide/2-getting-started/">Getting started</a></li>
+    <li><a href="/hq/guide/3-core-concepts/">Core concepts</a></li>
+    <li><a href="/hq/guide/4-commands/">Commands</a></li>
+  </ul>
+</div>
+
+<div class="hq-cat">
+  <p class="hq-cat-title">Everyday use<span class="hq-cat-count">4 guides</span></p>
+  <p class="hq-cat-desc">The day-to-day workflows: workers, knowledge, projects, and sync.</p>
+  <ul class="hq-cat-links">
+    <li><a href="/hq/guide/5-workers/">Workers</a></li>
+    <li><a href="/hq/guide/6-knowledge-bases/">Knowledge bases</a></li>
+    <li><a href="/hq/guide/7-projects/">Projects</a></li>
+    <li><a href="/hq/guide/8-cloud-sync/">Cloud sync</a></li>
+  </ul>
+</div>
+
+<div class="hq-cat">
+  <p class="hq-cat-title">Products<span class="hq-cat-count">8 products</span></p>
+  <p class="hq-cat-desc">The HQ ecosystem: independently versioned products that snap together.</p>
+  <ul class="hq-cat-links hq-cat-links-2col">
+    <li><a href="/hq/products/hq-core/">hq-core</a></li>
+    <li><a href="/hq/products/hq-cli/">hq-cli</a></li>
+    <li><a href="/hq/products/hq-cloud/">hq-cloud</a></li>
+    <li><a href="/hq/products/hq-sync/">hq-sync</a></li>
+    <li><a href="/hq/products/hq-console/">hq-console</a></li>
+    <li><a href="/hq/products/hq-deploy/introduction/">hq-deploy</a></li>
+    <li><a href="/hq/products/hq-pro/about/">hq-pro</a></li>
+    <li><a href="/hq/products/hq-packages/overview/">hq-packages</a></li>
+  </ul>
+</div>
+
+<div class="hq-cat">
+  <p class="hq-cat-title">Capabilities<span class="hq-cat-count">6 topics</span></p>
+  <p class="hq-cat-desc">Built-in superpowers that work across every HQ instance.</p>
+  <ul class="hq-cat-links hq-cat-links-2col">
+    <li><a href="/hq/products/capabilities/hq-secrets/">hq-secrets</a></li>
+    <li><a href="/hq/products/capabilities/hq-share/">hq-share</a></li>
+    <li><a href="/hq/products/capabilities/external-connections/">External connections</a></li>
+    <li><a href="/hq/products/capabilities/slack-bot-factory/">Slack Bot Factory</a></li>
+    <li><a href="/hq/products/capabilities/agents-in-slack/">Agents in Slack</a></li>
+    <li><a href="/hq-in-chat/">HQ MCP</a></li>
+  </ul>
+</div>
+
+<div class="hq-cat">
+  <p class="hq-cat-title">Architecture & development<span class="hq-cat-count">4 topics</span></p>
+  <p class="hq-cat-desc">How HQ is built, how the pieces compose, and how to run it locally.</p>
+  <ul class="hq-cat-links">
+    <li><a href="/hq/architecture/1-overview/">Architecture overview</a></li>
+    <li><a href="/hq/architecture/2-ecosystem/">Ecosystem & repo map</a></li>
+    <li><a href="/hq/development/1-local-setup/">Local development setup</a></li>
+    <li><a href="/hq/roadmap/1-overview/">Roadmap</a></li>
+  </ul>
+</div>
+
+<div class="hq-cat">
+  <p class="hq-cat-title">Security & reference<span class="hq-cat-count">4 topics</span></p>
+  <p class="hq-cat-desc">Security posture, tenant isolation, and quick-lookup references.</p>
+  <ul class="hq-cat-links">
+    <li><a href="/hq/security/1-overview/">Security overview</a></li>
+    <li><a href="/hq/security/3-tenant-isolation/">Tenant isolation</a></li>
+    <li><a href="/glossary/">Glossary</a></li>
+    <li><a href="/comparison/">HQ vs. alternatives</a></li>
+  </ul>
+</div>
+
+</div>
+
+<div class="hq-install">
+  <div class="hq-install-copy">
+    <p class="hq-eyebrow">Quick start</p>
+    <p class="hq-install-title">Install HQ in one command</p>
+    <p class="hq-install-desc">Scaffold a fresh HQ, open your agent, and run setup. Your team's context layer is live.</p>
+  </div>
   <div class="hq-terminal">
     <div class="hq-terminal-bar"><span></span><span></span><span></span></div>
     ```bash
@@ -33,62 +114,16 @@ import { CardGrid, LinkCard } from '@astrojs/starlight/components';
     /setup
     ```
   </div>
+</div>
 
-  <CardGrid>
-    <LinkCard title="What is HQ?" href="/hq/guide/1-what-is-hq/" description="The product, the model, and why it exists." />
-    <LinkCard title="Getting started" href="/hq/guide/2-getting-started/" description="Install, set up, and run your first session." />
-    <LinkCard title="Core concepts" href="/hq/guide/3-core-concepts/" description="Companies, workers, knowledge, policies, projects." />
-  </CardGrid>
-</section>
-
-<section class="hq-section">
-  <p class="hq-eyebrow">The platform</p>
-  <h2 class="hq-h">One platform, eight products</h2>
-  <p class="hq-lead">HQ ships as a split ecosystem of independently versioned products that snap together. Start with one, grow into all of them. See how they compose in the <a href="/hq/architecture/2-ecosystem/">Ecosystem & Repo Map</a>.</p>
-
-  <CardGrid>
-    <LinkCard title="hq-core" href="/hq/products/hq-core/" description="Your starting point. The create-hq scaffold that seeds a new HQ instance in minutes." />
-    <LinkCard title="hq-cli" href="/hq/products/hq-cli/" description="The hq command. Manage modules and sync with the cloud straight from your terminal." />
-    <LinkCard title="hq-cloud" href="/hq/products/hq-cloud/" description="The bidirectional sync engine that keeps every machine on your team in lockstep." />
-    <LinkCard title="hq-sync" href="/hq/products/hq-sync/" description="The macOS menubar app. All the power of sync, no terminal required." />
-    <LinkCard title="hq-console" href="/hq/products/hq-console/" description="The admin UI for deployments, teams, and usage at a glance." />
-    <LinkCard title="hq-deploy" href="/hq/products/hq-deploy/introduction/" description="Ship static and SSR web apps to AWS with a single command." />
-    <LinkCard title="hq-pro" href="/hq/products/hq-pro/about/" description="The vault, team platform, and shared identity that power HQ for teams." />
-    <LinkCard title="hq-packages" href="/hq/products/hq-packages/overview/" description="Content packs that install new capabilities into any HQ instance." />
-  </CardGrid>
-</section>
-
-<section class="hq-section">
-  <p class="hq-eyebrow">Capabilities</p>
-  <h2 class="hq-h">Built-in superpowers</h2>
-
-  <CardGrid>
-    <LinkCard title="hq-secrets" href="/hq/products/capabilities/hq-secrets/" description="Inject secrets into commands without ever printing them. Schema driven and safe by default." />
-    <LinkCard title="hq-share" href="/hq/products/capabilities/hq-share/" description="Share vault paths through single-use links with a browser ACL picker." />
-  </CardGrid>
-</section>
-
-<section class="hq-section">
-  <p class="hq-eyebrow">Go deeper</p>
-  <h2 class="hq-h">Under the hood</h2>
-
-  <CardGrid>
-    <LinkCard title="Architecture" href="/hq/architecture/1-overview/" description="How HQ is built, layer by layer." />
-    <LinkCard title="Development" href="/hq/development/1-local-setup/" description="Clone and run the individual repos locally." />
-    <LinkCard title="Roadmap" href="/hq/roadmap/1-overview/" description="What's shipped and what's next." />
-  </CardGrid>
-
-  <p class="hq-note">Meeting intelligence and signals now live inside HQ as company skills and a synced signals store, surfaced through the <code>hq</code> CLI and HQ workers. This capability is being rebuilt on HQ. Documentation returns here once it ships.</p>
-</section>
-
-<section class="hq-cta">
-  <p class="hq-eyebrow">Ready when you are</p>
-  <h2 class="hq-h">Give your team a shared brain</h2>
-  <p class="hq-lead">Install HQ, connect your tools, and let context compound. It scales from a solo builder to an enterprise.</p>
+<div class="hq-support">
+  <p class="hq-eyebrow">Still stuck?</p>
+  <p class="hq-support-title">We've got you</p>
+  <p class="hq-support-desc">Can't find what you need? Reach out and a human will point you the right way.</p>
   <div class="hq-cta-actions">
-    <a class="hq-btn-primary" href="/hq/guide/2-getting-started/">Get started</a>
-    <a class="hq-btn-ghost" href="/hq/architecture/1-overview/">See the architecture</a>
+    <a class="hq-btn-primary" href="https://github.com/indigoai-us">Ask on GitHub</a>
+    <a class="hq-btn-ghost" href="https://www.hqforwork.com">Visit hqforwork.com</a>
   </div>
-</section>
+</div>
 
 </div>

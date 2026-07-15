@@ -153,7 +153,7 @@ a { text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* ==========================================================
-   Landing page — brand marketing treatment
+   Help center homepage — brand treatment
    Palette: near-black base, periwinkle accent (#818cf8) used
    sparingly, mono uppercase labels, white pill primary CTA.
    ========================================================== */
@@ -164,63 +164,211 @@ a:hover { text-decoration: underline; }
   --hq-accent-glow: rgba(99, 102, 241, 0.1);
 }
 
-/* Hero */
-.hero {
-  padding: 4.5rem 0 2.5rem;
-}
-
-.hero h1 {
-  font-size: clamp(2.25rem, 6vw, 3.5rem) !important;
-  line-height: 1.06;
-  letter-spacing: -0.03em;
+/* Page title: bigger, friendlier on the help homepage only */
+main:has(.hq-help) h1 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem) !important;
   font-weight: 500 !important;
-  max-width: 40rem;
+  letter-spacing: -0.03em;
 }
 
-.hero .tagline {
-  font-size: 1.0625rem !important;
-  line-height: 1.6;
+.hq-help-sub {
   color: var(--sl-color-gray-1);
-  max-width: 36rem;
+  font-size: 0.9375rem !important;
+  line-height: 1.65;
+  max-width: 34rem;
+  margin-top: 0.5rem !important;
 }
 
-/* Hero action buttons: white pill primary, quiet ghost secondary */
-.hero .sl-link-button.primary,
-.hero a.action.primary {
-  background: #fafafa;
-  border: 1px solid #fafafa;
-  color: #000000;
+/* Search box: opens the built-in Starlight search modal */
+.hq-search {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 34rem;
+  margin: 1.5rem 0 1rem;
+  padding: 0.8125rem 1rem;
+  background: #0a0a0c;
+  border: 1px solid var(--sl-color-gray-4);
+  color: var(--sl-color-gray-2);
+  font-family: var(--sl-font);
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.hq-search:hover,
+.hq-search:focus-visible {
+  border-color: rgba(129, 140, 248, 0.45);
+  box-shadow: 0 0 28px -10px var(--hq-accent-glow), 0 0 0 1px rgba(129, 140, 248, 0.12);
+}
+
+.hq-search-icon {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--sl-color-gray-2);
   border-radius: 999px;
-  font-family: var(--sl-font-system-mono);
-  font-size: 0.875rem;
-  padding: 0.625rem 1.5rem;
-  box-shadow: 0 0 24px -6px rgba(255, 255, 255, 0.5);
-  transition: box-shadow 150ms ease, background 150ms ease;
+  position: relative;
+  flex-shrink: 0;
 }
 
-.hero .sl-link-button.primary:hover,
-.hero a.action.primary:hover {
-  background: #ffffff;
-  box-shadow: 0 0 32px -4px rgba(255, 255, 255, 0.7);
+.hq-search-icon::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 1.5px;
+  background: var(--sl-color-gray-2);
+  transform: rotate(45deg);
+  bottom: -3px;
+  right: -4px;
 }
 
-.hero .sl-link-button.minimal,
-.hero a.action.minimal {
+.hq-search-label {
+  flex: 1;
+}
+
+.hq-search-kbd {
   font-family: var(--sl-font-system-mono);
-  font-size: 0.875rem;
+  font-size: 0.6875rem;
+  color: var(--sl-color-gray-2);
+  border: 1px solid var(--sl-color-gray-4);
+  padding: 0.125rem 0.375rem;
+}
+
+/* Popular topic pills */
+.hq-popular {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 2.5rem;
+}
+
+.hq-popular-label {
+  font-family: var(--sl-font-system-mono);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--hq-accent);
+  margin-right: 0.25rem;
+}
+
+.hq-popular a {
+  font-size: 0.8125rem;
+  color: var(--sl-color-gray-1);
+  border: 1px solid var(--sl-color-gray-4);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.hq-popular a:hover {
+  text-decoration: none;
+  color: var(--sl-color-white);
+  border-color: rgba(129, 140, 248, 0.45);
+}
+
+/* Category grid */
+.hq-cats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  gap: 1rem;
+  margin: 0 0 2.5rem;
+}
+
+.hq-cat {
+  border: 1px solid var(--sl-color-gray-4);
+  background: #0a0a0c;
+  padding: 1.25rem 1.25rem 1rem;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.hq-cat:hover {
+  border-color: rgba(129, 140, 248, 0.35);
+  box-shadow: 0 0 28px -10px var(--hq-accent-glow);
+}
+
+.hq-cat-title {
+  font-family: var(--sl-font-system-mono);
+  font-size: 0.875rem !important;
+  color: var(--sl-color-white);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 !important;
+}
+
+.hq-cat-title::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  background: var(--hq-accent);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.hq-cat-count {
+  margin-left: auto;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sl-color-gray-3);
+  border: 1px solid var(--sl-color-gray-5);
+  padding: 0.125rem 0.375rem;
+  white-space: nowrap;
+}
+
+.hq-cat-desc {
+  font-size: 0.8125rem !important;
+  color: var(--sl-color-gray-2);
+  line-height: 1.5;
+  margin: 0.625rem 0 0.75rem !important;
+}
+
+.hq-cat-links {
+  list-style: none;
+  padding: 0;
+  margin: 0 !important;
+}
+
+.hq-cat-links-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 1rem;
+}
+
+.hq-cat-links li {
+  margin: 0 !important;
+  border-top: 1px solid var(--sl-color-gray-5);
+}
+
+.hq-cat-links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4375rem 0;
+  font-size: 0.8125rem;
   color: var(--sl-color-gray-1);
 }
 
-.hero .sl-link-button.minimal:hover,
-.hero a.action.minimal:hover {
+.hq-cat-links a::after {
+  content: "\2192";
+  color: var(--sl-color-gray-4);
+  transition: color 150ms ease, transform 150ms ease;
+}
+
+.hq-cat-links a:hover {
+  text-decoration: none;
   color: var(--sl-color-white);
 }
 
-/* Landing sections */
-.hq-landing .hq-section {
-  margin: 4rem 0;
+.hq-cat-links a:hover::after {
+  color: var(--hq-accent);
+  transform: translateX(2px);
 }
 
+/* Shared mono eyebrow label */
 .hq-eyebrow {
   font-family: var(--sl-font-system-mono);
   font-size: 0.6875rem !important;
@@ -230,7 +378,7 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.75rem !important;
+  margin: 0 0 0.5rem !important;
 }
 
 .hq-eyebrow::before {
@@ -241,28 +389,46 @@ a:hover { text-decoration: underline; }
   display: inline-block;
 }
 
-.hq-landing .hq-h {
-  font-size: 1.625rem !important;
-  font-weight: 500 !important;
-  letter-spacing: -0.02em;
-  margin-top: 0 !important;
+/* Quick install band */
+.hq-install {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  border: 1px solid var(--sl-color-gray-4);
+  padding: 1.5rem;
+  margin: 0 0 2.5rem;
+  background: #0a0a0c;
 }
 
-.hq-lead {
-  color: var(--sl-color-gray-1);
-  font-size: 0.9375rem !important;
-  line-height: 1.65;
-  max-width: 38rem;
+@media (max-width: 50rem) {
+  .hq-install {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hq-install-title {
+  font-size: 1.125rem !important;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--sl-color-white);
+  margin: 0 !important;
+}
+
+.hq-install-desc {
+  font-size: 0.8125rem !important;
+  color: var(--sl-color-gray-2);
+  line-height: 1.55;
+  margin: 0.5rem 0 0 !important;
 }
 
 /* Terminal block with accent corner brackets */
 .hq-terminal {
   position: relative;
-  max-width: 30rem;
-  margin: 1.5rem 0 2rem;
   border: 1px solid var(--sl-color-gray-4);
   background: #050505;
   padding: 0.25rem 1rem 0.5rem;
+  margin: 0 !important;
 }
 
 .hq-terminal::before,
@@ -315,68 +481,32 @@ a:hover { text-decoration: underline; }
   border: none;
 }
 
-/* Product cards: angular, mono titles, accent hover */
-.hq-landing .sl-link-card {
-  border-radius: 0;
-  border: 1px solid var(--sl-color-gray-4);
-  background: #0a0a0c;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
-}
-
-.hq-landing .sl-link-card:hover {
-  border-color: rgba(129, 140, 248, 0.45);
-  box-shadow: 0 0 28px -10px var(--hq-accent-glow), 0 0 0 1px rgba(129, 140, 248, 0.12);
-  background: #0c0c10;
-}
-
-.hq-landing .sl-link-card .title {
-  font-family: var(--sl-font-system-mono);
-  font-size: 0.875rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.hq-landing .sl-link-card .title::before {
-  content: "";
-  width: 5px;
-  height: 5px;
-  background: var(--hq-accent);
-  display: inline-block;
-  flex-shrink: 0;
-}
-
-.hq-landing .sl-link-card .description {
-  font-size: 0.8125rem;
-  line-height: 1.55;
-  color: var(--sl-color-gray-1);
-}
-
-.hq-note {
-  font-size: 0.8125rem !important;
-  color: var(--sl-color-gray-2);
-  border-left: 2px solid var(--sl-color-gray-4);
-  padding-left: 1rem;
-  max-width: 38rem;
-  margin-top: 2rem !important;
-}
-
-/* Closing CTA band */
-.hq-cta {
-  margin: 5rem 0 3rem;
-  padding: 3rem 2rem;
+/* Support band */
+.hq-support {
   border: 1px solid var(--sl-color-gray-4);
   text-align: center;
-  background:
-    radial-gradient(ellipse 60% 80% at 50% 120%, var(--hq-accent-glow), transparent);
+  padding: 2.5rem 2rem;
+  margin: 0 0 1rem;
+  background: radial-gradient(ellipse 60% 80% at 50% 120%, var(--hq-accent-glow), transparent);
 }
 
-.hq-cta .hq-eyebrow {
+.hq-support .hq-eyebrow {
   justify-content: center;
 }
 
-.hq-cta .hq-lead {
-  margin: 0.75rem auto 1.75rem;
+.hq-support-title {
+  font-size: 1.375rem !important;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--sl-color-white);
+  margin: 0 !important;
+}
+
+.hq-support-desc {
+  font-size: 0.875rem !important;
+  color: var(--sl-color-gray-1);
+  max-width: 28rem;
+  margin: 0.625rem auto 1.5rem !important;
 }
 
 .hq-cta-actions {
@@ -418,18 +548,14 @@ a:hover { text-decoration: underline; }
   background: rgba(255, 255, 255, 0.05);
 }
 
-/* Light theme: keep the landing legible if someone flips the toggle */
-:root[data-theme="light"] .hero .sl-link-button.primary,
-:root[data-theme="light"] .hero a.action.primary {
-  background: #111111;
-  border-color: #111111;
-  color: #ffffff;
-  box-shadow: none;
+/* Light theme: keep the help center legible if someone flips the toggle */
+:root[data-theme="light"] .hq-search,
+:root[data-theme="light"] .hq-cat,
+:root[data-theme="light"] .hq-install {
+  background: #fafafa;
 }
-:root[data-theme="light"] .hq-terminal { background: #fafafa; }
-:root[data-theme="light"] .hq-landing .sl-link-card { background: #fafafa; }
-:root[data-theme="light"] .hq-landing .sl-link-card:hover { background: #f5f5f7; }
-:root[data-theme="light"] .hq-cta { background: radial-gradient(ellipse 60% 80% at 50% 120%, rgba(99, 102, 241, 0.06), transparent); }
+:root[data-theme="light"] .hq-terminal { background: #f5f5f5; }
+:root[data-theme="light"] .hq-support { background: radial-gradient(ellipse 60% 80% at 50% 120%, rgba(99, 102, 241, 0.06), transparent); }
 :root[data-theme="light"] .hq-btn-primary { background: #111111; border-color: #111111; color: #ffffff !important; box-shadow: none; }
 :root[data-theme="light"] .hq-btn-ghost { border-color: rgba(0, 0, 0, 0.2); }
 
