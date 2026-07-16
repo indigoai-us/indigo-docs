@@ -31,7 +31,7 @@ You can also use the channel's **Settings → Integrations → Add apps** menu. 
 - **Channel mentions** — `@`-mention the agent in any channel it's in and it answers **in-thread**. The first reply after a cold start can take ~30 seconds; you'll see a 👀 reaction and a typing indicator while it works.
 - **Threads it's part of** — once the agent is mentioned in a thread (or starts one), it follows that thread and answers follow-ups without needing another mention.
 - **Top-level channel chatter** — the agent does **not** respond to messages that don't mention it. Mention it once per conversation to pull it in.
-- **Direct messages** — DM the agent's app directly; access can be restricted to specific teammates by the company's configuration.
+- **Direct messages** — DM the agent's app directly; access can be restricted to specific teammates by the agent's configuration.
 
 ## When the agent acts as you (owner delegation)
 
@@ -41,18 +41,22 @@ A few things worth knowing:
 
 - **Owners are managed in the console.** Open the agent's settings and use the **Owners** panel to see the current owners, invite another owner, or revoke one. The Owners panel is visible only to active owners — if you don't own the agent, you won't see it.
 - **The agent only ever borrows *your own* access.** It never combines several owners' permissions, and it never exceeds what you can already reach yourself. A non-owner never triggers delegation.
-- **If the agent can't recognize who you are, it falls back to its own identity** rather than guessing — so delegation simply doesn't kick in until your identity is linked (below).
-- **A company can turn delegation off.** It's enabled everywhere by default, but each company can opt out in its settings; with delegation off, the agent always acts as itself.
+- **If the agent can't recognize who you are, it falls back to its own identity** rather than guessing — so delegation simply doesn't kick in until your identity is linked or safely matched (below).
+- **A company can turn delegation off.** It's enabled everywhere by default, but a company-level control can disable it; with delegation off, the agent always acts as itself.
 
-### Link your Slack workspace if your emails differ
+### Connect your personal Slack identity
 
-The agent recognizes you by matching your Slack identity to your HQ account. If the email on your Slack workspace is the **same** as your HQ login email, this just works. If they **differ**, link the workspace once so the agent knows it's you:
+The most reliable way for an agent to recognize you is to connect your personal Slack identity for the workspace where you talk to it. HQ prompts you when that connection is missing:
 
-1. In the HQ console, open **Personal Integrations**.
-2. Choose **Connect Slack** and approve the Slack authorization screen for the workspace where you talk to the agent.
-3. That link binds your Slack account in that workspace to your HQ identity. From then on the agent recognizes you there and delegation activates.
+- after you create an agent;
+- after you accept an invitation to become an agent owner; and
+- in the agent's settings while you are an active owner.
 
-Until that link exists (and your emails don't match), the agent can't confirm you're an owner and will act as itself.
+Choose **Connect Slack** in any of those prompts and approve the Slack authorization screen for the agent's workspace. The prompt never blocks agent creation or owner approval, and you can also connect later under **Personal Integrations**.
+
+The connection is workspace-specific. If you authorize a different workspace, HQ tells you which workspace the agent expects and lets you reconnect. If the saved connection needs attention, the same prompt offers a reconnect.
+
+As a fallback, HQ can safely match a verified Slack email to the same email on an active company membership. That fallback is deliberately narrow; an explicit personal connection remains the primary path and is required when the emails differ. If neither path can verify you, the agent acts as itself rather than guessing.
 
 ## Troubleshooting
 
@@ -63,7 +67,7 @@ Check the agent's Slack diagnostics in the console (agent settings → Slack). I
 If the agent has an allowed-callers list, senders not on it are dropped silently by design. Check the agent's caller settings in the console.
 
 **The reply takes a long time.**
-Agents process one conversation at a time. A long-running task (a scheduled job, a big question) holds the queue; subsequent messages answer when it finishes.
+An agent handles each conversation in order. A long-running task delays later replies in that same conversation, while separate conversations can continue in parallel.
 
 **The agent doesn't act as me even though I own it.**
-The agent must be able to match your Slack identity to your HQ account. If your Slack workspace email differs from your HQ login email, link the workspace under **Personal Integrations → Connect Slack** (see [When the agent acts as you](#when-the-agent-acts-as-you-owner-delegation)). Also confirm you're an active owner in the agent's **Owners** panel, and that your company hasn't turned delegation off in its settings. When your identity can't be resolved, the agent acts as itself by design rather than guessing.
+The agent must be able to match your Slack identity to your HQ account. Use **Connect Slack** in the agent's settings, or open **Personal Integrations**, and authorize the same workspace the agent uses (see [When the agent acts as you](#when-the-agent-acts-as-you-owner-delegation)). Also confirm you're an active owner in the agent's **Owners** panel, and ask your company owner or HQ support whether the company-level delegation control was disabled. When your identity can't be resolved, the agent acts as itself by design rather than guessing.
