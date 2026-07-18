@@ -3,3 +3,4 @@ dist/
 .astro/
 .vercel/
 .vercel
+pnpm-lock.yaml

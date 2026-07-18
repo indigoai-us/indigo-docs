@@ -12,7 +12,7 @@ export default defineConfig({
       plugins: [starlightClientMermaid()],
       title: "Indigo HQ Docs",
       description:
-        "Documentation for Indigo HQ — the OS for AI workers.",
+        "Documentation for Indigo HQ, the operating system for AI workers.",
       logo: {
         src: "./src/assets/logo.svg",
         replacesTitle: true,
