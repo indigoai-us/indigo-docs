@@ -1,28 +1,28 @@
 ---
 title: hq-console
-description: The HQ Console — a Next.js 15 admin UI for HQ deployments, teams, and usage, authenticated over the shared Cognito identity.
+description: The HQ Console is a Next.js 15 admin UI for HQ deployments, teams, and usage, authenticated over the shared Cognito identity.
 ---
 
-**hq-console** is the HQ admin surface: a Next.js web app where administrators manage HQ Cloud deployments, teams, and usage. It is deployed to Vercel (e.g. `hq.computer`).
+**hq-console** is the HQ admin surface: a Next.js web app where administrators manage HQ Cloud deployments, teams, Fleet Agents, and usage. It is deployed to Vercel (e.g. `hq.computer`).
 
 ## What it is
 
 - A **Next.js 15 / React 19** application styled with Tailwind v4.
-- Authenticated with **NextAuth v5** via OIDC against the shared AWS Cognito identity pool (the same pool provisioned by [hq-pro](/hq/products/hq-pro/about/)) — the console does **not** run its own user store.
+- Authenticated with **NextAuth v5** via OIDC against the shared AWS Cognito identity pool, which is also provisioned by [hq-pro](/hq/products/hq-pro/about/). The Console does **not** run its own user store.
 - Uses AWS SDK v3 (Cognito, S3, Secrets Manager, STS) and recharts for usage visualizations.
 
 ## Who uses it
 
-Administrators and team owners. The console is the human-facing window into the cloud side of HQ — the things you don't manage from the CLI.
+Administrators and team owners. The Console is the human-facing window into the cloud side of HQ: the things you do not manage from the CLI.
 
 ## Key surfaces
 
-- **Deployments** — visibility into HQ web-artifact deploys managed by [hq-deploy](/hq/products/hq-deploy/introduction/).
-- **Team** — membership and team administration backed by the [hq-pro](/hq/products/hq-pro/about/) team platform, including the invite-acceptance flow (`/invite/[token]` → `/api/invites/claim`).
-- **Agents** — per-agent settings, including an **Owners** panel (list, invite, and revoke agent owners) shown only to an agent's active owners. Agent creation, owner approval, and agent settings offer a non-blocking personal Slack connection prompt when an owner is not linked to the agent's workspace. Agent ownership is what powers owner delegation when an owner messages the agent in [Slack](/hq/products/capabilities/agents-in-slack/).
-- **Personal Integrations** — per-user account links, including a workspace-specific Slack connection so agents can recognize you reliably (see [Agents in Slack](/hq/products/capabilities/agents-in-slack/)).
-- **Connections** — issue scoped, read-only credentials so external agents and services can read selected prefixes of your company vault. See [External Connections](/hq/products/capabilities/external-connections/).
-- **Usage** — usage and activity charts.
+- **Deployments:** visibility into HQ web-artifact deploys managed by [hq-deploy](/hq/products/hq-deploy/introduction/).
+- **Team:** membership and team administration backed by the [hq-pro](/hq/products/hq-pro/about/) team platform, including the invite-acceptance flow (`/invite/[token]` → `/api/invites/claim`).
+- **Agents:** create and operate persistent [Fleet Agents](/hq/products/fleet-agents/) with managed runtimes, company access, communication channels, and an Owners panel for delegated ownership.
+- **Personal Integrations:** link individual accounts, including a workspace-specific Slack connection that lets an agent recognize its owners reliably. See [Access and security](/hq/products/fleet-agents/access/).
+- **Connections:** issue scoped, read-only credentials so external agents and services can read selected prefixes of your company vault. See [External Connections](/hq/products/capabilities/external-connections/).
+- **Usage:** usage and activity charts.
 
 ## How it relates to the rest of the ecosystem
 

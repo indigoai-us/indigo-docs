@@ -1,0 +1,96 @@
+---
+title: Operate and troubleshoot
+description: Monitor Fleet Agent health, control its lifecycle, use the CLI, and resolve common setup or channel failures.
+sidebar:
+  order: 6
+---
+
+The Agents roster is the starting point for operations. It uses labels such as **Setting up**, **Live**, **Needs re-auth**, **Needs attention**, **Degraded**, **Down**, **Stopped**, and **Removed**. Open settings for runtime health, heartbeat, authentication, and channel diagnostics.
+
+## Lifecycle controls
+
+| Action | Effect |
+|---|---|
+| Start | Starts a stopped runtime with its saved configuration. |
+| Stop | Stops the runtime while preserving identity, settings, and access. |
+| Reauthenticate | Repeats the provider sign-in flow without replacing the agent. |
+| Retry setup | Resumes a failed or interrupted provisioning stage. |
+| Remove | Deprovisions the agent after confirmation. |
+
+Configuration changes apply to a live runtime when supported. Otherwise HQ records the change for the next start.
+
+Owners and admins can also inspect session and transcript pages for an agent. These views help distinguish a channel delivery problem from work that reached the runtime and failed later. Health details include heartbeat, uptime, ready time, runtime and CLI versions, and component status.
+
+## CLI reference
+
+Use the agent UID shown by `list` for commands that target one agent.
+
+```bash
+hq agents list --company acme
+hq agents status <agent-uid>
+hq agents set <agent-uid> --name "Fleet Scout" --title "Research Lead"
+hq agents config <agent-uid> --model gpt-5.6-sol --effort high --tier default
+hq agents stop <agent-uid>
+hq agents start <agent-uid>
+hq agents retry <agent-uid>
+```
+
+Add `--json` to supported read or update commands for machine-readable output. Rename and removal are also available:
+
+```bash
+hq agents rename <agent-uid> fleet-scout
+hq agents rm <agent-uid> --yes
+```
+
+`rm --yes` is destructive. Prefer the Console when a human should review the target and consequences.
+
+## Troubleshooting
+
+### Setup is stalled
+
+Open the agent row and identify the stage that needs attention. Use **Retry** for a transient provisioning failure and **Reauthenticate** for an expired or incomplete provider login. Do not create a replacement while the original setup can still resume.
+
+### The runtime is live but the agent does not respond
+
+Check the runtime heartbeat, provider authentication, and selected model. If the model is incompatible with the provider or authentication method, choose a supported model and restart when prompted.
+
+### Slack messages do not arrive
+
+Open the Slack diagnostics in agent settings:
+
+- **Waiting for event** means HQ has not yet seen an inbound Slack event.
+- **Outbound only** means the app can send but inbound event delivery is not healthy.
+- **Missing configuration** means the Slack attachment is incomplete.
+
+Use **Finish install** when the Console shows a pending installation. Otherwise verify that the current app is still installed and is a member of the channel, then collect the diagnostic state and last-event time for support. Do not detach and reattach unless you intend to replace the Slack app.
+
+### One person cannot call the agent
+
+Check the Telegram caller group in Agent Settings. For Slack or email, ask an operator to inspect any API-managed caller allowlist. A configured restriction rejects callers that HQ cannot map to an allowed active company member.
+
+### A response is delayed
+
+Confirm that the runtime heartbeat is current and that provider authentication is healthy. Each conversation runs in order, while distinct conversations use a pool of two to five runtime lanes. Complex work, a full lane pool, and provider queues can increase response time. Avoid repeated duplicate messages while the original request is still running.
+
+## Scheduled jobs
+
+Fleet Agents can schedule one-time or recurring work from their runtime. Schedules accept relative or absolute times, cron or rate expressions, and IANA time zones.
+
+- Recurring work cannot run more often than every five minutes.
+- Each agent can have up to 25 active jobs.
+- The same job never overlaps itself.
+
+Scheduled jobs do not have a general Console management screen in the current release. Manage them through the agent's jobs tool and remember that they run as the agent identity, not as a channel requester.
+
+## Escalation details
+
+When asking for help, include:
+
+- the company and agent UID;
+- the current roster state;
+- the failing setup stage or channel;
+- the runtime and heartbeat status;
+- the last Slack event timestamp, if Slack is affected; and
+- the exact time of a safe test request.
+
+Do not include provider keys, bot tokens, vault values, or authentication codes.

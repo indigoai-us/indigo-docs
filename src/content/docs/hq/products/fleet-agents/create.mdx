@@ -1,0 +1,73 @@
+---
+title: Create an agent
+description: Provision a Fleet Agent, choose its runtime provider, and complete authentication.
+sidebar:
+  order: 2
+---
+
+Create Fleet Agents from the **Agents** page for a company in HQ Console. The wizard provisions the agent's identity, membership, vault workspace, managed runtime, and selected authentication method as one resumable setup.
+
+## Before you start
+
+You need:
+
+- permission to manage agents for the company;
+- a provider account or API key supported by the Console;
+- permission to install apps in Slack if you plan to connect Slack; and
+- approval for the recurring price shown by the Console before activation.
+
+Provider choices can vary by account and release. Use the options shown in your Console.
+
+Owners and admins can create agents when the company grants them the **Create agents** permission. Only a company owner can create an agent with the admin membership role. Machine agents cannot create other agents.
+
+## 1. Set the identity
+
+Choose an agent handle and complete its public profile. The handle becomes part of the agent's company identity and is used by channels and vault paths, so treat it as permanent. You can change the display name, avatar, title, and description later.
+
+![The identity step in the Fleet Agent creation wizard](/images/fleet-agents/create-agent.png)
+
+## 2. Choose a provider and authentication method
+
+Select a provider, then use an authentication method that provider accepts:
+
+| Provider | Authentication |
+|---|---|
+| Codex | ChatGPT subscription sign-in or an OpenAI API key |
+| Grok | Grok subscription sign-in or an xAI API key |
+| Claude | Claude subscription sign-in, when enabled for your account |
+
+Subscription sign-in opens the provider's device or OAuth flow. API keys are write-only: submit the key through the wizard, and HQ stores the credential in the company vault without displaying it again.
+
+![Runtime provider and authentication choices in HQ Console](/images/fleet-agents/runtime-and-auth.png)
+
+:::note
+The provider, model, and authentication method must agree. For example, ChatGPT subscription authentication cannot run API-only Codex models. The Console filters or rejects incompatible combinations.
+:::
+
+## 3. Confirm and provision
+
+Review the recurring price displayed in the wizard and create the agent. The current list price is **$100 per month**, billed to the host company, and charging starts when the agent is created. Contract pricing, sponsorships, or account-specific overrides may change the amount shown. HQ then works through the setup stages:
+
+1. create the agent identity and company membership;
+2. prepare the vault workspace and access grants;
+3. provision and bootstrap the managed runtime;
+4. complete provider authentication;
+5. sync the company context; and
+6. attach any channels selected during setup.
+
+![Fleet Agent provisioning progress in HQ Console](/images/fleet-agents/provisioning-progress.png)
+
+You can leave and return to the agent row while setup continues. If a stage needs attention, open the agent and follow the retry or reauthentication prompt rather than creating a duplicate.
+
+A new agent has no company file, secret, or connector grants by default. Assign groups and explicit resource grants after the runtime is ready.
+
+## 4. Verify the agent
+
+When setup finishes:
+
+1. confirm the roster shows the agent as live;
+2. open settings and check the runtime and heartbeat signals;
+3. send a small task through a connected channel; and
+4. confirm the response arrives under the agent's own identity.
+
+Next, review the agent's [configuration](/hq/products/fleet-agents/configuration/) and [access](/hq/products/fleet-agents/access/) before giving it production work.

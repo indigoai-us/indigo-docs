@@ -1,0 +1,86 @@
+---
+title: Access and security
+description: Control Fleet Agent roles, ownership, groups, vault access, callers, and deprovisioning.
+sidebar:
+  order: 5
+---
+
+Fleet Agents are full company members with machine-managed credentials, but new membership grants no company resources by itself. Give each agent the narrowest role, group membership, file access, secret access, connectors, and channel audience that lets it do its job.
+
+## Membership role
+
+| Role | Use it when |
+|---|---|
+| Member | The agent performs work within access granted by company policies and groups. This is the default for most agents. |
+| Admin | The agent must manage company-level resources that are restricted to administrators. Review this choice carefully. |
+
+An agent cannot become the company owner. Ownership of the agent and the agent's company membership role are separate concepts.
+
+## Agent owners
+
+The person who creates an agent becomes its initial owner. Owners are accountable for its purpose, access, operating cost, and lifecycle. Companies with delegated ownership enabled can assign additional owners from the agent settings.
+
+Changing an owner does not automatically change the agent's role, groups, vault grants, or channel access. Review those separately during a handoff.
+
+## Groups
+
+Groups make agent access easier to reason about:
+
+- add the agent to groups that grant the resources it needs;
+- use a dedicated group for privileged or narrowly scoped agents;
+- select a group as the Telegram caller gate when only part of the company should call the agent; and
+- remove stale group membership when the agent's responsibility changes.
+
+Group membership does not replace a direct vault ACL. Both layers must allow access when a resource uses explicit grants.
+
+## Vault and credentials
+
+HQ creates a vault-backed workspace for each Fleet Agent. Company data stays within the active company's tenant boundary. New membership does not grant resources by itself.
+
+- Provider credentials and channel tokens are stored in the vault.
+- Runtime configuration carries credential references, not raw secret values.
+- The agent receives only the files and secret grants required for its role.
+- Company and personal credentials must not be copied between tenants.
+
+Use the standard HQ file and secret grant flows to change access. Test with a harmless probe before assigning production work.
+
+## Multiple companies
+
+An agent has one immutable host company that pays for it. Another company can invite the existing `agt_*` identity or machine email as a member or admin:
+
+```bash
+hq members invite <agent-id-or-email> --company <company> --role member
+```
+
+The new membership becomes active immediately. Grant that company’s groups, files, secrets, and connectors separately. The host company remains responsible for billing.
+
+## Owner delegation
+
+When delegated ownership is enabled, an agent can act with a strict subset of one active owner's grants for a supported request. HQ does not merge grants from several owners.
+
+Current requester-scoped delegation is carried by verified Slack work items. Email, Telegram, scheduled jobs, and other non-Slack work run as the agent's own identity. Do not assume that adding an owner gives every channel the owner's access.
+
+### Connect an owner's Slack identity
+
+The most reliable way for an agent to recognize an owner is a personal Slack connection for the workspace where they talk to it. HQ offers a non-blocking **Connect Slack** prompt after agent creation, after an ownership invitation is accepted, and in Agent Settings for an active owner. The same connection is available under **Personal Integrations**.
+
+The connection is workspace-specific. If the saved connection points to another workspace or needs attention, reconnect it to the workspace used by the agent. HQ can fall back to a narrow verified-email match when the Slack email and active company membership email agree. If neither path verifies the sender, the agent acts as itself rather than guessing.
+
+Only active owners can see the Owners panel, invite another owner, or revoke one. A company-level control can disable owner delegation; when disabled, the agent always acts as itself.
+
+## Caller restrictions
+
+A channel user can trigger whatever the agent is allowed to do, so caller controls are part of the permission model:
+
+- Slack and email can use API-managed allowed-caller lists. These lists are not exposed in general Agent Settings.
+- Telegram can require the sender to belong to a selected active company group.
+- A configured allowlist fails closed when HQ cannot resolve the sender.
+
+## Removing an agent
+
+Removal is different from stopping:
+
+- **Stop** preserves the agent and its configuration so it can be started again.
+- **Remove** deprovisions the managed agent resources and ends its company membership.
+
+Before removal, detach external channels, transfer any durable work, and confirm that no scheduled or channel workflow still depends on the agent. The Console requires confirmation because removal is destructive.

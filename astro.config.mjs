@@ -6,6 +6,7 @@ export default defineConfig({
   redirects: {
     "/hq/architecture/2-monorepo/": "/hq/architecture/2-ecosystem/",
     "/hq/roadmap/2-v5-launch/": "/hq/roadmap/2-shipped-and-next/",
+    "/hq/products/capabilities/agents-in-slack/": "/hq/products/fleet-agents/channels/",
   },
   integrations: [
     starlight({
@@ -51,6 +52,7 @@ export default defineConfig({
             { label: "hq-sync", link: "/hq/products/hq-sync/" },
             { label: "HQ Workspace", link: "/hq/products/hq-workspace/" },
             { label: "hq-console", link: "/hq/products/hq-console/" },
+            { label: "Fleet Agents", autogenerate: { directory: "hq/products/fleet-agents" } },
             { label: "hq-deploy", autogenerate: { directory: "hq/products/hq-deploy" } },
             { label: "hq-pro", autogenerate: { directory: "hq/products/hq-pro" } },
             { label: "hq-packages", autogenerate: { directory: "hq/products/hq-packages" } },
@@ -61,7 +63,6 @@ export default defineConfig({
                 { label: "hq-share", link: "/hq/products/capabilities/hq-share/" },
                 { label: "hq-secrets", link: "/hq/products/capabilities/hq-secrets/" },
                 { label: "Slack Bot Factory", link: "/hq/products/capabilities/slack-bot-factory/" },
-                { label: "Agents in Slack", link: "/hq/products/capabilities/agents-in-slack/" },
                 { label: "HQ MCP", link: "/hq-in-chat/" },
               ],
             },

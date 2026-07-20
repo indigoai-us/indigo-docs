@@ -1,0 +1,41 @@
+---
+title: Fleet Agents
+description: Persistent AI teammates with managed runtimes, company access, and their own communication channels.
+sidebar:
+  order: 1
+---
+
+A Fleet Agent is a persistent AI teammate managed by HQ. Each agent has its own identity, company membership, vault-backed workspace, cloud runtime, and optional Slack, email, and Telegram channels.
+
+Fleet Agents are not the same as [HQ workers](/hq/guide/5-workers/). A worker is a reusable task definition that runs inside an HQ session. A Fleet Agent stays available between conversations, can be addressed directly, and acts under its own company identity.
+
+![The Fleet Agent roster in HQ Console](/images/fleet-agents/agents-roster.png)
+
+## What an agent includes
+
+| Layer | What HQ manages |
+|---|---|
+| Identity | Agent name, handle, profile, company email, and membership |
+| Access | Company role, groups, ownership, and vault grants |
+| Runtime | Provider authentication, model settings, process lifecycle, and health |
+| Channels | Slack, email, and Telegram connections |
+| Operations | Provisioning progress, start and stop controls, reauthentication, diagnostics, and removal |
+
+The current list price is **$100 per month**, billed to the company that creates the agent. The Console shows the applicable price before creation. Contract pricing, credits, or sponsorship can change the amount invoiced.
+
+The creating company remains the agent's host company. Another company can add the same agent as a member or admin without creating a second agent, but that membership does not grant files, secrets, groups, or connectors by itself.
+
+## Typical workflow
+
+1. [Create the agent](/hq/products/fleet-agents/create/) in HQ Console.
+2. Choose its provider and complete the matching authentication flow.
+3. Review its [configuration](/hq/products/fleet-agents/configuration/).
+4. Add any [communication channels](/hq/products/fleet-agents/channels/).
+5. Assign the right [role, groups, owners, and vault access](/hq/products/fleet-agents/access/).
+6. Use [health signals and lifecycle controls](/hq/products/fleet-agents/operations/) to keep it available.
+
+## Where to manage agents
+
+Open a company in HQ Console and choose **Agents**. The roster shows each agent's profile, runtime state, owner, and available actions. Open the gear menu on an agent row for health, model, profile, access, and channel settings.
+
+The Console is the recommended surface for setup and day-to-day administration. The `hq agents` commands provide a smaller operational interface for scripts and terminal workflows. Agent creation is Console-only in the current release.
