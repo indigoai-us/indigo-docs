@@ -1,36 +1,34 @@
 ---
 title: Getting Started
-description: Install HQ and run your first AI worker in under 5 minutes.
+description: Install the HQ desktop app and open your workspace in Claude Code or Codex.
 ---
 
 ## Prerequisites
 
-- **Node.js** 18+ ([nodejs.org](https://nodejs.org))
-- **Claude Code** CLI ([docs](https://docs.anthropic.com/en/docs/claude-code))
-- **qmd** for search (`brew install tobi/tap/qmd`)
-- **gh** CLI (optional, for code workers)
+- A supported Mac or Windows PC
+- **Claude Code** or **Codex**
+- An HQ account
 
 ## Install
 
+1. Go to [hqforwork.com/install](https://hqforwork.com/install) and download HQ
+   for your computer.
+2. Open **HQ** and sign in.
+3. Choose where your HQ workspace should live (the default is `~/hq`).
+4. Select **Install** and let HQ finish setup.
+5. On the **HQ is ready** screen, select **Open in Claude Code** or
+   **Open in Codex**.
+
+Opening either AI tool is the final onboarding step. HQ opens the selected tool
+in your workspace, completes onboarding, and switches to the compact sync app in
+your menu bar or system tray. If you want to open the workspace yourself, select
+**Finish** instead.
+
+## Finish setup in your AI tool
+
+Claude Code opens with `/setup` ready to run. In Codex, open the prompt and run:
+
 ```bash
-npx create-hq
-```
-
-The installer will:
-1. Ask where to create your HQ (default: `~/hq`)
-2. Copy the template (17 commands, 26 workers, 8 knowledge bases)
-3. Initialize a git repository
-4. Check your dependencies
-5. Optionally install `@indigoai/hq-cli` for module management
-6. Optionally set up cloud sync
-
-## Setup Wizard
-
-Open your HQ in Claude Code and run the interactive setup:
-
-```bash
-cd hq
-claude
 /setup
 ```
 
