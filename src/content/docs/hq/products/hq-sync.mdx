@@ -1,32 +1,51 @@
 ---
-title: hq-sync
-description: The HQ Sync menubar app — a macOS Tauri 2 desktop GUI that drives bidirectional S3 sync for your HQ instance.
+title: HQ desktop app
+description: One desktop app that installs HQ, opens your workspace in an AI tool, and keeps it synced.
 ---
 
-**hq-sync** is the HQ Sync menubar app: a native macOS menu-bar agent that keeps your local HQ directory synced with the cloud, without living in the terminal. It wraps the same sync engine the `hq` CLI uses behind a friendly GUI aimed at non-technical users.
+The **HQ desktop app** is one installer and sync app. On first launch it creates
+your HQ workspace and guides you through setup. After onboarding, the same app
+lives in the macOS menu bar or Windows system tray and keeps your local HQ
+directory synced with the cloud.
 
 ## What it is
 
-- A **Tauri 2** desktop app (small Rust backend + Svelte 5 UI), distributed as a signed/notarized macOS app.
-- Identifier `ai.indigo.hq-sync-menubar`, productName "HQ Sync".
+- A **Tauri 2** desktop app (small Rust backend + Svelte 5 UI), distributed for macOS and Windows.
+- One download, version, and updater stream for installation and ongoing sync.
 - A system-tray agent with per-workspace sync rows, real per-file progress, a Stop button, conflict resolution, new-file notifications, instant DM notifications, a notifications-first popover with full notification history, share reactions, and Connect diagnostics.
 
 ## Who uses it / when
 
-Use hq-sync when you want HQ kept in sync in the background without running `hq sync` commands by hand — especially on a workstation where a non-technical operator just wants a menubar toggle. Power users who live in the terminal can keep using the [`hq` CLI](/hq/products/hq-cli/) directly; both drive the same engine.
+Use the desktop app to install HQ and keep it synced in the background without
+running `hq sync` commands by hand. Power users who live in the terminal can
+keep using the [`hq` CLI](/hq/products/hq-cli/) directly; both drive the same
+engine.
+
+## First-run onboarding
+
+Download HQ from [hqforwork.com/install](https://hqforwork.com/install), sign
+in, choose a workspace location, and select **Install**. The final **HQ is
+ready** screen offers **Open in Claude Code** and **Open in Codex**.
+
+Selecting either tool completes onboarding, opens the workspace there, and
+hands control to the compact sync popover. There are no additional desktop
+onboarding screens to dismiss. If you prefer to open the workspace manually,
+select **Finish**.
 
 ## How it works
 
-hq-sync is a **GUI over the engine, not its own sync implementation**. It spawns the `hq-sync-runner` binary shipped by [`@indigoai-us/hq-cloud`](/hq/products/hq-cloud/), reads the ndjson sync events that runner emits, and renders them as live progress in the menubar. The actual bidirectional S3 transfer, journaling, and conflict detection all happen in the cloud engine.
+The desktop app is a **GUI over the engine, not its own sync implementation**. It spawns the `hq-sync-runner` binary shipped by [`@indigoai-us/hq-cloud`](/hq/products/hq-cloud/), reads the ndjson sync events that runner emits, and renders them as live progress in the menu bar or system tray. The actual bidirectional S3 transfer, journaling, and conflict detection all happen in the cloud engine.
 
 ```mermaid
 graph LR
-    tray["hq-sync<br/>(menubar UI)"] -->|spawns| runner["hq-sync-runner<br/>(@indigoai-us/hq-cloud)"]
+    tray["HQ desktop app<br/>(menu bar / tray UI)"] -->|spawns| runner["hq-sync-runner<br/>(@indigoai-us/hq-cloud)"]
     runner <-->|bidirectional sync| s3["AWS S3<br/>(per-entity prefix)"]
     runner -->|ndjson events| tray
 ```
 
-> **Distinction:** "hq-sync" is the menubar **app**. The sync **engine** is `@indigoai-us/hq-cloud`, and the same engine is also invoked by `hq sync` from the CLI. The app does not contain its own sync logic.
+> **Distinction:** The HQ desktop app owns onboarding and the tray UI. The sync
+> **engine** is `@indigoai-us/hq-cloud`, and the same engine is also invoked by
+> `hq sync` from the CLI. The app does not contain its own sync logic.
 
 ## Instant DM delivery
 
@@ -81,9 +100,13 @@ When someone shares a file with you, the share isn't a dead-end alert (as of **0
 
 ## Install & updates
 
-hq-sync ships through GitHub Releases as a signed, notarized macOS DMG (minimum macOS 13.0). It auto-updates via a published `latest.json` manifest — once installed, new versions are offered automatically.
+The HQ desktop app ships through GitHub Releases as a signed, notarized macOS
+DMG (minimum macOS 13.0) and a Windows installer. It auto-updates via a
+published `latest.json` manifest — once installed, new versions are offered
+automatically.
 
-Releases are cut by pushing a `v*` git tag, which runs the sign/notarize/DMG workflow. The version is kept in lockstep across `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json`.
+Releases are cut from the unified `hq-desktop-app` repository. Installation and
+sync therefore always move forward on the same version and updater stream.
 
 ## Related
 
