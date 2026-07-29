@@ -12,7 +12,7 @@ directory synced with the cloud.
 
 - A **Tauri 2** desktop app (small Rust backend + Svelte 5 UI), distributed for macOS and Windows.
 - One download, version, and updater stream for installation and ongoing sync.
-- A system-tray agent with per-workspace sync rows, real per-file progress, a Stop button, conflict resolution, new-file notifications, instant DM notifications, a notifications-first popover with full notification history, share reactions, and Connect diagnostics.
+- A system-tray agent with per-workspace sync rows, real per-file progress, a Stop button, conflict resolution, a compact messages-and-notifications popover, full desktop messaging, share reactions, and Connect diagnostics.
 
 ## Who uses it / when
 
@@ -47,6 +47,18 @@ graph LR
 > **engine** is `@indigoai-us/hq-cloud`, and the same engine is also invoked by
 > `hq sync` from the CLI. The app does not contain its own sync logic.
 
+## The full desktop workspace
+
+Select **Open full HQ** from the compact menu-bar or system-tray window to open
+the complete desktop workspace. It brings Inbox, Messages, Meetings,
+Marketplace, Library, Files, company workspaces, projects, tasks, goals, and
+settings into one native window.
+
+The desktop workspace keeps source context visible. Projects and tasks show
+their owner or creator when HQ can establish that identity, along with their
+company and source path. Knowledge files render Markdown directly, including
+tables, code, lists, quotes, links, and task lists.
+
 ## Instant DM delivery
 
 HQ Sync also receives **direct messages** — sent with `hq dm` or the `/dm` command — and surfaces them as native macOS notifications, with one-click "Copy prompt" and "Open details" actions and an inline reply. "Open details" opens the full **two-way conversation thread** — your messages and theirs, in order — not just the single notification, so a DM reads as a conversation rather than a one-off alert.
@@ -77,17 +89,43 @@ HQ ships capabilities as **packs** (engineering, design, and more). From **Setti
 
 Like everything else in HQ Sync, the window is a GUI over the `hq` CLI — it wraps the `hq packs` commands (see [hq-cli](/hq/products/hq-cli/)) so the CLI and the app share one implementation.
 
-## Notifications
+## Messages and notifications
 
-Notifications in HQ Sync are normally transient — a DM banner or a new-file alert appears and then it's gone. As of **0.9.8**, notifications are the first thing you see: the menubar popover opens to a **Notifications** tab (with a **Workspaces** tab beside it for the sync rows), showing a compact, reverse-chronological feed with an unread badge and a "Mark all read" action. The desktop view gains a matching full-size **Notifications** page with the feed grouped by day. (This supersedes the bell-button Notifications window introduced in 0.6.0.)
+The compact window is a quick triage surface for messages, channel activity,
+shares, sync events, and updates. As of **0.10.35**, the HQ menu-bar icon carries
+an unread-message badge, while the popover gives senders, conversation context,
+timestamps, and primary actions more breathing room. Repetitive automated
+activity is grouped instead of flooding the list. Select **Open messages** for
+the complete conversation workspace, or **Open full HQ** for the desktop home.
 
-The feed brings three notification types into one view:
+The feed brings the main notification types into one view:
 
 - **Direct messages** you've received — click through to the full conversation thread and reply.
+- **Channel activity** that needs your attention — open the relevant conversation.
 - **Files shared with you** — click through to the share details.
 - **New files** synced to your drive — the files teammates added, attributed to whoever added them.
+- **Product updates** — open the updater directly instead of landing in an unrelated inbox.
 
 Direct messages and shared files show their full history (the server retains them). New-file history fills in across sessions as your `hq` CLI updates to the version that reports them — within a session, the current sync's new files always appear.
+
+## Appearance and reading size
+
+Open **Settings → Appearance** to tune the desktop without changing the meaning
+of any status color:
+
+- **Theme** — follow the system, or choose Light or Dark.
+- **Window opacity** — choose any value from 0% to 100%. **100% is fully
+  solid**; lower values reveal more of the native Liquid Glass or Mica material.
+- **Interface size** — adjust the app-wide reading size with the slider, or use
+  `Command +` / `Command -` on macOS and `Control +` / `Control -` on Windows.
+  `Command 0` or `Control 0` returns to 100%.
+
+Appearance applies across the app and persists between launches. The desktop
+also respects the operating system's Reduce Transparency and Reduce Motion
+accessibility settings.
+
+On macOS, **Settings → General → Show in Dock** can add HQ to the Dock and app
+switcher. It is off by default, so HQ otherwise remains a menu-bar app.
 
 ## Share reactions & messaging the sharer
 
@@ -107,6 +145,9 @@ automatically.
 
 Releases are cut from the unified `hq-desktop-app` repository. Installation and
 sync therefore always move forward on the same version and updater stream.
+The app version is visible in the desktop toolbar and update popover. Settings
+also shows the installed HQ Core version, release channel, automatic-update
+state, and a manual **Check for updates** action.
 
 ## Related
 
