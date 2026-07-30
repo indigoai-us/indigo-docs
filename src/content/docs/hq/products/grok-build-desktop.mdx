@@ -1,0 +1,95 @@
+---
+title: Grok Build Desktop
+description: A native macOS workspace for running Grok Build, Codex, and Claude Code in durable parallel sessions.
+---
+
+Grok Build Desktop is a local-first macOS app for working with multiple coding
+agents without losing the session you were in. Pick an agent when you start a
+session, keep several sessions running, and move between them while background
+turns continue.
+
+[Download Grok Build Desktop for macOS](https://www.hqforwork.com/build/)
+
+## Supported agents
+
+### Grok Build
+
+Grok runs through the locally installed Grok CLI. Each live desktop session has
+its own isolated agent bridge, so one long turn does not block another session.
+Messages, thoughts, tools, approvals, and HQ command seeds render in the native
+chat interface.
+
+### Codex
+
+Codex runs through `codex app-server` and uses the authentication already owned
+by the Codex CLI. The model menu is loaded from your installed Codex catalog
+rather than being frozen into the app. The reasoning menu exposes every level
+reported for the chosen model, including Low, Medium, High, Extra High, Max,
+and Ultra when supported.
+
+Authenticate before use:
+
+```bash
+codex login
+```
+
+### Claude Code
+
+Claude opens as a real PTY-backed terminal inside the app. Authentication and
+credentials stay entirely inside the locally installed Claude CLI; Indigo does
+not proxy or store them.
+
+When you explicitly choose Claude, the app launches:
+
+```bash
+claude --dangerously-skip-permissions
+```
+
+:::caution
+`--dangerously-skip-permissions` lets Claude Code run tools without asking for
+each permission. Use Claude sessions only in folders where you trust the
+instructions and repository contents. The app shows this state in the terminal
+toolbar.
+:::
+
+If Claude reports an expired or revoked token, run `/login` in the embedded
+terminal. That repairs the CLI-owned login without sending credentials through
+the desktop app.
+
+## Start and switch sessions
+
+1. Select **New session**.
+2. Choose **Grok**, **Codex**, or **Claude** in the agent picker.
+3. For Codex, choose a model and available reasoning level.
+4. Start work. You can open another session while the current agent continues.
+5. Select any sidebar row to return to its transcript or terminal.
+
+The selected agent is locked after a session starts. Create a new session to use
+a different agent. This keeps provider state, history, approvals, and running
+processes isolated.
+
+## Claude terminal appearance
+
+Open **Settings → Appearance** to choose a terminal font preset or custom font
+stack. Font sizes from 11–24 px are supported. The terminal also preserves ANSI
+color, Unicode drawing characters, resize behavior, scrollback, and CLI redraws.
+
+## Requirements
+
+- macOS on Apple Silicon
+- The CLI for each agent you plan to use must be installed and available on
+  `PATH`
+- Each CLI must be authenticated with its own supported login flow
+
+The app is signed, notarized, and updates through its public release feed.
+
+## Troubleshooting
+
+- **A session will not resume:** Stop and start that session. Other sessions are
+  not stopped.
+- **Codex models are missing:** Update the Codex CLI, sign in again, and reopen
+  the model picker.
+- **Claude shows 401 or revoked OAuth:** Run `/login` in the Claude terminal.
+- **A CLI is not found:** Confirm `grok`, `codex`, or `claude` works in Terminal
+  and is on your shell `PATH`.
+
