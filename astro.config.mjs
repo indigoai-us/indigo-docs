@@ -52,6 +52,7 @@ export default defineConfig({
             { label: "hq-sync", link: "/hq/products/hq-sync/" },
             { label: "HQ Workspace", link: "/hq/products/hq-workspace/" },
             { label: "hq-console", link: "/hq/products/hq-console/" },
+            { label: "Grok Build Desktop", link: "/hq/products/grok-build-desktop/" },
             { label: "Fleet Agents", autogenerate: { directory: "hq/products/fleet-agents" } },
             { label: "hq-deploy", autogenerate: { directory: "hq/products/hq-deploy" } },
             { label: "hq-pro", autogenerate: { directory: "hq/products/hq-pro" } },
