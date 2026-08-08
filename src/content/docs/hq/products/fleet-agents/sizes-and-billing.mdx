@@ -1,0 +1,64 @@
+---
+title: Agent sizes and billing
+description: The Fleet Agent box-size ladder, monthly pricing, Team plan inclusions, and how size changes are approved and billed.
+sidebar:
+  order: 7
+---
+
+Every Fleet Agent runs on its own dedicated box. The box size determines how
+much compute the agent has for concurrent work, and it sets the agent's
+monthly price.
+
+## The size ladder
+
+Three sizes are available:
+
+| Size | Monthly price | Built for |
+| --- | --- | --- |
+| **Basic** | $100 | Q&A and simple tasks |
+| **Power** | $250 | Multi-user work, projects, light development |
+| **Dev** | $500 | Complex development, many users, project orchestration |
+
+You can move an agent up or down the ladder at any time from its settings; a
+mid-cycle change is prorated on your next invoice using standard Stripe
+proration.
+
+### Previously offered sizes
+
+Earlier ladders included a smaller entry box and a larger top box. Agents
+already running on those sizes are grandfathered: they keep billing exactly
+what they bill today and keep running unchanged. Those sizes are no longer
+available for new agents, and an explicit resize moves the agent onto the
+current ladder.
+
+## Who can change an agent's size
+
+Changing a size changes your bill, so applying a size change requires the
+`changeAgentSize` capability:
+
+- **Company owners** always have it.
+- **Company admins** have it when the owner grants it.
+- Everyone else sees a **request** path instead: the request goes to the
+  owner, who can approve or decline it.
+
+The confirmation step always shows the exact monthly change before anything
+is applied.
+
+## Team plan inclusions
+
+The Team plan includes three agents' boxes in the flat plan fee:
+
+- **1 Dev-size box** (your first agent)
+- **2 Basic-size boxes**
+
+Upgrades beyond what is included are available for the price difference, and
+agents beyond the included three bill at the ladder price. Deleting an agent
+never raises the bill on the agents that remain — the plan's inclusions
+belong to the plan, not to a particular agent.
+
+## See also
+
+- [Configure an agent](/hq/products/fleet-agents/configuration/) — identity,
+  model, and runtime settings.
+- [Operate and troubleshoot](/hq/products/fleet-agents/operations/) — health,
+  lifecycle, and diagnostics.
