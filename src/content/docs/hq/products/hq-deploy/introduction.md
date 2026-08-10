@@ -36,6 +36,7 @@ hq-deploy deploy ──────────► POST /api/apps/:id/deploy
 - **Enterprise self-hosting** — Provision the full stack in a customer's AWS account via CloudFormation.
 - **Zero-downtime SSR deploys** — ECS rolling updates with `minimumHealthyPercent=100`.
 - **Upgrade management** — ChangeSet previews with dry-run mode for enterprise stack updates.
+- **[In-context comments](/hq/products/hq-deploy/comments/)** — Viewers leave feedback directly on a gated deploy, anchored to a point or a region and tagged to their identity, behind the same access gate as the deploy.
 
 ## Projects That Built This
 
