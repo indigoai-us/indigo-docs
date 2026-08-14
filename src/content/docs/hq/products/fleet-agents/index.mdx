@@ -21,21 +21,22 @@ Fleet Agents are not the same as [HQ workers](/hq/guide/5-workers/). A worker is
 | Channels | Slack, email, and Telegram connections |
 | Operations | Provisioning progress, start and stop controls, reauthentication, diagnostics, and removal |
 
-The current list price is **$100 per month**, billed to the company that creates the agent. The Console shows the applicable price before creation. Contract pricing, credits, or sponsorship can change the amount invoiced.
+The monthly price depends on the selected box size and the host company's plan. HQ Console and `hq agents provision` show the applicable company-specific price before creation. Contract pricing, plan inclusions, credits, or sponsorship can change the amount invoiced.
 
 The creating company remains the agent's host company. Another company can add the same agent as a member or admin without creating a second agent, but that membership does not grant files, secrets, groups, or connectors by itself.
 
 ## Typical workflow
 
-1. [Create the agent](/hq/products/fleet-agents/create/) in HQ Console.
-2. Choose its provider and complete the matching authentication flow.
-3. Review its [configuration](/hq/products/fleet-agents/configuration/).
-4. Add any [communication channels](/hq/products/fleet-agents/channels/).
-5. Assign the right [role, groups, owners, and vault access](/hq/products/fleet-agents/access/).
-6. Use [health signals and lifecycle controls](/hq/products/fleet-agents/operations/) to keep it available.
+1. [Create the agent](/hq/products/fleet-agents/create/) in HQ Console or with `hq agents provision`.
+2. Choose its box size and review the company-specific monthly price.
+3. Choose its provider and complete the matching authentication flow.
+4. Review its [configuration](/hq/products/fleet-agents/configuration/).
+5. Add any [communication channels](/hq/products/fleet-agents/channels/).
+6. Assign the right [role, groups, owners, and vault access](/hq/products/fleet-agents/access/).
+7. Use [health signals and lifecycle controls](/hq/products/fleet-agents/operations/) to keep it available.
 
 ## Where to manage agents
 
 Open a company in HQ Console and choose **Agents**. The roster shows each agent's profile, runtime state, owner, and available actions. Open the gear menu on an agent row for health, model, profile, access, and channel settings.
 
-The Console is the recommended surface for setup and day-to-day administration. The `hq agents` commands provide a smaller operational interface for scripts and terminal workflows. Agent creation is Console-only in the current release.
+The Console is the recommended surface for guided setup and day-to-day administration. The `hq agents` commands provide creation and a smaller operational interface for scripts and terminal workflows. Both creation routes expose the same size ladder and company-specific cost before provisioning.

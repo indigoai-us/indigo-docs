@@ -1,11 +1,11 @@
 ---
 title: Create an agent
-description: Provision a Fleet Agent, choose its runtime provider, and complete authentication.
+description: Choose a Fleet Agent size, review its monthly cost, provision the runtime, and complete authentication.
 sidebar:
   order: 2
 ---
 
-Create Fleet Agents from the **Agents** page for a company in HQ Console. The wizard provisions the agent's identity, membership, vault workspace, managed runtime, and selected authentication method as one resumable setup.
+Create Fleet Agents from the **Agents** page for a company in HQ Console or with `hq agents provision`. Both paths let you choose the box size and show the company-specific monthly price before anything is provisioned. The setup creates the agent's identity, membership, vault workspace, managed runtime, and selected authentication method as one resumable flow.
 
 ## Before you start
 
@@ -26,7 +26,21 @@ Choose an agent handle and complete its public profile. The handle becomes part 
 
 ![The identity step in the Fleet Agent creation wizard](/images/fleet-agents/create-agent.png)
 
-## 2. Choose a provider and authentication method
+## 2. Choose a size and review the cost
+
+Choose **Basic**, **Power**, or **Dev** based on the work the agent will perform. The Console shows the capacity and applicable monthly price on each card. Contract pricing, plan inclusions, sponsorships, and account-specific overrides can change the amount, including making a size $0 for a company that is not billed per agent.
+
+The CLI exposes the same choice and quote:
+
+```bash
+hq agents provision "Fleet Scout" --company acme --size power
+```
+
+Before provisioning, the CLI prints the selected size, capacity, and company-specific monthly price, then asks for confirmation. Add `--yes` only for an already-reviewed automated flow.
+
+See [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/) for the size ladder and plan inclusions.
+
+## 3. Choose a provider and authentication method
 
 Select a provider, then use an authentication method that provider accepts:
 
@@ -44,9 +58,9 @@ Subscription sign-in opens the provider's device or OAuth flow. API keys are wri
 The provider, model, and authentication method must agree. For example, ChatGPT subscription authentication cannot run API-only Codex models. The Console filters or rejects incompatible combinations.
 :::
 
-## 3. Confirm and provision
+## 4. Confirm and provision
 
-Review the recurring price displayed in the wizard and create the agent. The current list price is **$100 per month**, billed to the host company, and charging starts when the agent is created. Contract pricing, sponsorships, or account-specific overrides may change the amount shown. HQ then works through the setup stages:
+Review the selected size and exact recurring price displayed in the Console or CLI, then create the agent. Charging starts when the agent is created. HQ then works through the setup stages:
 
 1. create the agent identity and company membership;
 2. prepare the vault workspace and access grants;
@@ -61,7 +75,7 @@ You can leave and return to the agent row while setup continues. If a stage need
 
 A new agent has no company file, secret, or connector grants by default. Assign groups and explicit resource grants after the runtime is ready.
 
-## 4. Verify the agent
+## 5. Verify the agent
 
 When setup finishes:
 

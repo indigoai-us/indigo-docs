@@ -39,9 +39,15 @@ hq packs uninstall <name>                # un-wire + archive a pack cleanly
 
 # capabilities
 hq run / hq secrets exec                 # schema-driven secret access
+
+# Fleet Agents
+hq agents provision "Fleet Scout" --company acme --size power
+hq agents list --company acme
 ```
 
 Pack commands accept `--json` for machine-readable output — the [hq-sync](/hq/products/hq-sync/) menubar app uses this to power its Packages window.
+
+Fleet Agent creation accepts `--size basic`, `--size power`, or `--size dev`. Before provisioning, the CLI prints the selected capacity and company-specific monthly price and asks for confirmation. See [Create an agent](/hq/products/fleet-agents/create/) and [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/).
 
 ## How it composes
 

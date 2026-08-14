@@ -26,6 +26,7 @@ Owners and admins can also inspect session and transcript pages for an agent. Th
 Use the agent UID shown by `list` for commands that target one agent.
 
 ```bash
+hq agents provision "Fleet Scout" --company acme --size power
 hq agents list --company acme
 hq agents status <agent-uid>
 hq agents set <agent-uid> --name "Fleet Scout" --title "Research Lead"
@@ -34,6 +35,8 @@ hq agents stop <agent-uid>
 hq agents start <agent-uid>
 hq agents retry <agent-uid>
 ```
+
+`provision` accepts `--size basic`, `--size power`, or `--size dev`. It prints the selected capacity and company-specific monthly price before asking for confirmation. Use `--yes` only when that quote has already been approved for an automated flow.
 
 Add `--json` to supported read or update commands for machine-readable output. Rename and removal are also available:
 
