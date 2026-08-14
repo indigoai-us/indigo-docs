@@ -19,6 +19,12 @@ Three sizes are available:
 | **Power** | $250 | Multi-user work, projects, light development |
 | **Dev** | $500 | Complex development, many users, project orchestration |
 
+Choose the initial size in the HQ Console creation wizard or with
+`hq agents provision --size basic|power|dev`. Both routes show the applicable
+company-specific monthly price before creation. Plan inclusions, contract
+pricing, credits, or sponsorship can make the displayed price different from
+the list price above.
+
 You can move an agent up or down the ladder at any time from its settings; a
 mid-cycle change is prorated on your next invoice using standard Stripe
 proration.
@@ -43,6 +49,11 @@ Changing a size changes your bill, so applying a size change requires the
 
 The confirmation step always shows the exact monthly change before anything
 is applied.
+
+After the new size is in place and the agent is healthy, HQ updates the size
+shown in the Console and sends the requester a completion notification. A
+failed change reports the size the agent remains on instead of claiming the
+requested size is ready.
 
 ## Team plan inclusions
 
