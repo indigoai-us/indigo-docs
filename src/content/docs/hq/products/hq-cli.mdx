@@ -43,6 +43,12 @@ hq run / hq secrets exec                 # schema-driven secret access
 # Fleet Agents
 hq agents provision "Fleet Scout" --company acme --size power
 hq agents list --company acme
+
+# work mesh (native REST + ~/.hq/work-mesh/cache — no pack helper)
+hq mesh check --company <slug>           # active project threads
+hq mesh start --project <slug>           # claim / report start
+hq mesh progress --project <slug> --summary "<text>"
+hq mesh doctor                           # warm directory, inbox, pair DMs
 ```
 
 Pack commands accept `--json` for machine-readable output — the [hq-sync](/hq/products/hq-sync/) menubar app uses this to power its Packages window.
