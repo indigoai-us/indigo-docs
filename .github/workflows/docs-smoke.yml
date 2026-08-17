@@ -44,11 +44,49 @@ jobs:
         run: |
           set -euo pipefail
 
-          overview=$(curl --fail --show-error --silent --retry 3 \
-            https://docs.getindigo.ai/hq/products/fleet-agents/)
-          grep --fixed-strings --quiet 'Fleet Agents' <<<"${overview}"
+          # --location is REQUIRED on these two requests, not a nicety. Since
+          # 2026-08-02 docs.getindigo.ai answers 307 and redirects to
+          # docs.hq.computer, and `curl --fail` treats a 307 as SUCCESS — so
+          # without --location these captured the 14-byte "Redirecting..." body
+          # and the content assertion failed while the site was perfectly
+          # healthy. That is the whole reason this workflow reported red on 63
+          # of 112 scheduled runs across a month. The route probes above already
+          # passed the entire time precisely because they do pass --location.
+          #
+          # The legacy hostname is kept under test deliberately: pointing these
+          # at docs.hq.computer would also silence the alarm, but would stop
+          # checking that the old public hostname still resolves and redirects.
+          assert_contains() {
+            local label="$1" url="$2" needle="$3" body
+            body=$(curl --fail --show-error --silent --location \
+              --retry 3 --retry-delay 2 "${url}")
 
-          legacy=$(curl --fail --show-error --silent --retry 3 \
-            https://docs.getindigo.ai/hq/products/capabilities/agents-in-slack/)
-          grep --fixed-strings --quiet \
-            'url=/hq/products/fleet-agents/channels/' <<<"${legacy}"
+            if grep --fixed-strings --quiet "${needle}" <<<"${body}"; then
+              echo "ok: ${label}"
+              return 0
+            fi
+
+            # `grep --quiet` on its own prints nothing, so the previous version
+            # of this step failed with a bare "Process completed with exit code
+            # 1" and no indication of which assertion broke or what was served
+            # instead. Diagnosing it required reproducing the request by hand.
+            {
+              echo "FAIL: ${label}"
+              echo "  url:      ${url}"
+              echo "  expected: ${needle}"
+              echo "  resolved: $(curl --silent --location --output /dev/null \
+                --write-out '%{url_effective} (HTTP %{http_code}, %{num_redirects} redirect(s))' \
+                "${url}")"
+              echo "  body was ${#body} bytes; first 400:"
+              printf '%s\n' "${body:0:400}"
+            } >&2
+            return 1
+          }
+
+          assert_contains "Fleet Agents overview renders" \
+            "https://docs.getindigo.ai/hq/products/fleet-agents/" \
+            'Fleet Agents'
+
+          assert_contains "legacy agents-in-Slack URL still redirects" \
+            "https://docs.getindigo.ai/hq/products/capabilities/agents-in-slack/" \
+            'url=/hq/products/fleet-agents/channels/'
