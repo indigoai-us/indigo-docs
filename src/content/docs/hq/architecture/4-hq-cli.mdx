@@ -7,11 +7,12 @@ The `@indigoai-us/hq-cli` package is the ongoing management CLI for HQ. It handl
 
 > One repo in the split [HQ ecosystem](/hq/architecture/2-ecosystem/) — published as `@indigoai-us/hq-cli`, depending on `@indigoai-us/hq-cloud` for sync.
 
-Built with [Commander.js](https://github.com/tj/commander.js), the CLI registers two top-level command groups:
+Built with [Commander.js](https://github.com/tj/commander.js), the CLI registers these top-level command groups:
 
 ```
 hq modules <add|sync|list|update>   # Module management
 hq sync <init|start|stop|status|push|pull>  # Cloud sync
+hq mesh <check|start|progress|blocked|done|note|story|doctor>  # Work mesh
 ```
 
 ## Module Commands
@@ -218,6 +219,21 @@ The `hq sync` command group bridges to `@indigoai-us/hq-cloud` via dynamic impor
 | `hq sync pull` | `pullAll()` | Force download all cloud changes to local |
 
 Dynamic imports (`await import("@indigoai-us/hq-cloud")`) mean the cloud package is only loaded when cloud commands are actually invoked. Module management commands work without `hq-cloud` installed.
+
+## Work mesh
+
+**File:** `src/commands/mesh.ts`
+
+`hq mesh` talks to hq-pro over the same Cognito session as `hq dm` / `hq files` and writes `~/.hq/work-mesh/cache`. It does not require the work-mesh pack helper and does not start MQTT listen. Distinct from `hq doctor` (hook guardrails).
+
+| Command | Description |
+|---------|-------------|
+| `hq mesh check` | List active project threads (`status` / `projects` aliases) |
+| `hq mesh start` / `progress` / `blocked` / `done` / `note` | Ensure a project thread and append an event |
+| `hq mesh story` | PATCH one Board story status |
+| `hq mesh doctor` | Warm directory, inbox, contacts, and pair-DM threads into the local cache |
+
+`hq mesh doctor --apply` (paced Board PUTs from local `prd.json`) is not in the CLI yet.
 
 ## File Layout
 
