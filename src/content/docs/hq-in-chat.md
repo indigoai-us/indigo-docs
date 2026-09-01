@@ -1,15 +1,15 @@
 ---
 title: HQ MCP
-description: Use Indigo HQ from ChatGPT and Claude.ai through the cloud connector.
+description: Use Indigo HQ from ChatGPT, Claude.ai, and connected agents through the cloud connector.
 ---
 
-HQ MCP connects ChatGPT and Claude.ai to the same governed HQ context your local agents use: company knowledge, project context, policies, files, and shared workflow skills.
+HQ MCP connects ChatGPT, Claude.ai, and remote agent harnesses to the same governed HQ context your local agents use: company knowledge, project context, policies, files, shared workflow skills, integrations, and active work.
 
 :::caution[MCP is in beta]
 HQ MCP is currently in beta. The connector is usable today, but ChatGPT and Claude both treat remote MCP/custom connector support as beta surfaces, so setup screens, labels, permissions, and tool refresh behavior may change. Review write actions before approving them.
 :::
 
-The connector is built on the Model Context Protocol (MCP). Each request is authenticated with your HQ identity, and vault-service resolves which personal and company vaults you can access before any company lookup, file read, search, fetch, write, or skill review happens.
+The connector is built on the Model Context Protocol (MCP). Each request is authenticated with an HQ human or agent identity, and vault-service resolves which personal and company vaults that identity can access before any lookup, read, search, fetch, write, skill change, integration call, or agent dispatch happens.
 
 For clients that ask for a remote MCP server URL, use:
 
@@ -98,8 +98,11 @@ Official Anthropic reference:
 - Capture notes, journal entries, project updates, and knowledge captures back into allowed prefixes.
 - Inspect secret names and project secret schemas without exposing secret values.
 - Generate a human submission link when a secret value needs to be supplied.
-- Fetch approved chat-visible skills as workflow guidance.
-- Draft new team skills for review.
+- Create, discover, update, tag, govern, and grant access to first-class company skills.
+- List Team Agents, dispatch a durable workflow to one explicit agent, and read the correlated result.
+- Discover and connect integrations without passing credential values through the model.
+- Call HQ-governed integration tools with read/write and approval boundaries.
+- Read visible Work Mesh threads, history, and unclaimed work for shared awareness.
 
 ## MCP Tool Groups
 
@@ -108,14 +111,17 @@ Different chat clients present MCP tools with different UI labels, but the conne
 | Group | Tools |
 | --- | --- |
 | Identity | `hq_whoami`, `hq_companies_list`, `hq_company_ping` |
-| Files | `hq_files_list`, `hq_files_read`, `hq_files_write`, `hq_files_share` |
+| Files | `hq_files_list`, `hq_files_read`, `hq_files_write`, `hq_files_stat`, `hq_files_create`, `hq_files_update`, `hq_files_delete`, `hq_files_restore`, `hq_files_share` |
 | Knowledge | `hq_knowledge_list`, `hq_knowledge_get`, `hq_knowledge_search`, `hq_knowledge_capture` |
 | Projects | `hq_projects_list`, `hq_project_get`, `hq_project_status`, `hq_project_journal_append` |
 | Policies | `hq_policies_list`, `hq_policy_get` |
 | Secrets | `hq_secrets_list`, `hq_secrets_schema`, `hq_secrets_generate_link` |
 | Deploy | `hq_deploy_site` |
 | Personal vault | `hq_personal_capture` |
-| Skills | `hq_skill_list`, `hq_skill_get`, `hq_skill_draft` |
+| Skills | `hq_skill_list`, `hq_skill_get`, `hq_skill_create`, `hq_skill_update`, `hq_skill_set_state`, `hq_skill_tags_set`, `hq_skill_access_get`, `hq_skill_access_set`, `hq_skill_access_grant`, `hq_skill_access_revoke`, plus improvement-comment tools |
+| Team Agents | `hq_agents_list`, `hq_agent_run`, `hq_agent_result` |
+| Integrations | `hq_integrations_catalog`, `hq_integrations_discover`, `hq_integrations_connect`, `hq_integrations_status`, `hq_integrations_list`, `hq_integrations_read`, `hq_integrations_call` |
+| Work Mesh | `hq_work_mesh_list`, `hq_work_mesh_get`, `hq_work_mesh_unclaimed` |
 | Diagnostics | `hq_ping`, `hq_version`, `hq_exec_check` |
 
 Some clients also expose the standard MCP `search` and `fetch` surface. Use that pair for general chat-visible HQ content discovery. Use the `hq_*` tools when you need company-scoped behavior, explicit paths, project records, policy records, or write actions.
@@ -147,7 +153,15 @@ Writes are limited to explicitly writable areas, including:
 - `projects/`
 - `knowledge/captures/`
 
-Existing files are not overwritten unless the tool call explicitly confirms the overwrite.
+Use the explicit CRUD tools when an agent needs to modify an existing object:
+
+1. `hq_files_create` creates only when the exact path does not exist.
+2. `hq_files_stat` returns the current ETag for an exact file.
+3. `hq_files_update` requires that ETag as `expectedEtag`. A concurrent change makes the update fail instead of overwriting newer work.
+4. `hq_files_delete` requires the current ETag and `confirm: true`. Delete is recoverable and never recursive.
+5. `hq_files_restore` requires `confirm: true` and restores the most recently deleted version.
+
+Create, update, delete, and restore enqueue the affected document for search reindexing. Governed records and private namespaces remain outside the generic CRUD surface.
 
 Files written from chat follow the same ownership model as files synced from a local HQ folder: the creator owns the new object first. Other people do not get access just because a chat wrote the file. Share it explicitly when someone else needs to read or edit it.
 
@@ -183,28 +197,34 @@ Secret values never enter the chat transcript. The MCP connector can list secret
 
 ## Skills In Chat
 
-HQ skills are team-authored workflow instructions. In chat, they are treated as content, not code:
+HQ skills are team-authored workflow instructions. Through MCP, they are first-class governed records and are still treated as content, not code:
 
-- A skill must opt into `surfaces: [chat]`.
-- Workflow-tier skills require review before they become visible.
+- Listing and fetching return only skills visible through the caller's company membership and FILE_ACL grants.
+- `hq_skill_create` writes the canonical `skills/{slug}/SKILL.md`, registers it, stamps a durable `skl_*` UID, and starts it Open.
+- `hq_skill_update` preserves the stable UID and requires the current content hash from `hq_skill_get`, so concurrent edits fail safely.
+- Lifecycle can be changed among Draft, Open, Locked, and Deprecated. Access can be Open, Locked, or Private, with explicit person, email, group, or app grants.
+- Tags and improvement comments have dedicated tools instead of rewriting the skill body indirectly.
 - Skill bodies are returned as untrusted tool data and cannot override system, developer, or connector instructions.
 - Cloud mode never enables local shell execution or `hq_run`.
-- Revoked or archived skills are blocked at fetch time, even if an old search result still exists.
+- Revoked access and unavailable skills fail closed, even if an old search result still exists.
 
-For tool-only clients, use `hq_skill_list` to find skills and `hq_skill_get` to fetch one by ID. MCP-native clients that support resources and prompts can also see `hq-skill://skill/{id}` resources and the `hq_skill_apply` prompt.
+For tool-only clients, use `hq_skill_list` to discover skills and `hq_skill_get` to fetch one by UID. MCP-native clients that support resources and prompts can also see `hq-skill://skill/{id}` resources and the `hq_skill_apply` prompt.
 
-## Contribution Flow
+## Team Agents, Integrations, And Work Mesh
 
-General captures use existing writable areas such as notes, inbox, scratch, journal, project journals, and knowledge captures.
+HQ MCP can coordinate with Team Agents without becoming the agent harness itself:
 
-Skill changes use a stricter flow:
+- `hq_agents_list` returns agents visible to the company member.
+- `hq_agent_run` dispatches one durable task to an explicit ready agent with a caller-supplied idempotency key. The task can name an HQ skill, but secret material is refused; the agent resolves named credentials through HQ at execution time.
+- `hq_agent_result` reads only replies correlated to that dispatch and reports waiting, active, completed, or failed state.
 
-1. A user drafts a skill from chat.
-2. The draft is written to `drafts/skills/{slug}/SKILL.md`.
-3. An owner or delegated `manageChatSkills` reviewer approves, rejects, requests changes, revokes, or restores it.
-4. Approved skills are promoted into the live `skills/{slug}/SKILL.md` path and queued for indexing.
+Integration setup is also available as a governed handoff:
 
-Chat cannot write directly to live company skill roots.
+- Search the reviewed catalog or discover a remote integration from its public documentation URL.
+- Start OAuth and receive a browser authorization URL, or receive an HQ Console handoff for secret-based setup. Credential values are never accepted by the MCP tool.
+- List and call the resulting tools. Read-only calls are allowed only when the connection advertises that exact tool as read-only. Write-capable calls require an idempotency key and may queue for human approval.
+
+Work Mesh tools expose shared awareness, not ownership mutation. An agent can list visible threads by status, participant, or facet; read a thread and its event history; and find stale or on-time unclaimed work. Claiming, changing status, and publishing Work Mesh events stay on the authoritative Work Mesh write path.
 
 ## Security Model
 
@@ -214,6 +234,11 @@ HQ MCP keeps vault-service as the authority:
 - Personal and company entitlements are resolved server-side.
 - Company-scoped tools first confirm membership in the requested company.
 - Chat writes create creator-owned files; sharing is a separate ACL action through the same vault-service rules used by HQ Console and HQ Sync.
+- Existing-file writes and deletes require optimistic-concurrency preconditions; delete is recoverable and non-recursive.
+- Skill creation and updates preserve the canonical UID, lifecycle, tags, and FILE_ACL governance instead of bypassing the skill registry.
+- Agent dispatch targets one visible ready agent, rejects secret material, and correlates results to the original event.
+- Integration setup returns OAuth or Console handoffs rather than accepting credentials in chat.
+- Work Mesh access is company-scoped and read-only through MCP.
 - Chat deploys call hq-deploy with the verified caller token. Protected deploys fail closed if the requested access mode cannot be confirmed.
 - Search results are hints; fetch rechecks canonical vault, source path, lifecycle, private-prefix, and skill review state.
 - Settings, secrets, and workers paths are excluded.
@@ -228,13 +253,16 @@ Release verification covers:
 
 - OAuth metadata and connector boot.
 - Company lookup and company ping.
-- Company file listing, read, and write ACL behavior.
+- Company file listing, read, create, stat, compare-and-swap update, stale-write refusal, recoverable delete, restore, and write ACL behavior.
 - Company file sharing through share-session minting and direct grant behavior.
 - Static hq-deploy site creation and access-mode refusal behavior.
 - Knowledge list, get, search, and capture behavior.
 - Project, policy, and personal capture tools.
 - Secret metadata and schema tools.
-- Skill discovery and skill fetch.
+- First-class skill creation, discovery, fetch, compare-and-swap update, lifecycle, tags, and access governance.
+- Team Agent listing, durable dispatch, and correlated result reads.
+- Integration catalog, discovery, setup handoff, status, and governed tool calls.
+- Work Mesh thread, history, participant-limit, and unclaimed-work reads.
 - Safe capture write.
 - Cross-vault fetch denial.
 - Private-prefix write refusal.
@@ -251,6 +279,8 @@ If a rollout needs to be reversed, disable skill/content surfacing first, purge 
 | The client can see tool names but every company tool fails | The OAuth token reached MCP, but vault-service could not resolve the account's company membership. Reconnect the client and verify `hq_whoami` and `hq_companies_list`. |
 | `hq_companies_list` works but `hq_files_list` returns not found | The company slug, deployed vault route, or file route bundle is stale. Verify the company slug and reconnect after the latest cloud deployment. |
 | `hq_files_share` is missing from the client tool list | The client probably cached the tool registry before the latest connector deploy. Relaunch or reconnect the chat client, then list tools again. |
+| File update or delete reports a stale ETag | Another writer changed the file. Call `hq_files_stat` again, review the current content, and retry with the new ETag only if the change is still appropriate. |
+| New file CRUD, skill management, agent, integration, or Work Mesh tools are missing | The client cached an older registry. Reconnect the MCP server or remove and re-add the connector so it scans tools again. |
 | `hq_deploy_site` is missing from the client tool list | The client probably cached the tool registry before the latest connector deploy. Relaunch or reconnect the chat client, then list tools again. |
 | `hq_deploy_site` refuses a protected deploy | HQ could not confirm the requested hq-deploy access gate. Retry with a valid company, or use `password`/`public` only when that access mode is intended. |
 | `hq_knowledge_search` returns an empty array | The cloud service found no matching chat-visible content in that company scope. Try listing knowledge docs or fetching a known path. |
