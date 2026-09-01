@@ -118,7 +118,7 @@ Different chat clients present MCP tools with different UI labels, but the conne
 | Secrets | `hq_secrets_list`, `hq_secrets_schema`, `hq_secrets_generate_link` |
 | Deploy | `hq_deploy_site` |
 | Personal vault | `hq_personal_capture` |
-| Skills | `hq_skill_list`, `hq_skill_get`, `hq_skill_create`, `hq_skill_update`, `hq_skill_set_state`, `hq_skill_tags_set`, `hq_skill_access_get`, `hq_skill_access_set`, `hq_skill_access_grant`, `hq_skill_access_revoke`, plus improvement-comment tools |
+| Skills | `hq_skill_list`, `hq_skill_get`, `hq_skill_create`, `hq_skill_update`, `hq_skill_set_state`, `hq_skill_tags_set`, `hq_skill_access_get`, `hq_skill_access_set`, `hq_skill_access_grant`, `hq_skill_access_revoke`, `hq_skill_improvements_list`, `hq_skill_improvement_post`, `hq_skill_improvement_resolve`, `hq_skill_improvement_withdraw` |
 | Team Agents | `hq_agents_list`, `hq_agent_run`, `hq_agent_result` |
 | Integrations | `hq_integrations_catalog`, `hq_integrations_discover`, `hq_integrations_connect`, `hq_integrations_status`, `hq_integrations_list`, `hq_integrations_read`, `hq_integrations_call` |
 | Work Mesh | `hq_work_mesh_list`, `hq_work_mesh_get`, `hq_work_mesh_unclaimed` |
