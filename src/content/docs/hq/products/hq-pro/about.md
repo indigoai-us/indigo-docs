@@ -23,6 +23,7 @@ sidebar:
 - [Onboarding](/hq/products/hq-pro/onboarding/) — creating and joining teams
 - [HQ Installer](/hq/products/hq-pro/overview/) — the native macOS onboarding wizard
 - [Installer Quickstart](/hq/products/hq-pro/quickstart/) · [Cognito Setup](/hq/products/hq-pro/cognito-setup/) · [Troubleshooting](/hq/products/hq-pro/troubleshooting/)
+- [Setup channel lifecycle](/hq/products/hq-pro/setup-channel-lifecycle/) — #setup → company → cloud → Workforce → first agent in the desktop app
 
 ## Related capabilities
 
