@@ -49,7 +49,7 @@ HQ validates the model name against the selected provider:
 - Grok supports `grok-*` models.
 - Claude supports Anthropic model families such as `claude-*`, `sonnet`, `opus`, and `haiku`.
 
-The available list is the source of truth for your account. ChatGPT subscription agents use `gpt-5.6-terra` by default; Sol and `*-codex` models require OpenAI API-key authentication. Agent Settings filters incompatible choices and returns an actionable message if a saved legacy value no longer matches the agent's authentication method. The Console also prevents model and reasoning combinations that the runtime cannot honor.
+The available list is the source of truth for your account. For Codex with ChatGPT subscription authentication, Agent Settings recommends `gpt-5.6-sol`; Sol is supported wherever it is available to the signed-in ChatGPT account. Models whose names end in `-codex` require OpenAI API-key authentication. Agent Settings filters incompatible choices and returns an actionable message if a saved value does not match the agent's authentication method. The Console also prevents model and reasoning combinations that the runtime cannot honor.
 
 ## Profile guidance
 
