@@ -5,9 +5,19 @@ sidebar:
   order: 3
 ---
 
-Open a company in HQ Console, choose **Agents**, then open the gear menu for an agent. Saving settings updates the running agent when possible. A change that cannot be applied live is saved for the next start.
+Open a company in HQ Console, choose **Agents**, then choose the **Settings** gear for an agent. Agent Settings keeps the full operating picture in one compact workspace:
 
-![Fleet Agent health and model settings in HQ Console](/images/fleet-agents/agent-settings.png)
+- **Configuration** contains profile and model values that save together.
+- **Controls** contains access, capacity, and runtime actions that apply immediately.
+- **Live systems** contains health signals and expandable connection managers.
+
+Most explanatory copy lives behind the help icon beside each section, leaving the values and current state visible at a glance.
+
+## Editing efficiently
+
+Choose a configuration value to edit it in place. Only one editor or picker stays open at a time. Clicking elsewhere closes the open editor while keeping its draft staged for **Save**; pressing **Escape** cancels that field's current edit instead. The footer tells you whether there are unsaved configuration changes, and **Save** remains disabled until a staged value differs from the saved configuration.
+
+Connection rows and the Agent size row expand in place. Clicking elsewhere collapses the open panel without changing anything. Actions labeled **Applies now** do not wait for the configuration Save button and show their own confirmation when the change is consequential.
 
 ## Configuration reference
 
@@ -25,6 +35,7 @@ Open a company in HQ Console, choose **Agents**, then open the gear menu for an 
 | Membership role | Company permissions granted to the agent | An agent can be a member or admin, but cannot become the company owner. |
 | Owners | People responsible for the agent | The creator is the initial owner. Additional ownership is shown only when enabled for the company. |
 | Groups | Company groups the agent belongs to | Use groups for organization and policy-driven access. |
+| Agent size | Runtime capacity and concurrency | Shows the current size, lanes, workers, and company-specific monthly price. Open the picker to compare Basic, Power, and Dev. See [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/). |
 | HQ MCP | Agent connection to HQ tools and context | Owners and admins manage it under **Integrations > For Agents** while the runtime is running. |
 | Slack | Slack app connection and diagnostics | Attach, finish a pending install, inspect delivery, or intentionally detach the app. |
 | Telegram | Telegram bot connection and caller group | Connect a managed bot or supply a token, then choose who can call it. |
@@ -52,6 +63,6 @@ Keep the title short and make the description operational. Channel users should 
 
 ## Managed settings
 
-Changing an agent's box size is an owner-approved billing action — see [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/). The backend also supports lower-level controls for autoscaling, caller email allowlists, provider migration, and direct MCP state. These are API or control-plane fields, not standard Agent Settings controls. An invalid value can prevent the runtime from starting or reject channel callers.
+Changing an agent's box size is a confirmed billing action available from Agent Settings — see [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/). The backend also supports lower-level controls for autoscaling, caller email allowlists, provider migration, and direct MCP state. These are API or control-plane fields, not standard Agent Settings controls. An invalid value can prevent the runtime from starting or reject channel callers.
 
 Credentials are stored as vault references. Raw provider keys and channel tokens are never returned by the settings API.

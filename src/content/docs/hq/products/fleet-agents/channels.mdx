@@ -5,16 +5,14 @@ sidebar:
   order: 4
 ---
 
-A Fleet Agent can use Slack, email, and Telegram under its own identity. HQ MCP can also connect a running agent to approved HQ tools. Channel credentials live in the company vault, and the Console exposes connection state and diagnostics without revealing tokens.
-
-![Fleet Agent channel connections and lifecycle controls](/images/fleet-agents/channels-and-controls.png)
+A Fleet Agent can use Slack, email, and Telegram under its own identity. HQ MCP can also connect a running agent to approved HQ tools. Channel credentials live in the company vault, and the Console exposes connection state and diagnostics without revealing tokens. In Agent Settings, choose a connection row to expand its manager; click elsewhere to collapse it and return to the compact status view.
 
 ## Slack
 
 ### Attach Slack
 
 1. Open the agent's settings.
-2. Under **Slack**, choose **Attach Slack**.
+2. Under **Live systems → Connections**, expand **Slack** and choose **Attach Slack**.
 3. Approve the Slack authorization screen. Your workspace may require an admin to approve the app.
 4. Return to HQ Console and confirm the Slack connection is active.
 
@@ -37,7 +35,7 @@ You can also open the channel's **Settings**, choose **Integrations**, and use *
 - It ignores unrelated top-level channel chatter.
 - In a direct message, send the request to the agent's app. The sender must resolve to an active company member and pass any configured caller restriction.
 
-The settings panel reports whether inbound events are healthy, outbound-only, waiting for an event, or missing configuration. It also shows the most recent Slack event seen by HQ.
+Under **Live systems → Connections**, expand **Slack** to see whether inbound events are healthy, outbound-only, waiting for an event, or missing configuration. The manager also shows the most recent Slack event seen by HQ.
 
 Messages in one conversation run in order. Distinct conversations can run in parallel, with a runtime capacity of two to five active lanes. Additional work waits until a lane is available.
 
@@ -51,7 +49,7 @@ Active company members can send mail to the agent. An API-managed allowed-sender
 
 ## Telegram
 
-Connect Telegram from the agent's settings:
+In Agent Settings, expand **Live systems → Connections → Telegram**, then:
 
 1. choose the managed bot flow or provide a bot token;
 2. complete the caller enrollment step shown by the Console; and
