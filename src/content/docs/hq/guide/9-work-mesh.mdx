@@ -23,7 +23,7 @@ or Linux systemd `hq-mesh-daemon.service`). It replaces the retired
 ## Context
 
 ```bash
-hq mesh context reconcile --session <sessionId>
+hq mesh context reconcile --observation-file <path>
 hq mesh context organize --session <sessionId> --decision <id> --option <id>
 hq mesh context untracked <sessionId>
 ```
@@ -33,9 +33,9 @@ hq mesh context untracked <sessionId>
 Presence and per-turn activity are automatic. Record Board signals only when needed:
 
 ```bash
-hq mesh session task-status --session <sid> --enqueue --seq <n> --task-id <id> --status in_progress
-hq mesh session blocked --session <sid> --enqueue --seq <n> --reason "waiting on review"
-hq mesh session note --session <sid> --enqueue --seq <n> --summary "short update"
+hq mesh session task-status --session-id <id> --task-id <task> --status in_progress --enqueue --seq <n> --harness <name> --adapter-version <ver>
+hq mesh session blocked --session-id <id> --enqueue --seq <n> --reason "waiting on review" --harness <name> --adapter-version <ver>
+hq mesh session note --session-id <id> --enqueue --seq <n> --summary "short update" --harness <name> --adapter-version <ver>
 ```
 
 Never put prompts, transcripts, tokens, or credentials into mesh events.
