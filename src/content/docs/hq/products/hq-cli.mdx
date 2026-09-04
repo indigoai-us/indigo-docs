@@ -49,11 +49,16 @@ hq mesh check --company <slug>           # active project threads
 hq mesh start --project <slug>           # claim / report start
 hq mesh progress --project <slug> --summary "<text>"
 hq mesh doctor                           # warm directory, inbox, pair DMs
+
+# historical meeting transcripts
+hq meetings import <transcript.json> --company <slug>
 ```
 
 Pack commands accept `--json` for machine-readable output — the [hq-sync](/hq/products/hq-sync/) menubar app uses this to power its Packages window.
 
 Fleet Agent creation accepts `--size basic`, `--size power`, or `--size dev`. Before provisioning, the CLI prints the selected capacity and company-specific monthly price and asks for confirmation. See [Create an agent](/hq/products/fleet-agents/create/) and [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/).
+
+`hq meetings import` lets a company owner add a normalized historical transcript to the company knowledge pipeline. The JSON file identifies the company, recorder, source, participants, provenance, timestamps, and timestamped transcript segments. Imports are immutable by `externalSourceId`: submitting the same file again reports `unchanged`, while submitting different content with the same ID reports a conflict instead of overwriting the original. Imported meeting paths are pipeline-managed and remain excluded from ordinary `hq sync push` uploads.
 
 ## How it composes
 
