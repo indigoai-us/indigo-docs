@@ -1,0 +1,41 @@
+---
+title: Work Mesh
+description: Automatic presence and session activity via hq mesh daemon, context, and session verbs.
+---
+
+# Work Mesh
+
+HQ Work Mesh keeps every human and agent session visible live: who is online,
+what they are working on, and what changed — without wiring a separate listen
+daemon.
+
+## Install the daemon
+
+```bash
+hq mesh daemon install
+hq mesh daemon status
+```
+
+This installs a user service (macOS LaunchAgent `ai.getindigo.hq-mesh-daemon`,
+or Linux systemd `hq-mesh-daemon.service`). It replaces the retired
+`hq-pack-work-mesh` `listen` installer.
+
+## Context
+
+```bash
+hq mesh context reconcile --observation-file <path>
+hq mesh context organize --session <sessionId> --decision <id> --option <id>
+hq mesh context untracked <sessionId>
+```
+
+## Manual session signals
+
+Presence and per-turn activity are automatic. Record Board signals only when needed:
+
+```bash
+hq mesh session task-status --session-id <id> --task-id <task> --status in_progress --enqueue --seq <n> --harness <name> --adapter-version <ver>
+hq mesh session blocked --session-id <id> --enqueue --seq <n> --reason "waiting on review" --harness <name> --adapter-version <ver>
+hq mesh session note --session-id <id> --enqueue --seq <n> --summary "short update" --harness <name> --adapter-version <ver>
+```
+
+Never put prompts, transcripts, tokens, or credentials into mesh events.
