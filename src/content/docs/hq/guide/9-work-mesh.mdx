@@ -22,6 +22,10 @@ or Linux systemd `hq-mesh-daemon.service`). It replaces the retired
 
 ## Context
 
+On fleet agent boxes, Work Mesh uses the agent's company identity before a device
+default. Explicit session context retains precedence. Hooks and transcript
+fallback follow the same company attribution rules.
+
 ```bash
 hq mesh context reconcile --observation-file <path>
 hq mesh context organize --session <sessionId> --decision <id> --option <id>
