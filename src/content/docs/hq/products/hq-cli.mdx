@@ -30,6 +30,7 @@ hq sync init                # authenticate
 hq sync start               # start background sync
 hq sync status              # health
 hq sync stop                # stop background sync
+hq sync doctor --reconcile-conflicts [--yes]   # clean up legacy .conflict-* twins (dry-run by default)
 
 # packs (content packs)
 hq install @indigoai-us/hq-pack-<name>   # install a content pack
@@ -53,6 +54,8 @@ hq mesh doctor                           # warm directory, inbox, pair DMs
 # historical meeting transcripts
 hq meetings import <transcript.json> --company <slug>
 ```
+
+`hq sync doctor --reconcile-conflicts` reconciles the sibling `<file>.conflict-<timestamp>-<machine>.<ext>` twins that earlier engine versions left beside live files. It is a dry-run by default and prints a plan; `--yes` applies it. A twin is promoted only when its frontmatter `version:` is strictly higher than the live file's — otherwise the live file is kept — and every losing or orphaned copy is parked under `.hq/conflict-backups/`. See [Cloud Sync](/hq/guide/8-cloud-sync/#conflict-resolution) for how current conflicts are decided.
 
 Pack commands accept `--json` for machine-readable output — the [hq-sync](/hq/products/hq-sync/) menubar app uses this to power its Packages window.
 

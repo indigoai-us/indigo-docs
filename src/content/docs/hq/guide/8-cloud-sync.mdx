@@ -49,6 +49,7 @@ This starts a background daemon that watches your HQ directory for changes and s
 | `hq sync status` | Show sync health (running, last sync, file count, errors) |
 | `hq sync push` | Force upload all local changes |
 | `hq sync pull` | Force download all cloud changes |
+| `hq sync doctor --reconcile-conflicts` | Clean up legacy `.conflict-*` twin files (dry-run; add `--yes` to apply) |
 
 ## How Sync Works
 
@@ -60,9 +61,23 @@ This starts a background daemon that watches your HQ directory for changes and s
 
 ### Conflict Resolution
 
-- **Last-write-wins** with a journal audit trail
-- The journal tracks hash, size, timestamp, and sync direction for every file
-- Git handles content-level conflicts for version-controlled files
+When the same file changed on both sides, sync picks a winner without leaving anything next to the live file:
+
+1. If both copies carry a frontmatter `version:` number, the **higher version wins**.
+2. Otherwise the **newer modification time wins**.
+3. Identical bodies keep the local copy; a true tie keeps the cloud copy.
+
+The losing copy is parked out of tree under `.hq/conflict-backups/` (never synced), and the decision — winner, reason, and both versions — is recorded on the matching row in `.hq-conflicts/index.json`. The journal still tracks hash, size, timestamp, and sync direction for every file, and Git handles content-level conflicts for version-controlled files.
+
+#### Cleaning up legacy conflict twins
+
+Older versions of the engine wrote a sibling `<file>.conflict-<timestamp>-<machine>.<ext>` twin beside the live file. `hq sync doctor --reconcile-conflicts` walks your HQ root and prints a plan for every twin it finds; add `--yes` to apply it (use `--hq-root <path>` to point at a different HQ):
+
+- A twin replaces the live file **only** when its frontmatter `version:` is strictly higher than the live file's. Otherwise the live file stays and the twin is parked.
+- Twins whose live file no longer exists are parked, never restored, and listed for manual review.
+- Symlinked or unreadable twins are skipped and listed for manual review.
+
+Everything parked lands in `.hq/conflict-backups/`, so no content is destroyed. The command is local-only and needs no cloud sign-in.
 
 ## What Syncs
 

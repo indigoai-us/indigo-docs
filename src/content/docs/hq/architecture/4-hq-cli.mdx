@@ -11,7 +11,7 @@ Built with [Commander.js](https://github.com/tj/commander.js), the CLI registers
 
 ```
 hq modules <add|sync|list|update>   # Module management
-hq sync <init|start|stop|status|push|pull>  # Cloud sync
+hq sync <init|start|stop|status|push|pull|doctor>  # Cloud sync
 hq mesh <check|start|progress|blocked|done|note|story|doctor>  # Work mesh
 ```
 
@@ -217,6 +217,7 @@ The `hq sync` command group bridges to `@indigoai-us/hq-cloud` via dynamic impor
 | `hq sync status` | `getStatus()` | Display sync health: running state, last sync time, file count, bucket, errors |
 | `hq sync push` | `pushAll()` | Force upload all local changes to S3 |
 | `hq sync pull` | `pullAll()` | Force download all cloud changes to local |
+| `hq sync doctor --reconcile-conflicts [--yes] [--hq-root <path>]` | `syncDoctor({ reconcileConflicts: true })` | Reconcile legacy `.conflict-*` twin files against their live files (dry-run unless `--yes`); local-only, no vault access |
 
 Dynamic imports (`await import("@indigoai-us/hq-cloud")`) mean the cloud package is only loaded when cloud commands are actually invoked. Module management commands work without `hq-cloud` installed.
 
