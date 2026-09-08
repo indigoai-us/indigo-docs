@@ -34,11 +34,11 @@ Submitting create-agent mints the agent and an invite-only company-scoped channe
 
 ## Company channel tabs
 
-Each company channel header is **Chat · Atlas · Team · Integrations · Settings**.
+Each company channel header is **Chat · Atlas · Team · Settings**.
 
 - **Chat** is the feed (lifecycle cards plus ordinary messages).
 - **Team** is humans (roles and invite-by-email), agents (resize / remove / spend), and permissions (who can create agents, who can invite). Defaults: create-agents **Owner only**, invite **Everyone**. Members see values without controls. Removing an agent or changing an owner role is a second click in the row, never a modal.
-- **Integrations** is connected apps, the available catalog, and a console link for secrets. Connect opens the provider in the system browser.
+- **Integrations** is not a channel tab. Apps are connected only in the HQ console, on the company's Integrations page; in the desktop app, the company's **More → Integrations** entry opens that page in the system browser.
 - **Settings** is identity, plan and billing, cloud, and the danger zone. Wallpaper is stored on the company and drives the channel hero. Members see General read-only.
 - **Atlas** is a read-only map of the company's people and agents.
 
