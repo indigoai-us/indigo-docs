@@ -3,7 +3,7 @@ title: hq-cloud
 description: The HQ cloud sync engine — bidirectional S3 sync that backs the hq CLI and the hq-sync menubar app.
 ---
 
-**hq-cloud** is the sync engine of the HQ ecosystem, published to npm as **`@indigoai-us/hq-cloud`** (currently **5.x**). It does the actual work of keeping a local HQ instance synchronized with cloud storage.
+**hq-cloud** is the sync engine of the HQ ecosystem, published to npm as **`@indigoai-us/hq-cloud`** (currently **6.x**). It does the actual work of keeping a local HQ instance synchronized with cloud storage.
 
 ## What it is
 
@@ -30,7 +30,7 @@ graph LR
 - **Auth** against the shared Cognito identity.
 - **Bidirectional file sync** to S3 with per-entity prefixes.
 - **Change detection** via chokidar, with gitignore-compatible path filtering.
-- **Conflict resolution** via a local journal that tracks per-file sync state.
+- **Conflict resolution** via a local journal that tracks per-file sync state. When both sides changed, the higher frontmatter `version:` wins (else the newer modification time); the losing copy is parked under `.hq/conflict-backups/` rather than written beside the live file. See [Cloud Sync](/hq/guide/8-cloud-sync/#conflict-resolution).
 
 ## Composition
 

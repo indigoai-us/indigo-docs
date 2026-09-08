@@ -513,13 +513,19 @@ The daemon worker keeps this pipeline alive as a background process, while the C
 
 ## Conflict Resolution
 
-The current implementation uses a **last-write-wins** strategy:
+When a file changed on both sides since the last sync, the engine decides a **version-aware winner** (`pickWinner` in `src/cli/conflict.ts`) on both pull and push:
 
-- **Upload**: If the local file hash differs from the journal, upload overwrites the remote copy.
-- **Download** (via `pullAll`): Remote files overwrite local copies unconditionally.
-- **No merge**: There is no three-way merge or diff. The journal tracks which direction the last sync went (`"up"` or `"down"`), providing an audit trail but not preventing overwrites.
+1. Both bodies carry a frontmatter `version:` integer → the higher version wins.
+2. Otherwise the newer modification time wins (gaps under 2 s count as a tie, since S3 `LastModified` is whole seconds).
+3. Identical bodies keep local; any remaining tie keeps the cloud copy.
 
-This is sufficient for the primary use case where a single user syncs between their workstation and mobile/web access. Multi-device concurrent editing would require a more sophisticated conflict resolution mechanism.
+If local wins, the local body stays live and the next push publishes it under an etag fence; if cloud wins, the cloud body is adopted. Either way the **losing body is parked out of tree** under `.hq/conflict-backups/<path>.<timestamp>-<machine><ext>` — `.hq/` is sync-ignored — so nothing is destroyed and no sibling `<file>.conflict-*` twin is written beside the live file. The decision (`winner`, `reason`, `localVersion`, `remoteVersion`) is recorded on the file's row in `.hq-conflicts/index.json` and on the `conflict` progress event.
+
+There is no three-way merge or diff. The journal tracks which direction the last sync went (`"up"` or `"down"`) as an audit trail.
+
+### Reconciling legacy twins
+
+Earlier engine versions wrote the loser as a sibling twin. `reconcileLegacyConflictTwins()` (`src/lib/conflict-reconcile.ts`, surfaced as `hq sync doctor --reconcile-conflicts`) walks the HQ root — skipping `.git`, `node_modules`, `.hq`, `.hq-conflicts`, and `repos` — groups twins per live path, and decides once per live file: a twin is promoted only when its frontmatter `version:` is strictly higher than the live file's (a twin's mtime is its detection time, never promotion evidence). Every other twin is parked under `.hq/conflict-backups/` with the live file untouched; orphan twins with no live sibling are parked and reported for manual review rather than restored; symlinked or unreadable twins are refused for manual review. Dry-run by default, `--yes` applies, and it never touches the vault.
 
 ## Security Model
 
