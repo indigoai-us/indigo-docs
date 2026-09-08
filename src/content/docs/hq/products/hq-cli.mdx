@@ -32,6 +32,9 @@ hq sync status              # health
 hq sync stop                # stop background sync
 hq sync doctor --reconcile-conflicts [--yes]   # clean up legacy .conflict-* twins (dry-run by default)
 
+# vault files
+hq access <path-or-query>   # can't find or open a file? never-existed / not-synced (fetched) / no-access (asks the owner)
+
 # packs (content packs)
 hq install @indigoai-us/hq-pack-<name>   # install a content pack
 hq packs list                            # installed packs + the curated catalog
@@ -56,6 +59,8 @@ hq meetings import <transcript.json> --company <slug>
 ```
 
 `hq sync doctor --reconcile-conflicts` reconciles the sibling `<file>.conflict-<timestamp>-<machine>.<ext>` twins that earlier engine versions left beside live files. It is a dry-run by default and prints a plan; `--yes` applies it. A twin is promoted only when its frontmatter `version:` is strictly higher than the live file's — otherwise the live file is kept — and every losing or orphaned copy is parked under `.hq/conflict-backups/`. See [Cloud Sync](/hq/guide/8-cloud-sync/#conflict-resolution) for how current conflicts are decided.
+
+`hq access <path-or-query>` (5.109+) is the one command for "I can't find or open this file." It resolves an exact vault key or a fuzzy name (it never auto-picks between several matches), then reports exactly one outcome: `never-existed` (exit 2), `local`/`not-synced` (exit 0), or `no-access` (exit 3). When the file exists and you can read it but it is not on disk, it fetches and pins it the same way `hq files get` does, repairing sync with `hq sync doctor` and retrying once if the fetch fails. When you lack access it names the grantor, shows their email, asks one yes/no question, and sends them a DM whose copy-prompt is the exact `hq files share … --permission read` command; repeat requests for the same prefix are deduped for 24 hours. `--json` never sends without `--yes`; `--no-fix` diagnoses only. Every access-denied error from `hq files …` and `hq sync …` now ends with `Run: hq access <path>`. See [hq-share](/hq/products/capabilities/hq-share/#requesting-access).
 
 Pack commands accept `--json` for machine-readable output — the [hq-sync](/hq/products/hq-sync/) menubar app uses this to power its Packages window.
 

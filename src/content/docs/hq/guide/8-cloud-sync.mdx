@@ -50,6 +50,7 @@ This starts a background daemon that watches your HQ directory for changes and s
 | `hq sync push` | Force upload all local changes |
 | `hq sync pull` | Force download all cloud changes |
 | `hq sync doctor --reconcile-conflicts` | Clean up legacy `.conflict-*` twin files (dry-run; add `--yes` to apply) |
+| `hq access <path-or-query>` | One file missing or locked? Reports never-existed / not-synced / no-access, fetches it when you have access, otherwise asks the owner for a grant (see [hq-share](/hq/products/capabilities/hq-share/#requesting-access)) |
 
 ## How Sync Works
 
