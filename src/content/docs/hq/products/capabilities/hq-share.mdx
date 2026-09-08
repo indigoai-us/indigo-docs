@@ -63,6 +63,16 @@ hq files share <prefix> --with @all --permission read   # company-wide
 
 The browser flow is the better fit when granting **multiple** recipients at once. Widening anyone to `write` is a privilege escalation — confirm with a human first.
 
+## Requesting access
+
+Sharing has a receiving side. When a teammate hits a file they cannot find or open, they run:
+
+```bash
+hq access <path-or-query>
+```
+
+It tells them which of three things is true and fixes what it can: the file was **never created**; it **exists but is not on their machine** (it fetches and pins it, repairing sync if the fetch fails); or it **exists and they lack a grant**. In the last case it names the grantor (the ACL creator, otherwise a company owner or admin), shows the email, asks one yes/no question, and sends that person a DM whose copy-prompt is the exact `hq files share <prefix> --with <email> --permission read` command — the grantor pastes it and the request is done. Repeat requests for the same prefix are deduped for 24 hours. Every `403` from `hq files …` or `hq sync …` ends with `Run: hq access <path>`. Requires `@indigoai-us/hq-cli` ≥ 5.109.0; in an agent session the same ladder is available as `/hq-access`.
+
 ## Who can mint
 
 Owners and admins resolve to `admin` on any prefix and can always mint. Members and guests need an explicit grant on each requested path, or the server returns `403 Forbidden`. A mint failure for an admin usually means a stale auth session — re-authenticate before assuming a permission gap.
