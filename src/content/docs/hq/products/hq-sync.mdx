@@ -96,6 +96,14 @@ Key properties:
 - **No DM is ever lost** — the durable store is the source of truth and MQTT is only the wake signal. If the real-time connection is unavailable, delivery falls back to the existing periodic poll with no loss and no regression.
 - **Nothing to configure** — the real-time path is automatic for signed-in users; DM notifications can be turned off in HQ Sync settings.
 
+## Messaging people outside your workspaces
+
+As of **0.10.240**, you can DM someone you don't share a workspace with. Sending the message creates a **connection request** instead of delivering straight away: your message is held until they accept, and an address with no HQ account gets an email invite so they can join and pick it up.
+
+Incoming requests are visible in three places: a live **Connection requests** row in the chat sidebar, a native "wants to connect" notification naming the sender, and a **Requests** screen where you can **Accept**, **Decline**, or **Block**. Accepting opens the conversation with their held message already in it.
+
+As of **0.10.241**, the search/create picker also handles addresses that match nobody on HQ: type an email and choose **Message `you@example.com`** (the address you typed) to write a first message. After you send, the result says "Request sent — held until they accept," or "Delivered" if you're already connected.
+
 ## Manage packages
 
 HQ ships capabilities as **packs** (engineering, design, and more). From **Settings → Packages → Manage…**, HQ Sync opens a dedicated Packages window where you can browse, install, update, and uninstall packs without touching the terminal:
