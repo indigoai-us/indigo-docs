@@ -68,6 +68,20 @@ Fleet Agent creation accepts `--size basic`, `--size power`, or `--size dev`. Be
 
 `hq meetings import` lets a company owner add a normalized historical transcript to the company knowledge pipeline. The JSON file identifies the company, recorder, source, participants, provenance, timestamps, and timestamped transcript segments. Imports are immutable by `externalSourceId`: submitting the same file again reports `unchanged`, while submitting different content with the same ID reports a conflict instead of overwriting the original. Imported meeting paths are pipeline-managed and remain excluded from ordinary `hq sync push` uploads.
 
+## Structured identity and access checks
+
+HQ CLI 5.109.7 adds structured output for scripts that verify a project handoff:
+
+```bash
+hq whoami --json
+hq people resolve teammate@example.com --company acme --membership-only --json
+hq files acl projects/example/ --company acme --json
+```
+
+`whoami --json` reports the selected identity and authentication state without printing tokens. `people resolve --membership-only` checks current company membership instead of relying on a local directory entry. `files acl --json` separates direct grants, inherited grants, and child entries; `exists: false` means the requested path has no direct ACL row, not that access is denied.
+
+For a handoff, match the intended company, exact prefix, recipient, and permission. A successful sender-side check does not prove the recipient can open the files; confirm pickup with the recipient separately.
+
 ## How it composes
 
 `hq-cli` handles two concerns: **module management** (the [module system](/hq/architecture/8-module-system/)) and **cloud sync**. Sync subcommands lazily `import("@indigoai-us/hq-cloud")` only when invoked, so module commands work even without the cloud engine present. The same engine is also driven by the [hq-sync](/hq/products/hq-sync/) menubar app.
