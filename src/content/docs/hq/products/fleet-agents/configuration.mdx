@@ -5,19 +5,20 @@ sidebar:
   order: 3
 ---
 
-Open a company in HQ Console, choose **Agents**, then choose the **Settings** gear for an agent. Agent Settings keeps the full operating picture in one compact workspace:
+Open a company in HQ Console, choose **Bots**, then open **Settings** for an agent. Agent Settings groups related controls in one sheet:
 
-- **Configuration** contains profile and model values that save together.
-- **Controls** contains access, capacity, and runtime actions that apply immediately.
-- **Live systems** contains health signals and expandable connection managers.
-
-Most explanatory copy lives behind the help icon beside each section, leaving the values and current state visible at a glance.
+- **Profile** contains identity fields, membership role, owners, and groups.
+- **Model accounts** places model, reasoning, and speed controls beside the account they use.
+- **Channels** shows each connection's status and expandable settings.
+- **Runtime** and **Agent size** provide lifecycle and capacity controls.
 
 ## Editing efficiently
 
-Choose a configuration value to edit it in place. Only one editor or picker stays open at a time. Clicking elsewhere closes the open editor while keeping its draft staged for **Save**; pressing **Escape** cancels that field's current edit instead. The footer tells you whether there are unsaved configuration changes, and **Save** remains disabled until a staged value differs from the saved configuration.
+Edit profile fields directly. Profile and model changes remain staged until you choose **Save**. The footer reports unsaved changes; cancelling with a draft asks whether to discard it. Dropdowns support keyboard navigation and Escape returns focus to their trigger.
 
-Connection rows and the Agent size row expand in place. Clicking elsewhere collapses the open panel without changing anything. Actions labeled **Applies now** do not wait for the configuration Save button and show their own confirmation when the change is consequential.
+Role changes use their own **Apply** and reset controls. Expand **Groups** in Profile to add a membership from the dropdown or remove an existing membership; these changes apply immediately and do not wait for Save.
+
+Expand a channel row to inspect its settings and connection details. Connected Personal Slack shows its workspace, and connected Telegram shows enrolled contacts and available management controls. Agent size opens a separate capacity picker. Runtime and channel actions use their own controls and confirmations.
 
 ## Configuration reference
 
@@ -30,7 +31,7 @@ Connection rows and the Agent size row expand in place. Clicking elsewhere colla
 | Description | One-line responsibility statement | State what the agent owns and when teammates should contact it. |
 | Provider | Runtime family | Selected at creation from the providers enabled for your account. Provider migration is not available in general Agent Settings. |
 | Model | Model used for new work | Must be compatible with the provider and authentication method. |
-| Reasoning effort | Depth used for supported models | Console values are Low, Medium, High, and Extra high. Grok does not use this setting. |
+| Reasoning effort | Depth used for supported models | Available levels depend on the selected model; both Codex and Grok expose supported reasoning choices. |
 | Speed | Standard or Fast service tier | Available for supported Codex configurations. Fast can increase provider cost. |
 | Membership role | Company permissions granted to the agent | An agent can be a member or admin, but cannot become the company owner. |
 | Owners | People responsible for the agent | The creator is the initial owner. Additional ownership is shown only when enabled for the company. |
