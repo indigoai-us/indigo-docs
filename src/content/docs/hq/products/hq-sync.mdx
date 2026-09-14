@@ -76,6 +76,30 @@ starter avatar, and source-session control together in one row:
 Drag the right edge of the left sidebar to resize it. HQ remembers its width
 on this device; double-click the edge to restore the default width.
 
+## HQ Meet field testing
+
+As of **0.10.255**, HQ Meet brings offices, audio/video calls, and transcription
+sessions into the desktop. Open **Office** in a company channel to see people
+and rooms on a map. Pan and zoom to explore, and set your door to open, knock
+only, or do not disturb. Knocks arrive through notifications while you work.
+
+In a call, open the transcript panel and choose **Start a transcription
+session**. Select the destination before starting:
+
+- **Personal notes** saves your own microphone transcript locally to your personal vault.
+- **Company** saves the room's shared transcript to the company vault, including speech from participants who join during the session.
+
+The person who starts the session can pause, resume, or end it. Pausing keeps
+speech off the record. Your microphone remains under your control; starting a
+session does not unmute it.
+
+Live transcription requires a local speech runtime and model on **each
+speaking participant's machine**. These are not bundled with this release.
+Follow the [local speech setup guide](https://github.com/indigoai-us/hq-desktop-app/blob/v0.10.255/apps/sync/scripts/meet-asr.md)
+before testing transcription. Calls remain usable without the speech runtime.
+Live multi-participant transcription and pause/resume behavior are still under
+field validation.
+
 ## Instant DM delivery
 
 HQ Sync also receives **direct messages** — sent with `hq dm` or the `/dm` command — and surfaces them as native macOS notifications, with one-click "Copy prompt" and "Open details" actions and an inline reply. "Open details" opens the full **two-way conversation thread** — your messages and theirs, in order — not just the single notification, so a DM reads as a conversation rather than a one-off alert.
