@@ -28,6 +28,18 @@ Workforce is the display name of the existing **$500 / month team** plan. The pl
 
 Stay on Starter is a real action (`skipped`). It does not unlock agents. Creating an agent on Starter resurfaces the Workforce card.
 
+### What Starter includes
+
+Starter is a hard-capped free plan, not a trial. It covers up to 5 members,
+10 secrets, 10 GB of storage, 1 connected integration, and 500 lifetime
+deployments. Agents, MCP and Atlas are not included. Going over a capped
+ceiling locks the workspace read-only for creates until an owner trims back
+under it or upgrades; nothing is deleted.
+
+Workforce removes the member, secret, storage, integration and deployment
+ceilings — all of them are unlimited on Workforce — and adds agents, hosted
+MCP and Atlas.
+
 ## Agent channel
 
 Submitting create-agent mints the agent and an invite-only company-scoped channel immediately. Setup finishes in that channel: a locked composer while the box is provisioning, then the agent's first message. Agent settings live in the existing agent-detail side pane — there is no separate agent settings tab.
