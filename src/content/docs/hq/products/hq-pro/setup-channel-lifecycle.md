@@ -26,6 +26,8 @@ Cards are `lifecycle_card` messages (v1). The server sets them; clients cannot m
 
 Workforce is the display name of the existing **$500 / month team** plan. The plan id stays `team`. Starter stays free. Enterprise is a talk-to-us link, not a new SKU.
 
+HQ Individual is a separate **$50 / month** plan for a single person's own HQ; it is not a company plan and cannot have members. It does not appear in the setup-channel lifecycle above, which is the company path.
+
 Stay on Starter is a real action (`skipped`). It does not unlock agents. Creating an agent on Starter resurfaces the Workforce card.
 
 ### What Starter includes
