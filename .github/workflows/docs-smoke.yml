@@ -18,11 +18,34 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Probe published pages
+      - name: Probe published pages (docs.hq.computer)
         shell: bash
         run: |
           set -euo pipefail
 
+          routes=(
+            fleet-agents
+            fleet-agents/create
+            fleet-agents/configuration
+            fleet-agents/channels
+            fleet-agents/access
+            fleet-agents/operations
+          )
+
+          for route_name in "${routes[@]}"; do
+            page_url="https://docs.hq.computer/hq/products/${route_name}/"
+            echo "Checking ${page_url}"
+            curl --fail --show-error --silent --location \
+              --retry 3 --retry-delay 2 --output /dev/null "${page_url}"
+          done
+
+      - name: Probe published pages (docs.getindigo.ai - legacy hostname)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # docs.getindigo.ai stays live until wave 12. These probes keep the
+          # team alerted if the old public hostname stops resolving or redirecting.
           routes=(
             fleet-agents
             fleet-agents/create
@@ -39,23 +62,13 @@ jobs:
               --retry 3 --retry-delay 2 --output /dev/null "${page_url}"
           done
 
-      - name: Verify Fleet Agents content and legacy redirect
+      - name: Verify Fleet Agents content (docs.hq.computer)
         shell: bash
         run: |
           set -euo pipefail
 
-          # --location is REQUIRED on these two requests, not a nicety. Since
-          # 2026-08-02 docs.getindigo.ai answers 307 and redirects to
-          # docs.hq.computer, and `curl --fail` treats a 307 as SUCCESS — so
-          # without --location these captured the 14-byte "Redirecting..." body
-          # and the content assertion failed while the site was perfectly
-          # healthy. That is the whole reason this workflow reported red on 63
-          # of 112 scheduled runs across a month. The route probes above already
-          # passed the entire time precisely because they do pass --location.
-          #
-          # The legacy hostname is kept under test deliberately: pointing these
-          # at docs.hq.computer would also silence the alarm, but would stop
-          # checking that the old public hostname still resolves and redirects.
+          # --location is required: curl --fail without it would capture a
+          # redirect body instead of the final page, causing false failures.
           assert_contains() {
             local label="$1" url="$2" needle="$3" body
             body=$(curl --fail --show-error --silent --location \
@@ -84,9 +97,73 @@ jobs:
           }
 
           assert_contains "Fleet Agents overview renders" \
-            "https://docs.getindigo.ai/hq/products/fleet-agents/" \
+            "https://docs.hq.computer/hq/products/fleet-agents/" \
             'Fleet Agents'
 
           assert_contains "legacy agents-in-Slack URL still redirects" \
+            "https://docs.hq.computer/hq/products/capabilities/agents-in-slack/" \
+            'url=/hq/products/fleet-agents/channels/'
+
+      - name: Verify Fleet Agents content and legacy redirect (docs.getindigo.ai)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # --location is REQUIRED on these two requests, not a nicety. Since
+          # 2026-08-02 docs.getindigo.ai answers 307 and redirects to
+          # docs.hq.computer, and `curl --fail` treats a 307 as SUCCESS -- so
+          # without --location these captured the 14-byte "Redirecting..." body
+          # and the content assertion failed while the site was perfectly
+          # healthy. That is the whole reason this workflow reported red on 63
+          # of 112 scheduled runs across a month. The route probes above already
+          # passed the entire time precisely because they do pass --location.
+          #
+          # The legacy hostname is kept under test deliberately: pointing these
+          # at docs.hq.computer would also silence the alarm, but would stop
+          # checking that the old public hostname still resolves and redirects.
+          # docs.getindigo.ai stays live until wave 12.
+          assert_contains() {
+            local label="$1" url="$2" needle="$3" body
+            body=$(curl --fail --show-error --silent --location \
+              --retry 3 --retry-delay 2 "${url}")
+
+            if grep --fixed-strings --quiet "${needle}" <<<"${body}"; then
+              echo "ok: ${label}"
+              return 0
+            fi
+
+            # `grep --quiet` on its own prints nothing, so the previous version
+            # of this step failed with a bare "Process completed with exit code
+            # 1" and no indication of which assertion broke or what was served
+            # instead. Diagnosing it required reproducing the request by hand.
+            {
+              echo "FAIL: ${label}"
+              echo "  url:      ${url}"
+              echo "  expected: ${needle}"
+              echo "  resolved: $(curl --silent --location --output /dev/null \
+                --write-out '%{url_effective} (HTTP %{http_code}, %{num_redirects} redirect(s))' \
+                "${url}")"
+              echo "  body was ${#body} bytes; first 400:"
+              printf '%s\n' "${body:0:400}"
+            } >&2
+            return 1
+          }
+
+          assert_contains "Fleet Agents overview renders via legacy host" \
+            "https://docs.getindigo.ai/hq/products/fleet-agents/" \
+            'Fleet Agents'
+
+          assert_contains "legacy agents-in-Slack URL still redirects via legacy host" \
             "https://docs.getindigo.ai/hq/products/capabilities/agents-in-slack/" \
             'url=/hq/products/fleet-agents/channels/'
+
+  site-url-check:
+    name: Site URL canonical check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Assert astro.config.mjs site is docs.hq.computer
+        run: node scripts/check-site-url.mjs
