@@ -90,3 +90,14 @@ jobs:
           assert_contains "legacy agents-in-Slack URL still redirects" \
             "https://docs.getindigo.ai/hq/products/capabilities/agents-in-slack/" \
             'url=/hq/products/fleet-agents/channels/'
+
+  site-url-check:
+    name: Site URL canonical check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Assert astro.config.mjs site is docs.hq.computer
+        run: node scripts/check-site-url.mjs
