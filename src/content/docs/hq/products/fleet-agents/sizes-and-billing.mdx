@@ -1,6 +1,6 @@
 ---
 title: Agent sizes and billing
-description: The Fleet Agent box-size ladder, monthly pricing, Team plan inclusions, and how size changes are approved and billed.
+description: The Fleet Agent box-size ladder, per-box billing on HQ Workforce, and how size changes are approved and billed.
 sidebar:
   order: 7
 ---
@@ -11,19 +11,21 @@ monthly price.
 
 ## The size ladder
 
-Three sizes are available:
+Three sizes are available. Hosted agents start from $100/mo per box; the
+Console shows the exact monthly price for each size before you create or
+resize an agent.
 
-| Size | Monthly price | Built for |
-| --- | --- | --- |
-| **Basic** | $100 | Q&A and simple tasks |
-| **Power** | $250 | Multi-user work, projects, light development |
-| **Dev** | $500 | Complex development, many users, project orchestration |
+| Size | Built for |
+| --- | --- |
+| **Basic** | Q&A and simple tasks |
+| **Power** | Multi-user work, projects, light development |
+| **Dev** | Complex development, many users, project orchestration |
 
 Choose the initial size in the HQ Console creation wizard or with
 `hq agents provision --size basic|power|dev`. Both routes show the applicable
-company-specific monthly price before creation. Plan inclusions, contract
-pricing, credits, or sponsorship can make the displayed price different from
-the list price above.
+company-specific monthly price before creation. Grandfathered inclusions,
+contract pricing, credits, or sponsorship can make the displayed price
+different from the price for the size.
 
 You can move an agent up or down the ladder at any time from its settings; a
 mid-cycle change is prorated on your next invoice using standard Stripe
@@ -61,9 +63,19 @@ shown in the Console and sends the requester a completion notification. A
 failed change reports the size the agent remains on instead of claiming the
 requested size is ready.
 
-## Team plan inclusions
+## Plan and billing
 
-The Team plan includes three agents' boxes in the flat plan fee:
+On HQ Workforce, every hosted agent is billed at its size rung from the first agent.
+No hosted agents are included in the plan fee. Starter does not unlock hosted
+agents.
+
+Self-run bots that you enroll as team members carry no fee. They count as
+members, and Workforce has unlimited members.
+
+### Companies that subscribed earlier
+
+Companies that subscribed to Workforce before per-box billing took effect
+keep three included boxes in the flat plan fee:
 
 - **1 Dev-size box** (your first agent)
 - **2 Basic-size boxes**
@@ -72,6 +84,12 @@ Upgrades beyond what is included are available for the price difference, and
 agents beyond the included three bill at the ladder price. Deleting an agent
 never raises the bill on the agents that remain — the plan's inclusions
 belong to the plan, not to a particular agent.
+
+### Pricing API
+
+A machine-readable statement of current plans, agent rungs, and billing rules
+is described in [Pricing API](/hq/products/hq-pro/pricing-api/) (available
+after release).
 
 ## See also
 
