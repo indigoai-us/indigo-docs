@@ -111,7 +111,7 @@ jobs:
 
           # --location is REQUIRED on these two requests, not a nicety. Since
           # 2026-08-02 docs.getindigo.ai answers 307 and redirects to
-          # docs.hq.computer, and `curl --fail` treats a 307 as SUCCESS -- so
+          # docs.hq.computer, and `curl --fail` treats a 307 as SUCCESS — so
           # without --location these captured the 14-byte "Redirecting..." body
           # and the content assertion failed while the site was perfectly
           # healthy. That is the whole reason this workflow reported red on 63
