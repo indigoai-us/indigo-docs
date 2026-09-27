@@ -26,7 +26,7 @@ Cards are `lifecycle_card` messages (v1). The server sets them; clients cannot m
 
 Workforce is the display name of the existing **$500 / month team** plan. The plan id stays `team`. Starter stays free. Enterprise is a talk-to-us link, not a new SKU.
 
-Stay on Starter is a real action (`skipped`). It does not unlock agents. Creating an agent on Starter resurfaces the Workforce card.
+Stay on Starter is a real action (`skipped`). Starter does not unlock hosted agents. Creating an agent on Starter resurfaces the Workforce card.
 
 ### What Starter includes
 
@@ -39,6 +39,10 @@ under it or upgrades; nothing is deleted.
 Workforce removes the member, secret, storage, integration and deployment
 ceilings — all of them are unlimited on Workforce — and adds agents, hosted
 MCP and Atlas.
+
+## First agent
+
+Step 4 is optional. Workforce does not include hosted agents: each hosted agent is billed per box at its size rung, from the first agent. See [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/).
 
 ## Agent channel
 
