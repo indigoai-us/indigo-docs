@@ -3,6 +3,7 @@ import starlight from "@astrojs/starlight";
 import starlightClientMermaid from "@pasqal-io/starlight-client-mermaid";
 
 export default defineConfig({
+  site: "https://docs.hq.computer",
   redirects: {
     "/hq/architecture/2-monorepo/": "/hq/architecture/2-ecosystem/",
     "/hq/roadmap/2-v5-launch/": "/hq/roadmap/2-shipped-and-next/",
