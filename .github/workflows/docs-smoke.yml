@@ -1,6 +1,8 @@
 name: Docs smoke
 
 on:
+  pull_request:
+    branches: [main]
   schedule:
     - cron: "17 */6 * * *"
   workflow_dispatch:
@@ -9,11 +11,23 @@ permissions:
   contents: read
 
 concurrency:
-  group: docs-smoke
+  group: docs-smoke-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
 jobs:
+  workforce-plan-copy:
+    name: Workforce plan copy drift check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Check plan copy and negative controls
+        run: node scripts/check-workforce-plan-copy.mjs
+
   fleet-agents:
+    if: ${{ github.event_name != 'pull_request' }}
     name: Fleet Agents routes
     runs-on: ubuntu-latest
     timeout-minutes: 5
