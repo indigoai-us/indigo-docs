@@ -34,7 +34,7 @@ HQ currently runs in a single AWS region with no cross-region replication or aut
 
 Indigo maintains an incident-response approach covering the standard lifecycle:
 
-1. Detection — via monitoring and alerting (CloudWatch alarms to on-call, Sentry error tracking, CloudTrail and application audit logs), and via reports to security@getindigo.ai.
+1. Detection — via monitoring and alerting (CloudWatch alarms to on-call, Sentry error tracking, CloudTrail and application audit logs), and via reports to security@hqforwork.com.
 2. Triage and classification — assess scope, severity, and whether customer data is affected.
 3. Containment — revoke credentials (access is recomputed per request, so revocation is fast), isolate affected components, and stop the bleeding.
 4. Eradication and recovery — remove the root cause and restore normal operation from backups/versioned data where needed.
