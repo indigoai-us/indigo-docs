@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
       - name: Check plan copy and negative controls
         run: node scripts/check-workforce-plan-copy.mjs
 
@@ -178,6 +178,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
       - name: Assert astro.config.mjs site is docs.hq.computer
         run: node scripts/check-site-url.mjs
