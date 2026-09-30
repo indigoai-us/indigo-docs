@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-Fleet Agents are full company members with machine-managed credentials, but new membership grants no company resources by itself. Give each agent the narrowest role, group membership, file access, secret access, connectors, and channel audience that lets it do its job.
+Fleet Agents join a host company as members during provisioning. Provisioning gives the agent read and write access to that company's vault; see [Default vault access](#default-vault-access) for the grants and how to narrow them. Later company memberships do not automatically grant the same vault access. Give each agent the narrowest role, group membership, file access, secret access, connectors, and channel audience that lets it do its job.
 
 ## Membership role
 
@@ -35,14 +35,46 @@ Group membership does not replace a direct vault ACL. Both layers must allow acc
 
 ## Vault and credentials
 
-HQ creates a vault-backed workspace for each Fleet Agent. Company data stays within the active company's tenant boundary. New membership does not grant resources by itself.
+HQ creates a vault-backed workspace for each Fleet Agent. Provisioning grants the agent access to its host company's vault as described below. Access does not cross into other companies: a later membership in another company does not create vault grants there.
 
 - Provider credentials and channel tokens are stored in the vault.
 - Runtime configuration carries credential references, not raw secret values.
-- The agent receives only the files and secret grants required for its role.
+- Review and narrow the default vault grants; manage secret access and other credentials separately.
 - Company and personal credentials must not be copied between tenants.
 
 Use the standard HQ file and secret grant flows to change access. Test with a harmless probe before assigning production work.
+
+## Default vault access
+
+When provisioning creates a new Member Fleet Agent, HQ grants its agent identity read and write access to the whole host-company vault and to its own `agents/<agent-uid>/` workspace. The workspace grant covers `agents/<agent-uid>/*`; the whole-vault grant uses the `*` prefix. Both grants are scoped to the host company's vault and do not carry over to other companies.
+
+To inspect the grants, find the agent UID in the `UID` column of `hq agents list --company <company-slug>`, then check the whole-vault and workspace ACLs:
+
+```bash
+hq files acl '*' --company <company-slug>
+hq files acl 'agents/<agent-uid>/*' --company <company-slug>
+```
+
+The ACL output lists grant entries for each principal. Any effective-permission field describes the signed-in user who ran the command, not the agent.
+
+To narrow access, remove the agent's whole-vault grant, then grant only the folders it needs with read or write permission:
+
+```bash
+hq files unshare '*' --with <agent-uid> --company <company-slug>
+hq files share 'knowledge/*' --with <agent-uid> --permission read --company <company-slug>
+```
+
+Use `--permission write` when the agent needs to change files in that folder. The agent's own workspace grant remains in place when the whole-vault grant is removed. After narrowing access, ask the agent to list one known, non-sensitive folder you granted and one folder you did not grant. The granted folder should be listed; the other should be refused. Then check both ACLs and the workspace ACL again:
+
+```bash
+hq files acl 'knowledge/*' --company <company-slug>
+hq files acl 'restricted/*' --company <company-slug>
+hq files acl 'agents/<agent-uid>/*' --company <company-slug>
+```
+
+Substitute real folders for `knowledge/*` and `restricted/*`. Confirm that the agent UID appears only on folders you granted and on its own workspace.
+
+A no-vault-access option at agent creation is planned, with no date announced. There is no commitment to change the default described here.
 
 ## Multiple companies
 
@@ -52,7 +84,7 @@ An agent has one immutable host company that pays for it. Another company can in
 hq members invite <agent-id-or-email> --company <company> --role member
 ```
 
-The new membership becomes active immediately. Grant that company’s groups, files, secrets, and connectors separately. The host company remains responsible for billing.
+The new membership becomes active immediately. It does not add vault grants in the invited company; grant that company’s files, groups, secrets, and connectors separately. The host company remains responsible for billing.
 
 ## Owner delegation
 
