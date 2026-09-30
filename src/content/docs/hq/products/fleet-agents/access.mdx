@@ -48,12 +48,14 @@ Use the standard HQ file and secret grant flows to change access. Test with a ha
 
 When provisioning creates a new Member Fleet Agent, HQ grants its agent identity read and write access to the whole host-company vault and to its own `agents/<agent-uid>/` workspace. The workspace grant covers `agents/<agent-uid>/*`; the whole-vault grant uses the `*` prefix. Both grants are scoped to the host company's vault and do not carry over to other companies.
 
-To inspect the grants, find the agent UID in the `UID` column of `hq agents list --company <company-slug>`, then check the whole-vault ACL:
+To inspect the grants, find the agent UID in the `UID` column of `hq agents list --company <company-slug>`, then check the whole-vault and workspace ACLs:
 
 ```bash
 hq files acl '*' --company <company-slug>
 hq files acl 'agents/<agent-uid>/*' --company <company-slug>
 ```
+
+The ACL output lists grant entries for each principal. Any effective-permission field describes the signed-in user who ran the command, not the agent.
 
 To narrow access, remove the agent's whole-vault grant, then grant only the folders it needs with read or write permission:
 
@@ -62,7 +64,15 @@ hq files unshare '*' --with <agent-uid> --company <company-slug>
 hq files share 'knowledge/*' --with <agent-uid> --permission read --company <company-slug>
 ```
 
-Use `--permission write` when the agent needs to change files in that folder. The agent's own workspace grant remains in place when the whole-vault grant is removed. After changing access, run `hq files browse 'knowledge/' --company <company-slug>` (substitute a known, non-sensitive shared folder) to check that the intended access works.
+Use `--permission write` when the agent needs to change files in that folder. The agent's own workspace grant remains in place when the whole-vault grant is removed. After narrowing access, ask the agent to list one known, non-sensitive folder you granted and one folder you did not grant. The granted folder should be listed; the other should be refused. Then check both ACLs and the workspace ACL again:
+
+```bash
+hq files acl 'knowledge/*' --company <company-slug>
+hq files acl 'restricted/*' --company <company-slug>
+hq files acl 'agents/<agent-uid>/*' --company <company-slug>
+```
+
+Substitute real folders for `knowledge/*` and `restricted/*`. Confirm that the agent UID appears only on folders you granted and on its own workspace.
 
 A no-vault-access option at agent creation is planned, with no date announced. There is no commitment to change the default described here.
 
