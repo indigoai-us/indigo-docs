@@ -49,6 +49,7 @@ export default defineConfig({
           items: [
             { label: "hq-core", link: "/hq/products/hq-core/" },
             { label: "hq-cli", link: "/hq/products/hq-cli/" },
+            { label: "HQ anywhere", link: "/hq/products/hq-anywhere/" },
             { label: "hq-cloud", link: "/hq/products/hq-cloud/" },
             { label: "hq-sync", link: "/hq/products/hq-sync/" },
             { label: "HQ Workspace", link: "/hq/products/hq-workspace/" },
