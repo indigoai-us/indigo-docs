@@ -1,0 +1,30 @@
+---
+title: /grill-me
+description: Run a decision interview on any topic, one question at a time.
+---
+
+`/grill-me` interviews you about a topic you name. It generates a question set from your prompt and asks it through the same interview engine that `/brainstorm` and `/prd` use. Use it when you want to work through decisions outside of project planning.
+
+## Usage
+
+```
+/grill-me "pricing for the team plan"
+/grill-me "migrating the API to the new auth service" --rounds
+```
+
+| Argument | Description |
+|----------|-------------|
+| `<topic>` | What to interview you about. If you leave it empty, HQ asks for it. |
+| `--rounds` | Ask questions in batched rounds instead of one at a time. |
+
+## What it does
+
+1. Resolves the active company from the topic or your working directory and reads that company's policies. If no company resolves, it runs without company context.
+2. Looks up facts the topic points to (board, repo, knowledge) so it does not ask questions it can answer itself.
+3. Builds a set of 4 to 12 questions, covering goals and scope first, then approach, then risks and success measures. Each decision question has 2 to 4 options and a recommended choice.
+4. Asks the questions. By default it asks one question per prompt.
+5. Writes a summary of your decisions, any assumed answers, and open items. When the topic is a project, the summary is saved to `grill-{date}.md` in the project folder.
+
+When the topic is a project, `/grill-me` suggests `/brainstorm` or `/prd` as the next step.
+
+The interview engine itself (`grilling`) is internal. You do not run it directly.
