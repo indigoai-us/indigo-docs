@@ -5,11 +5,13 @@ description: Install HQ for Claude Code and Codex, connect hosted MCP clients, a
 
 HQ Anywhere connects Claude Code, Codex, ChatGPT, and Grok to your HQ context. Claude Code and Codex use local HQ components. ChatGPT and Grok connect to the hosted HQ MCP service.
 
-HQ Anywhere is available to people who opt in during setup in HQ Desktop when the `hq-anywhere-runtime` rollout switch is enabled. The switch is an administrator kill switch. If the CLI reports that HQ Anywhere is unavailable, check that you opted in and ask your HQ administrator whether rollout is enabled for your account.
+HQ Anywhere is available when the `hq-anywhere-runtime` rollout switch is enabled for your account. The switch is an administrator kill switch.
+
+You turn HQ Anywhere on or off yourself in HQ Desktop. You can opt in during setup, or later in **Settings > HQ Anywhere**. The HQ background service picks up the change within a minute; you do not need to restart anything. If the CLI reports that HQ Anywhere is unavailable, check that the setting is on and ask your HQ administrator whether rollout is enabled for your account.
 
 ## Install
 
-Run the install command from an HQ checkout. To use a different checkout, add `--hq-root <directory>`. Use `--dry-run` to review local file and configuration changes before installing.
+You can run the install command from any folder. It uses the HQ checkout you set up with HQ Desktop; to use a different checkout, add `--hq-root <directory>`. Use `--dry-run` to review local file and configuration changes before installing.
 
 ### Claude Code with direct hooks
 
@@ -17,7 +19,7 @@ Run the install command from an HQ checkout. To use a different checkout, add `-
 hq install --global --runtime claude
 ```
 
-Direct mode adds the HQ instructions, skills, hooks, and MCP server to your Claude Code user setup. It records the previous settings so the global install can be removed later. Direct mode is the default.
+Direct mode adds the HQ instructions, skills, hooks, and MCP server to your Claude Code user setup. It records the previous settings so the global install can be removed later. Direct mode is the default. Skills that belong to one company are not added to your global setup, so they never show up in another company's folders.
 
 ### Claude Code with the plugin
 
