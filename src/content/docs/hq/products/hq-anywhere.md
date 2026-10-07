@@ -7,7 +7,7 @@ HQ Anywhere connects Claude Code, Codex, ChatGPT, and Grok to your HQ context. C
 
 HQ Anywhere is available when the `hq-anywhere-runtime` rollout switch is enabled for your account. The switch is an administrator kill switch.
 
-You turn HQ Anywhere on or off yourself in HQ Desktop. You can opt in during setup, or later in **Settings > HQ Anywhere**. The HQ background service picks up the change within a minute; you do not need to restart anything. If the CLI reports that HQ Anywhere is unavailable, check that the setting is on and ask your HQ administrator whether rollout is enabled for your account.
+You turn HQ Anywhere on or off yourself in HQ Desktop. You can opt in during setup, or later in **Settings > General > HQ Anywhere**. The HQ background service picks up the change within a minute; you do not need to restart anything. If the CLI reports that HQ Anywhere is unavailable, check that the setting is on and ask your HQ administrator whether rollout is enabled for your account.
 
 ## Install
 
