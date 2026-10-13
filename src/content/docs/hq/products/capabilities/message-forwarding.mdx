@@ -1,0 +1,70 @@
+---
+title: Message forwarding
+description: Forward an HQ direct message or channel message, with its Details or Prompt card and files, to another person, bot, or channel from the desktop app or the hq CLI.
+sidebar:
+  order: 5
+---
+
+You can forward any HQ message to one person, bot, or channel. The forward keeps the original message body and its Details or Prompt card. The recipient sees a `Forwarded from {name}` header above the copied message, and you can add a note of your own above it.
+
+Forwarding works in the [HQ desktop app](/hq/products/hq-sync/) and in the [`hq` CLI](/hq/products/hq-cli/). Both use the same send routes as a normal message, so a forward is delivered, stored, and notified like any other DM or channel post.
+
+## From the desktop app
+
+1. Hover a message in a 1:1 DM, group DM, or channel and click **Forward** in the row that holds **Reply** and **Copy**.
+2. Pick one destination. The picker lists the people, bots, and channels you can already message in that company, and the search field filters by name.
+3. Optionally type a note. The preview shows the original sender, the first lines of the message, and the Details or Prompt card title.
+4. Press **Enter** or click **Send**. **Escape** closes the picker.
+
+If the send fails, the picker stays open with your destination and note kept, and the error tells you what to do next.
+
+## From the CLI
+
+```bash
+# Find the eventId of the message you want to forward
+hq dm thread alex@example.com
+
+# Forward it to a teammate with a note
+hq dm forward <eventId> --from alex@example.com --to sam@example.com --note "Can you take this one?"
+
+# Forward a channel message to another channel
+hq dm forward <eventId> --from general --to launches
+
+# Forward to a fleet agent; the note becomes the agent's instruction
+hq dm forward <eventId> --from alex@example.com --to agt_XXXXXXXX --note-file ./ask.md
+```
+
+`hq dm thread` and `hq dm <channel>` print each message's eventId, show `Forwarded from {name}` on forwarded messages, and include `forwardedFrom` in `--json` output. The command prints the new eventId after a successful forward.
+
+| Flag | What it does |
+|---|---|
+| `--from <person\|channel>` | Where the original message lives: a person's email or UID, or a channel name or ID. |
+| `--to <person\|agent\|channel>` | The destination: a person's email or UID, an agent UID, or a channel name or ID. |
+| `--note <text>` | A note shown above the forwarded message. |
+| `--note-file <path>` | Read the note from a file. |
+| `--grant-files` | Give the recipient read access to attached files they cannot open yet. |
+| `--omit-files` | Send without the files the recipient cannot open. |
+| `--cross-company` | Confirm a forward to a destination in another company. |
+
+Channel posts also accept `--details`, `--details-file`, `--prompt`, and `--prompt-file`, so you can post a Details or Prompt card to a channel directly.
+
+## Files
+
+When the message has files the recipient cannot open, HQ sends nothing until you choose:
+
+- **Share and send** (desktop) or `--grant-files` (CLI) grants the recipient read access to those files, then sends. Each grant is recorded the same way a manual file share is. If a grant fails, nothing is sent.
+- **Send without files** (desktop) or `--omit-files` (CLI) sends the message without them.
+
+Without either flag the CLI lists the files and exits with an error. Files the recipient can already open are forwarded with no question. Files you are not allowed to share are never granted; they are listed as not included.
+
+Forwards to a channel never carry files. The desktop app says so before you send.
+
+## Across companies
+
+A forward to someone in the same company works for anyone who can read the original message and message the destination.
+
+A forward into a different company is allowed only when you are an owner or admin of both companies. The desktop app shows a warning naming both companies and asks you to confirm. The CLI exits with the same warning unless you pass `--cross-company`. Cross-company forwards carry the message text, Details, and Prompt, and never files.
+
+## Forwarding to a bot
+
+A forward to a fleet agent or bot lands in its inbox and wakes it like a normal DM. The bot treats you as the requester and your note as the instruction. The forwarded message is marked as quoted content from its original author, so the bot reads it as material to work with and does not take instructions from that author. A forward with no note still wakes the bot and tells it that you forwarded the message without a note.
