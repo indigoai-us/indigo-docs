@@ -1,0 +1,93 @@
+---
+title: Billing and usage
+description: What the Free plan includes, what counts as usage, billing past $10 a month, the spend limit, and deploy extras.
+sidebar:
+  order: 10
+---
+
+
+HQ has a Free plan. Free includes $10 of usage each month. That covers cloud
+storage, sync and the rest of the usage rates. Usage past $10 in a month is
+billed by use.
+
+No card is needed to sign in, deploy or use DMs. HQ asks for a card only when
+a month's usage passes $10.
+
+Current rates are on the [pricing page](https://www.hqforwork.com/pricing).
+To run HQ with no account and no cloud, see
+[Use HQ for free](/hq/guide/use-hq-for-free/).
+
+## What is free and what counts as usage
+
+| Always free | Counts toward your $10, then billed by use |
+|-------------|---------------------------------------------|
+| Deploys, with no limit | Syncs that upload, download or delete files in the HQ cloud vault |
+| Direct messages (DMs) | Storage in the HQ cloud vault, including old versions of files |
+| HQ core on your computer: your files, knowledge, skills, workers and projects | Secrets stored in HQ |
+| Local search and the other local `hq` CLI commands | HQ MCP calls, and external MCP calls made through HQ |
+| Running HQ in Claude Code, Codex or Cursor with your own AI subscription | Integration calls through HQ |
+| Background AI that HQ runs for you | Agent runs |
+| Syncs that only upload session logs or only clean up, and syncs that find nothing to move or fail | |
+
+Agent and Outpost boxes are billed per box and are separate from the $10 of
+usage.
+
+Hosted agents are a la carte on every plan, Free included. No plan upgrade
+is needed to add one. A hosted agent needs a card on file before it is created.
+Self-run (external) agents have no fee.
+
+Usage stops at a spend limit of $100 a month by default. The account owner can
+change it.
+
+## When usage starts
+
+Usage starts when you sign in to HQ and use a cloud service, such as sync,
+storage or secrets. HQ core and the local `hq` CLI commands never count as
+usage. To install HQ with no account, see
+[Use HQ for free](/hq/guide/use-hq-for-free/).
+
+## Deploys
+
+Deploys are free and are never blocked by plan limits. They need an HQ sign-in
+so HQ knows whose site it is.
+
+1. Sign in with `/hq-login` in Claude Code, or `hq login` in a terminal.
+2. Run `/deploy` in Claude Code or Codex from your HQ folder and say what to
+   publish. If you do not belong to a company, the site deploys under your own
+   name.
+
+These deploy extras are not free:
+
+- Custom domains, which need a paid plan.
+- Remote databases (`hq db provision`).
+- Secrets that a deployed app reads from HQ. These count as secrets stored in
+  HQ.
+
+## Controlling sync
+
+Sync is the usage that grows fastest for most people. Each sync that moves
+files counts toward your $10. To sync less:
+
+- **Desktop app.** Open Settings, then Sync. "Sync on launch", "Auto-sync" and
+  "Instant sync" control when HQ syncs on its own. "Also sync my personal HQ
+  files to the cloud" uploads everything in your HQ folder outside cloud
+  companies, including companies you keep local.
+- **HQ background service.** If you installed it with `hq daemon install`,
+  pause its sync with `hq daemon sync pause`, or turn it off for this computer
+  with `hq daemon disable sync`.
+- **Sync commands.** `hq sync push`, `hq sync pull`, `hq sync now`,
+  `hq team-sync` and the `/hq-sync` skill all sync when you run them.
+- **Skills that sync.** While you are signed in, a few HQ skills push files to
+  your personal vault. `/handoff` does this to save session state.
+
+To stop all cloud activity, sign out:
+
+```bash
+hq logout
+```
+
+## Check your usage
+
+The Billing page in the HQ console shows how much of your $10 you have used
+this month. If it shows usage you did not expect, check [Controlling sync](#controlling-sync) for anything
+that is still syncing.

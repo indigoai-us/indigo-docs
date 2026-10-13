@@ -8,6 +8,7 @@ export default defineConfig({
     "/hq/architecture/2-monorepo/": "/hq/architecture/2-ecosystem/",
     "/hq/roadmap/2-v5-launch/": "/hq/roadmap/2-shipped-and-next/",
     "/hq/products/capabilities/agents-in-slack/": "/hq/products/fleet-agents/channels/",
+    "/hq/guide/diy-method/": "/hq/guide/use-hq-for-free/",
   },
   integrations: [
     starlight({
