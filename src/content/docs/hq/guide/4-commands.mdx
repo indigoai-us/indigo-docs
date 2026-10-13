@@ -22,6 +22,40 @@ Saves git state, active files, and a summary. Use when you want to bookmark prog
 ### /handoff
 Creates a comprehensive thread at `workspace/threads/` with all context needed to resume in a fresh session. Automatically triggered when context reaches 70% capacity.
 
+#### Deficiency report
+
+Each handoff also lists problems with the HQ setup that slowed the session down. The agent answers a fixed checklist of seven areas from memory: finding files, automated checks, coding conventions, injected context, tool cost, steps that did nothing, and access to information. Each problem it records needs concrete evidence from the session. Items without evidence are dropped.
+
+Every problem gets one of three kinds, and each kind goes to a different place:
+
+- `local-setup`: problems with your own machine or account. The handoff summary lists them under **Your setup**, with the command to fix each one when there is one.
+- `repo`: problems in the code repo you were working in. These are saved as repo-scoped learnings.
+- `hq-core`: problems in HQ itself. On a standard install, HQ files these with the HQ team as one feedback report per handoff.
+
+The feedback report contains only the `hq-core` items (area, severity, summary, evidence and proposed fix) and a short `system_info` block. It never includes log files. Before it is sent, the report is checked for secrets, and a match stops the submit. An item that was already reported in the last 7 days is not sent again.
+
+#### Turning off automatic reports
+
+Set `HQ_HANDOFF_AUTOFILE=0` to stop handoffs from filing reports:
+
+```bash
+export HQ_HANDOFF_AUTOFILE=0
+```
+
+The problems are still saved in the handoff thread and shown in the summary. Nothing is sent to the HQ team.
+
+#### What `system_info` contains
+
+| Field | Value |
+|-------|-------|
+| `hq_version` | The HQ version from `core/core.yaml` |
+| `hq_cli_version` | The installed `hq` CLI version, if any |
+| `host` | `cli`, `desktop` or `sdk` |
+| `os` | The operating system name, for example `darwin` or `linux` |
+| `hooks_enforced` | `true` when HQ hooks are confirmed to run in this session |
+
+`system_info` contains no file paths, email addresses or tokens.
+
 ### /nexttask
 Scans projects, workspace, and queues to recommend what to work on next. Considers priority, dependencies, and recent activity.
 
