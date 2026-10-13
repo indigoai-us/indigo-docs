@@ -1,149 +1,102 @@
 ---
-title: Use HQ without being billed
-description: Run HQ core on your own computer with cloud sync off, use the hq CLI, and deploy for free.
+title: Use HQ for free
+description: What the Free plan includes, what is billed past $10 of usage a month, and how to keep an eye on your usage.
 sidebar:
   label: Use HQ for free
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+HQ has a Free plan. Free includes $10 of usage each month. That covers cloud
+storage, sync and the rest of the usage rates. Usage past $10 in a month is
+billed by use.
 
-HQ bills for the HQ cloud services you use. HQ core on your own computer, the
-local `hq` CLI commands, and deploys are free. This page shows how to use HQ
-without turning on anything that is billed.
+No card is needed to sign in, deploy or use DMs. HQ asks for a card only when
+a month's usage passes $10.
 
 Current rates are on the [pricing page](https://www.hqforwork.com/pricing).
 
-## What is free and what is billed
+## What is free and what counts as usage
 
-| Free | Billed |
-|------|--------|
-| HQ core on your computer: your files, knowledge, skills, workers and projects | Syncs that upload, download or delete files in the HQ cloud vault |
-| Local search and the other local `hq` CLI commands listed below | Storage in the HQ cloud vault, including old versions of files |
-| Running HQ in Claude Code, Codex or Cursor with your own AI subscription | Secrets stored in HQ |
-| Deploys | HQ MCP calls, and external MCP calls made through HQ |
-| Background AI that HQ runs for you | Integration calls through HQ |
-| Syncs that only upload session logs or only clean up, and syncs that find nothing to move or fail | Agent runs |
-| | Agent and Outpost boxes, billed per box |
+| Always free | Counts toward your $10, then billed by use |
+|-------------|---------------------------------------------|
+| Deploys, with no limit | Syncs that upload, download or delete files in the HQ cloud vault |
+| Direct messages (DMs) | Storage in the HQ cloud vault, including old versions of files |
+| HQ core on your computer: your files, knowledge, skills, workers and projects | Secrets stored in HQ |
+| Local search and the other local `hq` CLI commands | HQ MCP calls, and external MCP calls made through HQ |
+| Running HQ in Claude Code, Codex or Cursor with your own AI subscription | Integration calls through HQ |
+| Background AI that HQ runs for you | Agent runs |
+| Syncs that only upload session logs or only clean up, and syncs that find nothing to move or fail | |
 
-Billing starts when you use a cloud service. If you never sign in to HQ, none
-of the billed services can run.
+Agent and Outpost boxes are billed per box and are separate from the $10 of
+usage.
 
-If you do sign in, the first $10 of billed usage each month is free, and no
-card is needed until a month's usage passes that amount. Usage also stops at
-a spend limit of $100 a month by default, which the account owner can change.
+Usage stops at a spend limit of $100 a month by default. The account owner can
+change it.
 
-## 1. Install HQ core without an account
+## 1. Install HQ
 
 ```bash
 npx create-hq
 ```
 
 This downloads HQ core into a folder on your computer and sets it up for the
-AI tools you already use. It does not ask you to sign in and does not set up
-cloud sync.
-
-When it finishes, open the folder in Claude Code and run `/setup`:
+AI tools you already use. Open the folder in Claude Code and run `/setup`:
 
 ```bash
 cd <your-hq-folder> && claude
 ```
 
-`/setup` asks "Sign in to HQ Cloud now?". Answer no. If you sign in here,
-setup runs a sync to claim any company invites. Everything else in setup works
-without signing in.
+`/setup` asks "Sign in to HQ Cloud now?". Signing in turns on the cloud
+services, such as sync, storage and secrets, which use your $10 of usage. You
+can also use HQ core without signing in. Nothing is billed then.
 
-<Aside type="caution">
-The HQ desktop app needs an HQ sign-in, and with its default settings it
-syncs to the HQ cloud on its own. To stay free, use `npx create-hq` instead of
-the desktop app, or turn its sync settings off as described in step 2.
-</Aside>
-
-## 2. Keep cloud sync off
-
-Every sync needs an HQ sign-in. If you are not signed in, nothing syncs.
-
-If you have signed in at some point, check each of these:
-
-- **Desktop app.** Open Settings, then Sync, and turn off "Sync on launch",
-  "Auto-sync", "Instant sync" and "Also sync my personal HQ files to the
-  cloud". Do not press Sync now. The personal files switch matters: when it is
-  on, HQ syncs everything in your HQ folder outside cloud companies to a
-  personal cloud vault, including companies you keep local.
-- **HQ background service.** If you installed it with `hq daemon install`,
-  stop its sync with `hq daemon sync pause`, or turn it off for this computer
-  with `hq daemon disable sync`.
-- **Sync commands.** Do not run `hq sync push`, `hq sync pull`, `hq sync now`,
-  `hq team-sync` or the `/hq-sync` skill.
-- **Cloud companies.** A company only becomes cloud-backed when you create or
-  join one through `hq onboard`, `hq cloud provision`, or the desktop app.
-  Companies you create locally are not cloud-backed, but personal file sync
-  (above) still uploads them while it is on.
-- **Skills that sync.** While you are signed in, a few HQ skills push files to
-  your personal vault. `/handoff` does this to save session state.
-
-To stop all of it at once, sign out:
-
-```bash
-hq logout
-```
-
-This clears the CLI's HQ sign-in, and the HQ background service stops syncing
-until you sign in again. If you use the desktop app, check its sync settings
-as well.
-
-## 3. Use the hq CLI
+You can install the `hq` CLI as well:
 
 ```bash
 npm install -g @indigoai-us/hq-cli
 ```
 
-Installing the CLI also installs a small background service for team presence.
-It needs an HQ sign-in to do anything.
-
-These commands work on your computer with no HQ account:
-
-| Command | What it does |
-|---------|--------------|
-| `hq search <query>` | Search your HQ with the local search index |
-| `hq index status`, `hq index sync` | Check and update the local search index |
-| `hq reindex` | Refresh skills, the workers registry and hook wiring |
-| `hq scan secrets` | Check staged changes or files for secrets before you commit |
-| `hq db status`, `hq db sql`, `hq db migrate` | Use a company's local SQLite database |
-| `hq install <path, git URL or npm package>` | Install a package from a local folder, a git URL, or npm |
-| `hq packs`, `hq modules` | Manage installed content packs and modules |
-| `hq rescue` | Update HQ core to the latest release, keeping your local edits |
-| `hq doctor` | Check hooks, runtimes and setup |
-| `hq resolve-company`, `hq version`, `hq capacity`, `hq provider` | Local information and launching your AI tools |
-
-Commands that use the HQ cloud need a sign-in. These include `hq secrets`,
-`hq run`, `hq files`, `hq members`, `hq dm`, `hq integrations`, `hq sync`,
-`hq team-sync`, `hq cloud`, `hq onboard`, `hq storage`, `hq vault`, `hq bot`,
-`hq agents`, `hq outposts` and `hq mesh`. Some of these use billed services.
-
-## 4. Deploy for free
+## 2. Deploy
 
 Deploys are free and are never blocked by plan limits. They need an HQ sign-in
 so HQ knows whose site it is.
 
-1. Check step 2 first. Signing in does not start a sync by itself, but if the
-   desktop app or the HQ background service is set to sync, it starts once you
-   are signed in.
-2. Sign in with `/hq-login` in Claude Code, or `hq login` in a terminal.
-3. Run `/deploy` in Claude Code or Codex from your HQ folder and say what to
+1. Sign in with `/hq-login` in Claude Code, or `hq login` in a terminal.
+2. Run `/deploy` in Claude Code or Codex from your HQ folder and say what to
    publish. If you do not belong to a company, the site deploys under your own
    name.
-4. When you are done, run `hq logout` if you want to be sure nothing syncs
-   later.
-
-Deployed sites are stored separately from the HQ cloud vault.
 
 These deploy extras are not free:
 
-- Custom domains, which need a Pro or Enterprise plan.
+- Custom domains, which need a paid plan.
 - Remote databases (`hq db provision`).
-- Secrets that a deployed app reads from HQ. These are secrets stored in HQ.
+- Secrets that a deployed app reads from HQ. These count as secrets stored in
+  HQ.
 
-## Check what you are billed for
+## 3. Control how much you sync
 
-The Billing page in the HQ console shows your usage. If it shows usage you did
-not expect, check step 2 for anything that is still syncing.
+Sync is the usage that grows fastest for most people. Each sync that moves
+files counts toward your $10. To sync less:
+
+- **Desktop app.** Open Settings, then Sync. "Sync on launch", "Auto-sync" and
+  "Instant sync" control when HQ syncs on its own. "Also sync my personal HQ
+  files to the cloud" uploads everything in your HQ folder outside cloud
+  companies, including companies you keep local.
+- **HQ background service.** If you installed it with `hq daemon install`,
+  pause its sync with `hq daemon sync pause`, or turn it off for this computer
+  with `hq daemon disable sync`.
+- **Sync commands.** `hq sync push`, `hq sync pull`, `hq sync now`,
+  `hq team-sync` and the `/hq-sync` skill all sync when you run them.
+- **Skills that sync.** While you are signed in, a few HQ skills push files to
+  your personal vault. `/handoff` does this to save session state.
+
+To stop all cloud activity, sign out:
+
+```bash
+hq logout
+```
+
+## Check your usage
+
+The Billing page in the HQ console shows how much of your $10 you have used
+this month. If it shows usage you did not expect, check step 3 for anything
+that is still syncing.
