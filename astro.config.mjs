@@ -8,6 +8,7 @@ export default defineConfig({
     "/hq/architecture/2-monorepo/": "/hq/architecture/2-ecosystem/",
     "/hq/roadmap/2-v5-launch/": "/hq/roadmap/2-shipped-and-next/",
     "/hq/products/capabilities/agents-in-slack/": "/hq/products/fleet-agents/channels/",
+    "/hq/guide/diy-method/": "/hq/guide/use-hq-for-free/",
   },
   integrations: [
     starlight({
@@ -72,6 +73,7 @@ export default defineConfig({
                 { label: "hq-share", link: "/hq/products/capabilities/hq-share/" },
                 { label: "hq-secrets", link: "/hq/products/capabilities/hq-secrets/" },
                 { label: "Slack Bot Factory", link: "/hq/products/capabilities/slack-bot-factory/" },
+                { label: "Message forwarding", link: "/hq/products/capabilities/message-forwarding/" },
                 { label: "HQ MCP", link: "/hq-in-chat/" },
               ],
             },
