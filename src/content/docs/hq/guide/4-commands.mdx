@@ -1,6 +1,6 @@
 ---
 title: Commands
-description: Complete reference for all 17 HQ slash commands.
+description: Reference for HQ slash commands.
 ---
 
 Run any command inside Claude Code with `/command-name`.
@@ -54,16 +54,32 @@ Interactive wizard to create a custom worker:
 
 | Command | Description |
 |---------|-------------|
+| `/brainstorm "idea"` | Explore approaches and decide whether to plan |
 | `/prd "description"` | Create a Project Requirements Document |
+| `/deep-plan "description"` | Plan a large project with research and a longer interview |
+| `/grill-me "topic"` | Run a decision interview on any topic |
+| `/plan` | Deprecated. Forwards to `/prd` |
 | `/run-project` | Execute a project through the Ralph loop |
 | `/execute-task` | Execute a single task through coordinated workers |
 
+### /brainstorm
+Compares approaches and surfaces unknowns through a short interview. The interview runs on the shared HQ interview engine, the same one `/prd` and `/grill-me` use. At the end, `/brainstorm` asks what to do next:
+- **Plan it now**: continues into `/prd` in the same session and writes `prd.json`. Your brainstorm answers carry over, so you are not asked them again.
+- **Upgrade to deep-plan**: hands off to `/deep-plan` for research and a longer interview.
+- **Stop here**: keeps the brainstorm and ends.
+
 ### /prd
-Generates a structured `prd.json` with:
+Runs its interview on the shared interview engine. If the project has a brainstorm, `/prd` loads those answers as known facts and skips questions they already settle. It records how many questions were asked, answered, and assumed in `metadata.interview` in `prd.json`. It generates a structured `prd.json` with:
 - Project metadata (name, repo, branch)
 - User stories with acceptance criteria
 - Task breakdown
 - Architecture decisions
+
+### /grill-me
+Interviews you about any topic, one question at a time, and saves a summary of your decisions. Pass `--rounds` to batch questions. See [/grill-me](/hq/commands/grill-me/).
+
+### /plan (deprecated)
+`/plan` is deprecated and forwards to `/prd`. Use `/prd` instead. The release that removes `/plan` is listed in the HQ changelog (`core/docs/hq/CHANGELOG.md`).
 
 ### /run-project
 Orchestrates multi-task execution using the Ralph methodology:
