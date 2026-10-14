@@ -46,6 +46,12 @@ export default defineConfig({
           autogenerate: { directory: "hq/guide" },
         },
         {
+          label: "Commands",
+          items: [
+            { label: "/grill-me", link: "/hq/commands/grill-me/" },
+          ],
+        },
+        {
           label: "Products",
           items: [
             { label: "hq-core", link: "/hq/products/hq-core/" },
@@ -67,6 +73,7 @@ export default defineConfig({
                 { label: "hq-share", link: "/hq/products/capabilities/hq-share/" },
                 { label: "hq-secrets", link: "/hq/products/capabilities/hq-secrets/" },
                 { label: "Slack Bot Factory", link: "/hq/products/capabilities/slack-bot-factory/" },
+                { label: "Message forwarding", link: "/hq/products/capabilities/message-forwarding/" },
                 { label: "HQ MCP", link: "/hq-in-chat/" },
               ],
             },

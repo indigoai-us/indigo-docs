@@ -11,6 +11,20 @@ Projects in HQ are structured task definitions that workers execute autonomously
 /prd "Build X"  →  /run-project  →  /execute-task (per story)
 ```
 
+## Starting from a brainstorm
+
+`/brainstorm "idea"` explores approaches before you commit to a plan. It ends with three choices: **Plan it now** (writes `prd.json` in the same session, reusing your brainstorm answers), **Upgrade to deep-plan**, or **Stop here**.
+
+`/plan` is deprecated and forwards to `/prd`.
+
+## Project glossary: GLOSSARY.md
+
+Project and repo glossaries used by the `tdd`, `diagnose`, and `wayfinder` skills are now named `GLOSSARY.md`. The old name, `CONTEXT.md`, is still read for one release. Rename existing files with:
+
+```bash
+git mv CONTEXT.md GLOSSARY.md
+```
+
 ## Creating Projects with /prd
 
 ```bash
