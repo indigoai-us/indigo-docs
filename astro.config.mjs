@@ -46,12 +46,6 @@ export default defineConfig({
           autogenerate: { directory: "hq/guide" },
         },
         {
-          label: "Commands",
-          items: [
-            { label: "/grill-me", link: "/hq/commands/grill-me/" },
-          ],
-        },
-        {
           label: "Products",
           items: [
             { label: "hq-core", link: "/hq/products/hq-core/" },
