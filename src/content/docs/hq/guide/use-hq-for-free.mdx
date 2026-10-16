@@ -1,13 +1,19 @@
 ---
-title: "Use HQ for free: the DIY method"
-description: Install HQ core and the HQ CLI on your own computer and run HQ with no account and no cloud. Your files stay yours.
+title: "Use HQ free, self-hosted or on-prem"
+description: Run HQ core and the HQ CLI on your own computers or servers with no HQ account and no HQ cloud. For advanced, enterprise and government teams that need to keep their work on their own machines.
 sidebar:
-  label: Use HQ for free
+  label: Use HQ free, self-hosted or on-prem
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-You can run HQ on your own computer for free, with no HQ account and no cloud.
+You can run HQ free on machines you control, with no HQ account and no HQ
+cloud. This is the self-hosted or on-prem way to use HQ. It is for advanced,
+enterprise and government teams that need their files, knowledge and work to
+stay on their own laptops, workstations or servers. HQ core is open source
+under the MIT license, so your team can read, audit and change every part
+that runs.
+
 You need the three things in this table.
 
 | What | Where to get it |
@@ -16,8 +22,34 @@ You need the three things in this table.
 | The HQ CLI | [`@indigoai-us/hq-cli` on npm](https://www.npmjs.com/package/@indigoai-us/hq-cli) |
 | The HQ desktop app (optional) | [hq-desktop-app releases](https://github.com/indigoai-us/hq-desktop-app/releases/latest) |
 
-HQ's cloud features are an add-on you can turn on later. See
-[What needs the cloud](#what-needs-the-cloud).
+## Who this is for
+
+- **Advanced users** who want to run HQ from a terminal and manage their own
+  files, backups and tools.
+- **Enterprise teams** with data-residency, security review or procurement
+  rules that keep company knowledge off third-party clouds.
+- **Government and regulated teams** that must run software on approved
+  machines and choose their own AI provider.
+
+If you want sync, sharing, hosted agents and deploys without running anything
+yourself, [sign up free](https://www.hqforwork.com/pricing) for HQ cloud
+instead. HQ cloud is billed by use; see
+[Billing and usage](/hq/products/hq-pro/billing-and-usage/).
+
+## What runs on your own machines
+
+Everything in steps 1 to 3 below runs on machines you control, with no HQ
+sign-in:
+
+- HQ core: your knowledge, skills, workers, projects and companies, kept as
+  normal files and folders.
+- The HQ CLI commands listed in [step 3](#3-use-hq-locally), including local
+  search and each company's local SQLite database.
+- Your AI coding tool, such as Claude Code, Codex or Cursor, under your own
+  account with its provider.
+
+The features in [What needs HQ cloud](#what-needs-hq-cloud) are an add-on you
+can turn on later.
 
 ## Your files are yours
 
@@ -92,7 +124,7 @@ to sign in to a free HQ account. Signing in is free and does not need a card.
   computer with your own AI model login. Each bot has an HQ identity, so it
   needs a sign-in.
 
-## What needs the cloud
+## What needs HQ cloud
 
 These features use the HQ cloud and need an HQ sign-in.
 
@@ -103,13 +135,20 @@ These features use the HQ cloud and need an HQ sign-in.
 - Hosted agents, and local bots
 - HQ MCP and integration calls
 
-When you turn the cloud on, the Free plan ([Billing and usage](/hq/products/hq-pro/billing-and-usage/))
-includes $10 of usage each month. Deploys and DMs are free. Usage past $10 is
-billed by use, and no card is needed until a month's usage passes $10.
+When you turn the cloud on, HQ cloud is billed by use with $10 of usage
+included each month, and new accounts get a 30-day trial. Deploys and DMs are
+free, and no card is needed until a month's usage passes $10. See
+[Billing and usage](/hq/products/hq-pro/billing-and-usage/).
 
-Hosted agents are a la carte on every plan, Free included, so you do not need
-to upgrade to add one. Each hosted agent is billed per box by size and needs a
-card on file before it is created. Local bots have no box fee.
+Hosted agents are billed per box by size and need a card on file before they
+are created. Local bots have no box fee.
+
+## Talk to us about an enterprise deployment
+
+If your team wants help running HQ on its own machines, a security review,
+contract pricing or support terms, request an enterprise demo from the
+[pricing page](https://www.hqforwork.com/pricing). Tell us where HQ will run
+and which AI provider you use.
 
 ## How synced files are encrypted
 

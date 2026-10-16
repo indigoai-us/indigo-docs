@@ -1,6 +1,6 @@
 ---
 title: Setup channel lifecycle
-description: Create a company, turn on cloud, upgrade to Workforce, and create the first agent inside the desktop app — no console or CLI required.
+description: Create a company, turn on cloud, set up billing, and create the first agent inside the desktop app, with no console or CLI required.
 sidebar:
   order: 8
 ---
@@ -17,33 +17,43 @@ Cards are `lifecycle_card` messages (v1). The server sets them; clients cannot m
 | --- | --- | --- | --- |
 | 1. Create company | #setup | `create_company` | The signed-in person |
 | 2. Activate cloud | Company channel | `activate_cloud` | Owner |
-| 3. Upgrade to Workforce | Company channel | `upgrade_plan` | Owner |
+| 3. Plan and billing | Company channel | `upgrade_plan` | Owner |
 | 4. Create first agent | Company channel | `create_agent` | Owner, or a role with `createAgents` |
 
 #setup also holds a `companies_summary` card after the first company exists. Opening a row jumps to that company's channel.
 
-## Workforce
+## Plan and billing
 
-Workforce is the display name of the existing **$500 / month team** plan. The plan id stays `team`. Starter stays free. Enterprise is a talk-to-us link, not a new SKU.
+Companies created from 16 October 2026 are on usage pricing. There is no plan
+to buy: each account gets $10 of usage a month and a 30-day trial, and usage
+past $10 is billed by use. See
+[Billing and usage](/hq/products/hq-pro/billing-and-usage/). Starter and
+Workforce are closed to new signups. Teams that need contract terms request an
+enterprise demo instead.
 
-Stay on Starter is a real action (`skipped`). Agents are available on Starter a la carte: self-run bots are free, and a hosted agent is billed per box and needs billing set up. Creating an agent does not require Workforce.
+Agents are available on every account a la carte: self-run bots are free, and
+a hosted agent is billed per box and needs billing set up.
 
-### What Starter includes
+### Companies that signed up earlier
+
+Companies created before 16 October 2026 keep their current plan. For them,
+step 3 offers the existing **$500 / month team** plan under its display name,
+Workforce. The plan id stays `team`. Stay on Starter is a real action
+(`skipped`). Creating an agent does not require Workforce.
 
 Starter is a hard-capped free plan, not a trial. It covers up to 5 members,
 10 secrets, 10 GB of storage, 1 connected integration, and 500 lifetime
-deployments. MCP and Atlas are not included. Agents are available a la carte,
-as on every plan. Going over a capped
-ceiling locks the workspace read-only for creates until an owner trims back
-under it or upgrades; nothing is deleted.
+deployments. MCP and Atlas are not included. Going over a capped ceiling locks
+the workspace read-only for creates until an owner trims back under it or
+upgrades; nothing is deleted.
 
 Workforce removes the member, secret, storage, integration and deployment
-ceilings — all of them are unlimited on Workforce — and adds hosted MCP and
+ceilings (all of them are unlimited on Workforce) and adds hosted MCP and
 Atlas.
 
 ## First agent
 
-Step 4 is optional and available on every plan. No plan includes hosted agents: each hosted agent is billed per box at its size rung, from the first agent, and needs billing set up. Self-run bots are free. See [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/).
+Step 4 is optional and available on every account. No plan includes hosted agents: each hosted agent is billed per box at its size, from the first agent, and needs billing set up. Self-run bots are free. See [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/).
 
 ## Agent channel
 
@@ -68,7 +78,6 @@ Everything an agent or a session can do (knowledge, policies, projects, branding
 ## What this is not
 
 - No per-company hosted owner agent.
-- No new plan tier or price.
 - No rebuild of checkout or invoices in-app (Stripe hosted stays).
 - The console is not removed.
 - Setup-agent autocreate stays off.
