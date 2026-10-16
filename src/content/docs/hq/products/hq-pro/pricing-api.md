@@ -51,7 +51,7 @@ The `usage` block, shortened:
 {
   "usage": {
     "version": "2026-10-16",
-    "newSignupsFrom": "2026-10-16T13:00:00Z",
+    "newSignupsFrom": "2026-10-16T18:00:00Z",
     "includedUsd": 10,
     "trial": { "days": 30, "capUsd": 500 },
     "meters": [
