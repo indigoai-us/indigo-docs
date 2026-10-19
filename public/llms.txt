@@ -1,27 +1,83 @@
 # HQ
 
-> HQ is an open-source team AI operating system — a shared, synced context and capability layer over Claude Code, Cursor, and Codex. It gives your AI coding agents your whole company's memory (knowledge, decisions, people, skills, and policies) so they stop forgetting everything every session. We call that default failure "Agent Amnesia"; HQ is the cure.
+> HQ is the company brain your AI runs on. It keeps a company's knowledge, projects, skills, workflows, credentials and AI teammates in one shared system the company owns, and it works across Claude Code, Codex, Cursor, Grok Build, ChatGPT and Claude. The core is open source (MIT).
 
-Install with one command: `npx create-hq`
+Key facts:
 
-HQ is built by Indigo. It is open source (MIT) at github.com/indigoai-us/hq-core. It works alongside the AI coding tools you already use — it does not replace them; it gives them a persistent, team-wide memory.
+- What it is: a suite of six connected products (HQ Core, HQ Cloud, Secrets + Integrations, HQ Deploy, HQ Bots, HQ MCP) that gives a company one way to work with AI. It does not replace AI tools or models. It gives them shared company context, tools and access.
+- Who it's for: companies and teams that want everyone, technical or not, working from the same AI context. Common users are founders and operators, agencies running many client workspaces, and consumer brands. Nontechnical teammates usually use HQ through Claude Desktop or ChatGPT (via HQ MCP), Slack, email, or deployed apps. A smaller operator group installs HQ and builds skills.
+- Pricing: sign up free with $10 of usage included every month and a 30-day free trial covering up to $500 of usage. After that, pay as you go. No seat fees. Deploys, DMs and background AI are free. Hosted AI agents run on boxes billed monthly by size, from $100 to $800. Enterprise is priced by contract. Full rates: https://hqforwork.com/pricing
+- Free self-hosted option: the open-source HQ core and the HQ CLI run on your own machines with no HQ account and no cloud.
+- Install: download the desktop app for macOS or Windows at https://hqforwork.com/install, or run `npx create-hq` in a terminal. A Linux desktop app is on a waitlist.
+- Data: local-first. Company memory lives in ordinary files in the HQ workspace. When HQ Cloud is used, synced data is encrypted in transit and at rest, credentials get separate field-level encryption, and each company is an isolated tenant.
+- Official domains: hqforwork.com (product site) and docs.hq.computer (documentation). Source code: https://github.com/indigoai-us/hq-core
 
-## Start here
-- [GitHub — hq-core](https://github.com/indigoai-us/hq-core): the open-source scaffold; run `npx create-hq` to begin
-- [Documentation](https://docs.hq.computer): how HQ works, concepts, and setup
-- [create-hq on npm](https://www.npmjs.com/package/create-hq): the installer package
+## Products
 
-## Core ideas
-- Agent Amnesia: the anti-pattern where an AI agent forgets all company context at the start of every session, forcing constant re-explaining and re-discovery.
-- Shared context layer: one place for a company's knowledge, decisions, people, skills, workers, and policies — synced across the team and read by agents automatically.
-- Data gravity / compounding: every session deepens the shared memory, which makes agents smarter and raises the switching cost. The memory is both the moat and the marketing.
+- [All products](https://hqforwork.com/products): overview of the six products and how they fit together
+- [HQ Core](https://hqforwork.com/products/core): open-source, file-based company memory (Knowledge, Skills, Projects, Workers, Policies) and the harness that loads it into every AI session
+- [HQ Cloud](https://hqforwork.com/products/cloud): syncs HQ across the team and every device, with an admin console for membership and access
+- [HQ Secrets + Integrations](https://hqforwork.com/products/integrations): connect company systems and MCP servers once, keep credentials encrypted, and grant use to people and bots without sharing raw keys
+- [HQ Deploy](https://hqforwork.com/products/deploy): publish AI-made reports, dashboards, portals and apps as public, password-protected or company-only links
+- [HQ Bots](https://hqforwork.com/products/bots): persistent AI teammates with a role, memory, tools, an email address and Slack access
+- [HQ MCP](https://hqforwork.com/products/mcp): brings company memory, tools and connected systems into Claude and ChatGPT through one permissioned connection
+- [Bot Directory](https://hqforwork.com/bots): preconfigured bots ready to name and deploy
+- [Pack Marketplace](https://hqforwork.com/marketplace): installable packs of skills, workers and policies published by HQ creators
 
-## What HQ provides
-- A synced knowledge + policy layer your agents read from automatically
-- Reusable skills and workers (specialized agents) shared across a team
-- Works with Claude Code, Cursor, and Codex
-- An MCP server (hq-mcp) to bridge agents to HQ-managed context
-- A CLI (`hq`, via `npx create-hq` or `brew install coreyepstein/tap/hq`)
+## Pricing and getting started
 
-## Who it's for
-Developers and technical teams using AI coding agents who are tired of re-teaching their tools the same company context every session.
+- [Pricing](https://hqforwork.com/pricing): usage rates, agent box prices, custom domain prices and a cost estimator
+- [Install HQ](https://hqforwork.com/install): desktop downloads for macOS and Windows, plus the terminal install
+- [Getting started](https://hqforwork.com/getting-started): seven hands-on lessons from install to a shared, reusable worker
+- [Use HQ free, self-hosted or on-prem](https://docs.hq.computer/hq/guide/use-hq-for-free/): run the open-source core with no HQ account or cloud
+- [Live training](https://hqforwork.com/training): free 45-minute sessions every week
+- [HQ cheat sheet](https://hqforwork.com/hq-cheat-sheet): nine working rules and example workflows
+- [Documentation](https://docs.hq.computer): concepts, commands and setup guides
+
+## Use cases
+
+- [HQ for agencies](https://hqforwork.com/hq-for-agencies): an isolated HQ per client while the agency reuses its methods
+- [Build a shared company brain](https://hqforwork.com/build-a-shared-company-brain): one approved source of company context for people and bots
+- [Company-wide AI adoption](https://hqforwork.com/company-wide-ai-adoption): let teams pick their models while context and capabilities stay shared
+- [Share AI skills with your team](https://hqforwork.com/share-ai-skills-with-your-team): turn one person's best workflow into a team command
+- [Share AI tools securely](https://hqforwork.com/share-ai-tools-securely): give access to APIs, MCPs and data without passing credentials around
+- [Connect company tools and data to AI](https://hqforwork.com/connect-company-tools-and-data-to-ai): connect each system once for the whole company
+- [Govern AI access, knowledge and approvals](https://hqforwork.com/govern-ai-access-knowledge-and-approvals): role-based access and human approval gates
+- [Set up bots that know your company](https://hqforwork.com/set-up-bots-that-know-your-company): persistent AI teammates with company context
+- [Automate reports, dashboards and briefs](https://hqforwork.com/automate-reports-dashboards-and-briefs): recurring reporting from shared data and definitions
+- [Schedule recurring AI work](https://hqforwork.com/schedule-recurring-ai-work): scheduled workflows with owners and review
+- [Turn meetings into decisions and action](https://hqforwork.com/turn-meetings-into-decisions-and-action): meeting capture into decisions, owners and follow-ups
+- [Keep brand voice consistent in AI](https://hqforwork.com/keep-brand-voice-consistent-in-ai): shared voice, claims and channel rules
+- [Onboard teammates into AI work faster](https://hqforwork.com/onboard-teammates-into-ai-work-faster): new hires start with context and access on day one
+- [Collaborate with AI](https://hqforwork.com/collaborate-with-ai): people and bots working on one project memory
+- [Publish AI work as apps, portals and pages](https://hqforwork.com/publish-ai-work-as-apps-portals-and-pages): turn projects into shareable destinations
+- [Run isolated client and brand workspaces](https://hqforwork.com/run-isolated-client-and-brand-workspaces): separate context and credentials per client or brand
+
+## Customers
+
+- [Case studies](https://hqforwork.com/case-studies): Bogey Bros, Goodo Studios, LiveRecover, Customer Conversations and Commerce Catalyst
+
+## Services and partners
+
+- [Services](https://hqforwork.com/services): Exec AGI Bootcamp, AI enablement, HQ development and app builds from the HQ team
+- [Implementation partners](https://hqforwork.com/partners): vetted firms that set up and roll out HQ
+- [AI implementation](https://hqforwork.com/ai-implementation): get matched with an implementation partner
+- [Enterprise AI readiness assessment](https://hqforwork.com/assessment): included with an enterprise implementation
+
+## Company
+
+- [FAQ](https://hqforwork.com/faq): 28 answers on products, pricing, security, platforms and governance
+- [Support](https://hqforwork.com/support): help with install, sign-in and account requests; replies within 24 hours
+- [Privacy policy](https://hqforwork.com/privacy)
+- [Terms of service](https://hqforwork.com/terms)
+- [Careers](https://hqforwork.com/careers)
+
+## Optional
+
+- [Blog](https://hqforwork.com/blog): essays on AI-native operations and team AI adoption
+- [Free books](https://hqforwork.com/book): Build Your Own AGI, editions for teams and for agencies
+- [Research](https://hqforwork.com/research): technical papers, including the Signal-Context Architecture
+- [Manifesto](https://hqforwork.com/manifesto): why accumulated company context matters more than the model
+- [Agent Amnesia](https://hqforwork.com/agent-amnesia): the problem of AI agents forgetting company context every session
+- [Labs](https://hqforwork.com/labs): experimental tools and prototypes
+- [Grok Build Desktop](https://hqforwork.com/build): a macOS app for running Grok Build, Codex and Claude Code sessions side by side
