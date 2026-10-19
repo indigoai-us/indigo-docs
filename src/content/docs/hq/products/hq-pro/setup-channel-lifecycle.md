@@ -28,8 +28,8 @@ Companies created from 16 October 2026 are on usage pricing. There is no plan
 to buy: each account gets $10 of usage a month and a 30-day trial, and usage
 past $10 is billed by use. See
 [Billing and usage](/hq/products/hq-pro/billing-and-usage/). Starter and
-Workforce are closed to new signups. Teams that need contract terms request an
-enterprise demo instead.
+Workforce are closed to new signups. Teams that need contract terms book a
+setup call instead.
 
 Agents are available on every account a la carte: self-run bots are free, and
 a hosted agent is billed per box and needs billing set up.
