@@ -36,7 +36,8 @@ a hosted agent is billed per box and needs billing set up.
 
 ### Companies that signed up earlier
 
-Companies created before 16 October 2026 keep their current plan. For them,
+Companies created before 16 October 2026 stay on their current plan until
+19 December 2026, when existing plans move to usage pricing. Until then,
 step 3 offers the existing **$500 / month team** plan under its display name,
 Workforce. The plan id stays `team`. Stay on Starter is a real action
 (`skipped`). Creating an agent does not require Workforce.
