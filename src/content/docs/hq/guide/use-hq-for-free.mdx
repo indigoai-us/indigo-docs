@@ -117,12 +117,49 @@ to sign in to a free HQ account. Signing in is free and does not need a card.
 
 - **Desktop app.** Download it from the
   [releases page](https://github.com/indigoai-us/hq-desktop-app/releases/latest).
-  It asks you to sign in when it first opens. To keep it from syncing, open
-  Settings, then Sync, and turn off "Sync on launch", "Auto-sync", "Instant
-  sync" and "Also sync my personal HQ files to the cloud".
+  It asks you to sign in when it first opens. To keep it from syncing, see
+  [Turn cloud sync off](#turn-cloud-sync-off) below.
 - **Local bots.** `hq bot create <name>` sets up a bot that runs on your
   computer with your own AI model login. Each bot has an HQ identity, so it
   needs a sign-in.
+
+## Turn cloud sync off
+
+If you sign in but don't want your files in the HQ cloud, turn sync off in
+the desktop app. A vault with sync off has no sync charges.
+
+1. Open **Settings**, then **Sync**. You can also get there from **Sync** in
+   the account menu, or from "Turn sync off or on for each vault" under the
+   usage meter.
+2. Under **Cloud sync**, turn off the switch for each vault you want to keep
+   on this computer only: your personal vault, any company vault, or **Turn
+   off all cloud sync** for everything.
+
+What happens when a vault's sync is off:
+
+- Nothing in that vault uploads or downloads. Other vaults keep syncing.
+- Your files stay on this computer, unchanged.
+- Teammates stop getting this computer's changes to that vault. For your
+  personal vault, your other computers stop getting them.
+- The switch only changes this computer. It does not turn sync off for your
+  teammates.
+- Sign-in, DMs, deploys and local HQ keep working.
+- The app shows "Sync is off for" and the vault name. To sync again, turn the
+  switch back on.
+
+The HQ CLI follows the same switches. `hq sync push`, `hq sync pull` and
+`hq sync now` refuse to run for a vault that is off, and change nothing.
+With `--all`, they skip the vaults that are off and sync the rest.
+
+<Aside type="note" title="Older desktop app versions">
+If your Sync settings don't have a switch for each vault, your app is older.
+Update it from the
+[releases page](https://github.com/indigoai-us/hq-desktop-app/releases/latest),
+or turn sync off by hand: open Settings, then Sync, and turn off "Sync on
+launch", "Auto-sync", "Instant sync" and "Also sync my personal HQ files to
+the cloud". Older versions of the HQ CLI do not check these settings, so
+don't run `hq sync` yourself.
+</Aside>
 
 ## What needs HQ cloud
 
