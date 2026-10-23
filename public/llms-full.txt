@@ -1096,6 +1096,14 @@ These features use the HQ cloud and need an HQ sign-in.
 - Hosted agents, and local bots
 - HQ MCP and integration calls
 
+Free HQ accounts include usage data. Using HQ for free includes sharing usage
+data with us, such as usage counts, skill and command names and timings, and
+never file contents, secrets, prompts and outputs, or vault data. Adding a card
+to your company turns this into a setting you can switch off. Self-hosted HQ
+with no sign-in sends no usage data. See
+[What HQ collects on the free plan](https://docs.hq.computer/hq/guide/what-hq-collects-on-the-free-plan/)
+and the [release notes](https://hq-free-plan-usage-data.hq.work).
+
 When you turn the cloud on, HQ cloud is billed by use with $10 of usage
 included each month, and new accounts get a 30-day trial. Deploys and DMs are
 free, and no card is needed until a month's usage passes $10. See
@@ -4129,7 +4137,7 @@ HQ power users who prefer the CLI can still use [create-hq](https://docs.hq.comp
 
 The installer walks you through **11 steps**, each implemented as a native screen rather than a child process wrapping the old CLI:
 
-1. **Welcome**, product identity, wizard overview, telemetry opt-in.
+1. **Welcome**, product identity, wizard overview, usage data on the free plan.
 2. **Create your account**, AWS Cognito sign-in, sign-up, or GitHub OAuth.
 3. **Set up your team**, create a new team (name + slug) or join via invite code.
 4. **Install dependencies**, auto-detects and installs Homebrew, Xcode CLT, Node.js, Git, gh, Claude Code, and qmd.
@@ -4298,7 +4306,27 @@ Because the binary is signed with Indigo's Developer ID and notarized by Apple, 
 
 #### Screen 1, Set up HQ
 
-The welcome screen introduces HQ as an open-source AI dev team for Claude Code, 45 workers, 60+ skills, and an orchestrator. It lists the 11 steps you're about to walk through and offers a **telemetry opt-in** checkbox (enabled by default). Telemetry is success/failure + version only, no file paths or content.
+The welcome screen introduces HQ as an open-source AI dev team for Claude Code, 45 workers, 60+ skills, and an orchestrator. It lists the 11 steps you're about to walk through.
+
+Setup also shows **Usage data on the free plan**. Using HQ for free includes sharing usage data with us. It helps us see what people use and fix what breaks. Adding a card to your company turns this into a setting you can switch off.
+
+What is collected:
+
+- usage counts
+- skill and command names
+- timings
+- model names
+- company and person ids
+- app version and operating system
+
+What is never collected:
+
+- file contents
+- secrets
+- prompts and outputs
+- vault data
+
+Collection starts after you click **Continue**. HQ can also run self-hosted with no usage data sent; see [Use HQ free, self-hosted or on-prem](https://docs.hq.computer/hq/guide/use-hq-for-free/). For the full details, see [What HQ collects on the free plan](https://docs.hq.computer/hq/guide/what-hq-collects-on-the-free-plan/).
 
 Click **Get Started** to begin.
 
@@ -4403,7 +4431,7 @@ When embeddings complete, Claude Code's `qmd search` and `qmd vsearch` commands 
 
 #### Screen 11, HQ is ready
 
-The final screen summarises the install: path, team name, team slug, and your email. If telemetry was enabled on screen 1, a success ping fires in the background.
+The final screen summarises the install: path, team name, team slug, and your email. If usage data is on for your company, a success event is sent in the background.
 
 Click **Open HQ in Claude Code** to launch `claude` in your new install directory. From there, your HQ is a live Claude Code session, `/startwork` picks up context, every shared worker is available, and `qmd` can search your freshly indexed knowledge base.
 
@@ -4580,7 +4608,7 @@ File an issue on `indigoai-us/hq-installer` with:
 - Your macOS version (`sw_vers`).
 - The installer version (visible in the app's About menu or the `.dmg` filename).
 
-Telemetry will have captured a `installer.install.failed` event with `step` and `error_code`, but that's anonymized, a first-person issue report always gets a faster fix.
+If usage data is on, HQ will have recorded an `installer.install.failed` event with `step` and `error_code`. Usage data is usage counts with no content, so it does not include your logs or the error text. An issue report from you always gets a faster fix.
 
 ### Package System
 
@@ -7789,6 +7817,10 @@ HQ has **not yet completed an independent third-party penetration test**. Intern
 - **CloudWatch** is used for application logs, metrics, and alarms.
 - **Sentry** is used for error and performance monitoring, with authentication tokens and local filesystem paths scrubbed before transmission; it is not intended to receive customer content.
 
+#### Product usage data
+
+The HQ desktop app and the HQ CLI send product usage data to Indigo. What is collected: usage counts, skill and command names, timings, model names, company and person ids, app version and operating system. What is never collected: file contents, secrets, prompts and outputs, vault data. For a company with no card on file, sharing usage data is part of using HQ for free and cannot be turned off. For a company with a card on file, it is a setting an admin can turn off. Hosted agents send usage data on every plan. HQ run self-hosted with no HQ account sends no usage data. See [What HQ collects on the free plan](https://docs.hq.computer/hq/guide/what-hq-collects-on-the-free-plan/).
+
 #### Compliance and privacy
 
 Indigo does not currently claim SOC 2 or ISO certification. HQ controls are designed to align with the SOC 2 Trust Services Criteria for Security, Availability, and Confidentiality, and readiness work is in progress.
@@ -8649,6 +8681,7 @@ This page pre-answers the common questions a security reviewer asks, organized b
 | Is customer data segregated per tenant? | ✅ | Dedicated S3 bucket and KMS key per tenant. ([Tenant Isolation](https://docs.hq.computer/hq/security/3-tenant-isolation/)) |
 | Is data classified and minimized? | ✅ | Classification defined; credentials/datasets/workers excluded from sync by default with first-push protection. |
 | Can customers export and delete their data? | 🟡 | Export and deletion supported on request; automated hard-delete offboarding on roadmap (soft-tombstone today). |
+| Do you collect product usage data (telemetry)? | ✅ | Usage counts, skill and command names, timings, model names, company and person ids, app version and operating system. Never file contents, secrets, prompts and outputs, or vault data. Required on the free plan (no card on file); a setting that can be turned off once a card is on file. Hosted agents send usage data on every plan. Self-hosted HQ with no account sends none. ([What HQ collects on the free plan](https://docs.hq.computer/hq/guide/what-hq-collects-on-the-free-plan/)) |
 | Do you use customer data to train AI models? | ❌ (we do not) | No model training on customer data. Cloud-side AI runs on AWS Bedrock, which does not train on submitted data; local agent tools use the customer's own model-provider account. ([Subprocessors](https://docs.hq.computer/hq/security/2-subprocessors/)) |
 
 #### DCS, Datacenter Security

@@ -49,6 +49,7 @@ This page pre-answers the common questions a security reviewer asks, organized b
 | Is customer data segregated per tenant? | ✅ | Dedicated S3 bucket and KMS key per tenant. ([Tenant Isolation](/hq/security/3-tenant-isolation/)) |
 | Is data classified and minimized? | ✅ | Classification defined; credentials/datasets/workers excluded from sync by default with first-push protection. |
 | Can customers export and delete their data? | 🟡 | Export and deletion supported on request; automated hard-delete offboarding on roadmap (soft-tombstone today). |
+| Do you collect product usage data (telemetry)? | ✅ | Usage counts, skill and command names, timings, model names, company and person ids, app version and operating system. Never file contents, secrets, prompts and outputs, or vault data. Required on the free plan (no card on file); a setting that can be turned off once a card is on file. Hosted agents send usage data on every plan. Self-hosted HQ with no account sends none. ([What HQ collects on the free plan](/hq/guide/what-hq-collects-on-the-free-plan/)) |
 | Do you use customer data to train AI models? | ❌ (we do not) | No model training on customer data. Cloud-side AI runs on AWS Bedrock, which does not train on submitted data; local agent tools use the customer's own model-provider account. ([Subprocessors](/hq/security/2-subprocessors/)) |
 
 ## DCS — Datacenter Security

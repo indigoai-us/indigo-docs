@@ -168,4 +168,4 @@ File an issue on `indigoai-us/hq-installer` with:
 - Your macOS version (`sw_vers`).
 - The installer version (visible in the app's About menu or the `.dmg` filename).
 
-Telemetry will have captured a `installer.install.failed` event with `step` and `error_code`, but that's anonymized — a first-person issue report always gets a faster fix.
+If usage data is on, HQ will have recorded an `installer.install.failed` event with `step` and `error_code`. Usage data is usage counts with no content, so it does not include your logs or the error text. An issue report from you always gets a faster fix.

@@ -117,6 +117,10 @@ HQ has **not yet completed an independent third-party penetration test**. Intern
 - **CloudWatch** is used for application logs, metrics, and alarms.
 - **Sentry** is used for error and performance monitoring, with authentication tokens and local filesystem paths scrubbed before transmission; it is not intended to receive customer content.
 
+## Product usage data
+
+The HQ desktop app and the HQ CLI send product usage data to Indigo. What is collected: usage counts, skill and command names, timings, model names, company and person ids, app version and operating system. What is never collected: file contents, secrets, prompts and outputs, vault data. For a company with no card on file, sharing usage data is part of using HQ for free and cannot be turned off. For a company with a card on file, it is a setting an admin can turn off. Hosted agents send usage data on every plan. HQ run self-hosted with no HQ account sends no usage data. See [What HQ collects on the free plan](/hq/guide/what-hq-collects-on-the-free-plan/).
+
 ## Compliance and privacy
 
 Indigo does not currently claim SOC 2 or ISO certification. HQ controls are designed to align with the SOC 2 Trust Services Criteria for Security, Availability, and Confidentiality, and readiness work is in progress.
