@@ -4137,7 +4137,7 @@ HQ power users who prefer the CLI can still use [create-hq](https://docs.hq.comp
 
 The installer walks you through **11 steps**, each implemented as a native screen rather than a child process wrapping the old CLI:
 
-1. **Welcome**, product identity, wizard overview, usage data on the free plan.
+1. **Welcome**: product identity, wizard overview, usage data on the free plan.
 2. **Create your account**, AWS Cognito sign-in, sign-up, or GitHub OAuth.
 3. **Set up your team**, create a new team (name + slug) or join via invite code.
 4. **Install dependencies**, auto-detects and installs Homebrew, Xcode CLT, Node.js, Git, gh, Claude Code, and qmd.
@@ -4306,7 +4306,7 @@ Because the binary is signed with Indigo's Developer ID and notarized by Apple, 
 
 #### Screen 1, Set up HQ
 
-The welcome screen introduces HQ as an open-source AI dev team for Claude Code, 45 workers, 60+ skills, and an orchestrator. It lists the 11 steps you're about to walk through.
+The welcome screen introduces HQ as an open-source AI dev team for Claude Code: 45 workers, 60+ skills, and an orchestrator. It lists the 11 steps you're about to walk through.
 
 Setup also shows **Usage data on the free plan**. Using HQ for free includes sharing usage data with us. It helps us see what people use and fix what breaks. Adding a card to your company turns this into a setting you can switch off.
 
@@ -4328,7 +4328,7 @@ What is never collected:
 
 Collection starts after you click **Continue**. HQ can also run self-hosted with no usage data sent; see [Use HQ free, self-hosted or on-prem](https://docs.hq.computer/hq/guide/use-hq-for-free/). For the full details, see [What HQ collects on the free plan](https://docs.hq.computer/hq/guide/what-hq-collects-on-the-free-plan/).
 
-Click **Get Started** to begin.
+Click **Continue** to begin.
 
 #### Screen 2, Create your account
 
@@ -7819,7 +7819,7 @@ HQ has **not yet completed an independent third-party penetration test**. Intern
 
 #### Product usage data
 
-The HQ desktop app and the HQ CLI send product usage data to Indigo. What is collected: usage counts, skill and command names, timings, model names, company and person ids, app version and operating system. What is never collected: file contents, secrets, prompts and outputs, vault data. For a company with no card on file, sharing usage data is part of using HQ for free and cannot be turned off. For a company with a card on file, it is a setting an admin can turn off. Hosted agents send usage data on every plan. HQ run self-hosted with no HQ account sends no usage data. See [What HQ collects on the free plan](https://docs.hq.computer/hq/guide/what-hq-collects-on-the-free-plan/).
+The HQ desktop app and the HQ CLI send product usage data to Indigo. What is collected: usage counts, skill and command names, timings, model names, company and person ids, app version and operating system. What is never collected: file contents, secrets, prompts and outputs, vault data. For a company with no card on file, sharing usage data is part of using HQ for free and cannot be turned off. For a company with a card on file, it is a setting you can turn off. Hosted agents send usage data on every plan. HQ run self-hosted with no HQ account sends no usage data. See [What HQ collects on the free plan](https://docs.hq.computer/hq/guide/what-hq-collects-on-the-free-plan/).
 
 #### Compliance and privacy
 

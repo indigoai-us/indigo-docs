@@ -19,7 +19,7 @@ HQ power users who prefer the CLI can still use [create-hq](/hq/products/hq-core
 
 The installer walks you through **11 steps**, each implemented as a native screen rather than a child process wrapping the old CLI:
 
-1. **Welcome** — product identity, wizard overview, usage data on the free plan.
+1. **Welcome**: product identity, wizard overview, usage data on the free plan.
 2. **Create your account** — AWS Cognito sign-in, sign-up, or GitHub OAuth.
 3. **Set up your team** — create a new team (name + slug) or join via invite code.
 4. **Install dependencies** — auto-detects and installs Homebrew, Xcode CLT, Node.js, Git, gh, Claude Code, and qmd.

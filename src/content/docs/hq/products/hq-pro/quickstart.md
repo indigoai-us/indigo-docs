@@ -15,7 +15,7 @@ Because the binary is signed with Indigo's Developer ID and notarized by Apple, 
 
 ## Screen 1 — Set up HQ
 
-The welcome screen introduces HQ as an open-source AI dev team for Claude Code — 45 workers, 60+ skills, and an orchestrator. It lists the 11 steps you're about to walk through.
+The welcome screen introduces HQ as an open-source AI dev team for Claude Code: 45 workers, 60+ skills, and an orchestrator. It lists the 11 steps you're about to walk through.
 
 Setup also shows **Usage data on the free plan**. Using HQ for free includes sharing usage data with us. It helps us see what people use and fix what breaks. Adding a card to your company turns this into a setting you can switch off.
 
@@ -37,7 +37,7 @@ What is never collected:
 
 Collection starts after you click **Continue**. HQ can also run self-hosted with no usage data sent; see [Use HQ free, self-hosted or on-prem](/hq/guide/use-hq-for-free/). For the full details, see [What HQ collects on the free plan](/hq/guide/what-hq-collects-on-the-free-plan/).
 
-Click **Get Started** to begin.
+Click **Continue** to begin.
 
 ## Screen 2 — Create your account
 
