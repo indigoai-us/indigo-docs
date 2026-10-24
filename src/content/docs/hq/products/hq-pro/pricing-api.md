@@ -27,10 +27,11 @@ The JSON body contains:
     t3.small, medium t3.medium, large t3.large, xlarge t3.xlarge)
   - `free`: what is never billed (deploys, DMs, background AI)
   - `domains`: the custom hostname and custom base domain add-on prices
-- `signup`: the options shown to new signups (sign up free, request an
-  enterprise demo) and the link to
+- `signup`: the options shown to new signups (sign up free, book a setup
+  call) and the link to
   [Use HQ free, self-hosted or on-prem](/hq/guide/use-hq-for-free/)
-- `plans[]`: legacy plans kept for existing customers. Each one carries
+- `plans[]`: legacy plans for existing customers, which move to usage
+  pricing on 19 December 2026. Each one carries
   `newSignupsUntil`, the instant it closed to new signups.
 - `agentRungs[]`: the legacy box sizes with their instance types and monthly
   prices, for accounts created before the usage card
