@@ -26,6 +26,23 @@ jobs:
       - name: Check plan copy and negative controls
         run: node scripts/check-workforce-plan-copy.mjs
 
+  internal-links:
+    name: Internal link check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build site
+        run: npm run build
+      - name: Check every internal link resolves
+        run: node scripts/check-internal-links.mjs
+
   fleet-agents:
     if: ${{ github.event_name != 'pull_request' }}
     name: Fleet Agents routes

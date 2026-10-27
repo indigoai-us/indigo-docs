@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-> **The Slack Bot Factory is a managed surface of [hq-pro](/hq/products/hq-pro/about/): a one-time workspace connect, the in-Slack `/hq-new-bot` command, and the [hq-packages](/hq/products/hq-packages/) `hq-pack-slack-bot` runtime.** It mints real, per-bot Slack apps on demand and lands their tokens in your company vault.
+> **The Slack Bot Factory is a managed surface of [hq-pro](/hq/products/hq-pro/about/): a one-time workspace connect, the in-Slack `/hq-new-bot` command, and the [hq-packages](/hq/products/hq-packages/overview/) `hq-pack-slack-bot` runtime.** It mints real, per-bot Slack apps on demand and lands their tokens in your company vault.
 
 :::caution[Workspace connect is currently white-glove]
 The one-time workspace connect is **not yet self-serve** — there is no `/hq-slack-connect` command in the current HQ release. To connect a Slack workspace, **reach out to the Indigo team** ([support@hqforwork.com](mailto:support@hqforwork.com) or your shared Slack channel) and we'll run the connect with you. Once your workspace is connected, minting bots with `/hq-new-bot` and running them with `hq-pack-slack-bot` works exactly as described below. A self-serve connect command is on the roadmap; this page documents the flow it will follow.
@@ -131,6 +131,6 @@ Three rules follow, and they are enforced end-to-end:
 ## Related
 
 - [hq-pro](/hq/products/hq-pro/about/) — the vault and identity the factory operates against
-- [hq-packages](/hq/products/hq-packages/) — home of the `hq-pack-slack-bot` runtime watcher
+- [hq-packages](/hq/products/hq-packages/overview/) — home of the `hq-pack-slack-bot` runtime watcher
 - [hq-secrets](/hq/products/capabilities/hq-secrets/) — the schema-driven secret access the vault writes use
 - [hq-share](/hq/products/capabilities/hq-share/) — single-use capability links, the same pattern the connect flow uses for value submission
