@@ -2,7 +2,7 @@
 
 > Documentation for HQ, the company brain your AI runs on: guides, product references, architecture, security, and development docs for HQ Core, the HQ CLI, HQ Cloud and sync, the console, fleet agents, deploy, the hq-pro platform, packages, secrets, sharing and HQ MCP.
 
-Last updated: 2026-10-20
+Last updated: 2026-10-29
 
 Product overview, pricing and use cases live on the product site: https://hqforwork.com/llms.txt
 
