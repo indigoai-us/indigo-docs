@@ -31,7 +31,7 @@ hq-deploy deploy ──────────► POST /api/apps/:id/deploy
 ## Key Features
 
 - **Framework detection** — Automatically identifies Next.js, Remix, Astro, Vite, and plain static sites.
-- **Dual auth** — Use platform API keys for simplicity, or AWS SSO for enterprise environments.
+- **Dual auth** — Clerk JWT for the web dashboard, platform API keys for the CLI.
 - **Multi-tenant** — Each org gets isolated resources. Cross-tenant access is impossible at the query level.
 - **Enterprise self-hosting** — Provision the full stack in a customer's AWS account via CloudFormation.
 - **Zero-downtime SSR deploys** — ECS rolling updates with `minimumHealthyPercent=100`.
@@ -40,12 +40,12 @@ hq-deploy deploy ──────────► POST /api/apps/:id/deploy
 
 ## Projects That Built This
 
-The deploy platform was constructed across 15 sequential projects, each building on the last:
+The deploy platform was constructed across a series of sequential projects, each building on the last:
 
 1. **Repo scaffold** — TypeScript strict mode, ESLint, directory structure
 2. **Domain hosting** — Route 53, ACM cert, S3 bucket, CloudFront
 3. **DB + API scaffold** — Aurora/Neon Postgres, Drizzle ORM, Hono server
-4. **Dual auth** — Clerk JWT, API keys, AWS SigV4
+4. **Dual auth** — Clerk JWT, API keys
 5. **App DNS API** — App registration, subdomain generation, CNAME management
 6. **Static flow** — Upload, extract, S3 sync, cache invalidation
 7. **SSR infra** — ECS cluster, ECR, ALB, Lambda@Edge routing
@@ -55,5 +55,4 @@ The deploy platform was constructed across 15 sequential projects, each building
 11. **Multi-tenant** — Org model, context middleware, scoped queries
 12. **Enterprise init** — AWS credential resolution, CloudFormation deployment
 13. **CloudFormation template** — Parameterized IaC for customer accounts
-14. **AWS SSO auth** — Profile resolution, account-to-org matching
-15. **Upgrade flow** — Version drift detection, ChangeSet preview
+14. **Upgrade flow** — Version drift detection, ChangeSet preview

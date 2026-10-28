@@ -27,8 +27,6 @@ Sign in to or create an **AWS Cognito** account in the shared hq-pro user pool. 
 - **Sign up** — email + password + confirm password. You'll receive a verification code by email; enter it to confirm.
 - **Continue with GitHub** — opens GitHub OAuth in a browser and returns to the app via a `hq-installer://` deep link.
 
-GitHub federation requires a one-time admin setup in the Cognito pool. See [Cognito setup](/hq/products/hq-pro/cognito-setup/).
-
 On success, your Cognito ID token is stored in the macOS Keychain under `com.indigoai.hq-installer`.
 
 ## Screen 3 — Set up your team

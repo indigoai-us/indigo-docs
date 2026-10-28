@@ -2,7 +2,7 @@
 
 > Documentation for HQ, the company brain your AI runs on: guides, product references, architecture, security, and development docs for HQ Core, the HQ CLI, HQ Cloud and sync, the console, fleet agents, deploy, the hq-pro platform, packages, secrets, sharing and HQ MCP.
 
-Last updated: 2026-10-20
+Last updated: 2026-10-29
 
 Product overview, pricing and use cases live on the product site: https://hqforwork.com/llms.txt
 
@@ -2508,7 +2508,7 @@ hq-deploy deploy ──────────► POST /api/apps/:id/deploy
 #### Key Features
 
 - **Framework detection**, Automatically identifies Next.js, Remix, Astro, Vite, and plain static sites.
-- **Dual auth**, Use platform API keys for simplicity, or AWS SSO for enterprise environments.
+- **Dual auth**, Clerk JWT for the web dashboard, platform API keys for the CLI.
 - **Multi-tenant**, Each org gets isolated resources. Cross-tenant access is impossible at the query level.
 - **Enterprise self-hosting**, Provision the full stack in a customer's AWS account via CloudFormation.
 - **Zero-downtime SSR deploys**, ECS rolling updates with `minimumHealthyPercent=100`.
@@ -2517,12 +2517,12 @@ hq-deploy deploy ──────────► POST /api/apps/:id/deploy
 
 #### Projects That Built This
 
-The deploy platform was constructed across 15 sequential projects, each building on the last:
+The deploy platform was constructed across a series of sequential projects, each building on the last:
 
 1. **Repo scaffold**, TypeScript strict mode, ESLint, directory structure
 2. **Domain hosting**, Route 53, ACM cert, S3 bucket, CloudFront
 3. **DB + API scaffold**, Aurora/Neon Postgres, Drizzle ORM, Hono server
-4. **Dual auth**, Clerk JWT, API keys, AWS SigV4
+4. **Dual auth**, Clerk JWT, API keys
 5. **App DNS API**, App registration, subdomain generation, CNAME management
 6. **Static flow**, Upload, extract, S3 sync, cache invalidation
 7. **SSR infra**, ECS cluster, ECR, ALB, Lambda@Edge routing
@@ -2532,16 +2532,15 @@ The deploy platform was constructed across 15 sequential projects, each building
 11. **Multi-tenant**, Org model, context middleware, scoped queries
 12. **Enterprise init**, AWS credential resolution, CloudFormation deployment
 13. **CloudFormation template**, Parameterized IaC for customer accounts
-14. **AWS SSO auth**, Profile resolution, account-to-org matching
-15. **Upgrade flow**, Version drift detection, ChangeSet preview
+14. **Upgrade flow**, Version drift detection, ChangeSet preview
 
 ### Authentication
 
 Source: https://docs.hq.computer/hq/products/hq-deploy/authentication/
 
-> Dual auth system, Clerk JWT, API keys, and AWS SigV4.
+> Dual auth system, Clerk JWT and API keys.
 
-HQ Deploy supports three authentication methods that chain together in a resolver pattern. The first valid credential wins.
+HQ Deploy supports two authentication methods that chain together in a resolver pattern. The first valid credential wins.
 
 #### Auth Resolver Chain
 
@@ -2553,9 +2552,6 @@ Request arrives
   │
   ├─ Has Authorization: Bearer hqd_*?
   │   └─ Yes → Lookup API key (bcrypt) → extract userId, orgId
-  │
-  ├─ Has AWS Signature headers?
-  │   └─ Yes → STS GetCallerIdentity → match account to org
   │
   └─ None valid → 401 Unauthorized
 ```
@@ -2582,28 +2578,6 @@ POST /api/keys → creates a new key
 - `DELETE /api/keys/:id` revokes a key
 - `GET /api/keys` lists active keys (without the secret portion)
 - Stored in `~/.hq-deploy/config.json` with file mode `0600`
-
-#### Method 3: AWS SigV4
-
-Enterprise auth for organizations using AWS SSO / aws-vault.
-
-1. Client signs the request with AWS credentials (standard SigV4 signing)
-2. Server validates by calling STS `GetCallerIdentity` with the same signature
-3. The AWS account ID is matched against `org.aws_account_id` in the database
-4. Only works when `org.auth_mode = 'aws-sso'`
-
-This allows enterprise developers to deploy using their existing AWS credentials without needing a separate platform account.
-
-#### Auth Mode Switching
-
-Organizations can be configured for either mode:
-
-| Mode | Primary Auth | Behavior |
-|------|-------------|----------|
-| `platform` | Clerk JWT or API key | Standard SaaS mode |
-| `aws-sso` | AWS SigV4 | Enterprise mode, no platform account needed |
-
-In `aws-sso` mode, if AWS credentials are missing or expired, the CLI errors out, it does **not** silently fall back to platform auth. This prevents accidental deploys to the wrong account.
 
 ### CloudFormation Template
 
@@ -2678,7 +2652,7 @@ This version is read during `hq-deploy upgrade` to determine what changes need t
 
 Source: https://docs.hq.computer/hq/products/hq-deploy/cli/
 
-> The hq-deploy CLI, framework detection, dual auth, and one-command deploys.
+> The hq-deploy CLI, framework detection, API key login, and one-command deploys.
 
 The `hq-deploy` CLI is the primary interface for deploying apps to the HQ Deploy platform. Install globally or run via npx.
 
@@ -2691,7 +2665,6 @@ The `hq-deploy` CLI is the primary interface for deploying apps to the HQ Deploy
 | `hq-deploy init` | Scaffold enterprise CloudFormation templates |
 | `hq-deploy apps` | List your deployed applications |
 | `hq-deploy logs` | View deploy and application logs |
-| `hq-deploy auth-mode` | Switch between `platform` and `aws-sso` auth |
 
 #### Framework Detection
 
@@ -2736,25 +2709,11 @@ hq-deploy deploy
 
 #### Authentication
 
-##### Platform Mode (default)
-
 ```bash
 hq-deploy login
 # Enter API key: hqd_xxxxxxxxxxxxxxxx
 # Stored in ~/.hq-deploy/config.json (mode 0600)
 ```
-
-##### AWS SSO Mode
-
-```bash
-hq-deploy auth-mode set aws-sso
-hq-deploy deploy --profile my-aws-profile
-# Reads AWS credentials → STS GetCallerIdentity
-# Maps account ID to org → deploys directly to S3/ECR/ECS
-# Bypasses control plane API entirely
-```
-
-AWS SSO mode is designed for enterprise customers who want deploys to go directly to their own AWS account without routing through the control plane.
 
 #### Enterprise Init
 
@@ -3084,17 +3043,13 @@ HQ Deploy is multi-tenant from the ground up. Every resource is scoped to an org
 POST /api/orgs
 {
   "name": "Acme Corp",
-  "slug": "acme-corp",
-  "auth_mode": "aws-sso",
-  "aws_account_id": "123456789012"
+  "slug": "acme-corp"
 }
 ```
 
 | Field | Purpose |
 |-------|---------|
 | `slug` | Unique identifier, used in URLs and file paths |
-| `auth_mode` | `platform` (Clerk/API key) or `aws-sso` (SigV4) |
-| `aws_account_id` | Required for `aws-sso` mode, validated format |
 
 #### Org Context Resolution
 
@@ -3104,7 +3059,6 @@ Every authenticated request resolves an org through middleware:
 Resolution priority:
 1. Clerk JWT claim (orgId)
 2. API key lookup → associated org
-3. AWS account ID match → org
 ```
 
 The resolved org is attached to `req.org` and available to all downstream handlers.
@@ -3129,7 +3083,6 @@ On first boot, a default org is seeded:
 
 ```
 slug: 'indigo'
-auth_mode: 'platform'
 ```
 
 Existing records without an `org_id` are backfilled to this default org. The seed is idempotent (`INSERT ... ON CONFLICT DO NOTHING`).
@@ -3358,7 +3311,7 @@ Source: https://docs.hq.computer/hq/products/hq-pro/about/
 - [GitHub Auth](https://docs.hq.computer/hq/products/hq-pro/github-auth/), federated sign-in
 - [Onboarding](https://docs.hq.computer/hq/products/hq-pro/onboarding/), creating and joining teams
 - [HQ Installer](https://docs.hq.computer/hq/products/hq-pro/overview/), the native macOS onboarding wizard
-- [Installer Quickstart](https://docs.hq.computer/hq/products/hq-pro/quickstart/) · [Cognito Setup](https://docs.hq.computer/hq/products/hq-pro/cognito-setup/) · [Troubleshooting](https://docs.hq.computer/hq/products/hq-pro/troubleshooting/)
+- [Installer Quickstart](https://docs.hq.computer/hq/products/hq-pro/quickstart/) · [Troubleshooting](https://docs.hq.computer/hq/products/hq-pro/troubleshooting/)
 - [Setup channel lifecycle](https://docs.hq.computer/hq/products/hq-pro/setup-channel-lifecycle/), #setup → company → cloud → billing → first agent in the desktop app
 
 #### Related capabilities
@@ -3721,132 +3674,6 @@ A super-admin can grant access directly, without a demo, for internal or expedit
 - Admins can see and act on pending and booked demo requests, and grant or revoke access, from the demo queue.
 - A teammate invited by an admin enters the same demo-gated flow rather than receiving an immediately-claimable invite, so everyone arrives through the same front door.
 
-### Cognito Setup (Admin)
-
-Source: https://docs.hq.computer/hq/products/hq-pro/cognito-setup/
-
-> One-time procedure to register GitHub as a federated identity provider in the hq-pro Cognito user pool.
-
-The HQ Installer's **Continue with GitHub** button on [screen 2](https://docs.hq.computer/hq/products/hq-pro/quickstart/#screen-2--create-your-account) requires GitHub to be registered as a federated identity provider in the hq-pro Cognito user pool. This is a **one-time administrator setup**, once GitHub is registered, every installer user benefits. You do **not** need to repeat these steps for each install.
-
-This page is for the person managing the hq-pro AWS account and the Indigo GitHub organization. End users never see this procedure.
-
-#### Current State
-
-The hq-pro Cognito user pool as of the installer's launch:
-
-| Field | Value |
-|---|---|
-| Pool name | `vault-users-dev2` |
-| Pool ID | `us-east-1_fOMM6hDMZ` |
-| Pool ARN | `arn:aws:cognito-idp:us-east-1:804849608251:userpool/us-east-1_fOMM6hDMZ` |
-| Hosted UI domain | `vault-indigo-dev2.auth.us-east-1.amazoncognito.com` |
-| AWS account | `804849608251` (profile: `indigo`) |
-| Region | `us-east-1` |
-| Stage deployed | `dev2` |
-| GitHub IdP status | **Absent**, `list-identity-providers` returns an empty array |
-
-The user pool client `vault-client-dev2` (ID `6hu2bg2gqdpfl9k1f2bpkgpf7o`) currently declares `supportedIdentityProviders: ["COGNITO"]`. The `infra/cognito.ts` file in hq-pro declares SSM parameters at `/vault/dev2/github/client-id` and `/vault/dev2/github/client-secret`, but both contain the placeholder value `PLACEHOLDER_CREATE_GITHUB_OAUTH_APP`.
-
-#### Prerequisites
-
-- AWS admin access to the Indigo account (profile `indigo`, account `804849608251`).
-- Permission to edit `infra/cognito.ts` in the hq-pro repo and deploy the SST stack.
-- GitHub organization admin rights to create an OAuth App under Indigo.
-
-#### Step 1, Create a GitHub OAuth App
-
-Create the OAuth App that GitHub will use to identify the installer and issue tokens.
-
-1. Go to **GitHub → Settings → Developer settings → OAuth Apps → New OAuth App**.
-2. Fill in the fields:
-   - **Application name**: `HQ Installer (Vault)`
-   - **Homepage URL**: `https://vault-indigo-{stage}.auth.us-east-1.amazoncognito.com`
-   - **Authorization callback URL**: `https://vault-indigo-{stage}.auth.us-east-1.amazoncognito.com/oauth2/idpresponse`
-3. Save the generated **Client ID** and **Client Secret**.
-4. Write both into SSM:
-
-```bash
-aws --profile indigo ssm put-parameter \
-  --name /vault/{stage}/github/client-id \
-  --value <client-id> \
-  --type SecureString --overwrite
-
-aws --profile indigo ssm put-parameter \
-  --name /vault/{stage}/github/client-secret \
-  --value <client-secret> \
-  --type SecureString --overwrite
-```
-
-Replace `{stage}` with `dev2` (or your target stage).
-
-#### Step 2, Register GitHub as a Cognito User Pool IdP
-
-Add a `UserPoolIdentityProvider` resource to `infra/cognito.ts` in the hq-pro repo:
-
-```typescript
-const githubIdP = new aws.cognito.UserPoolIdentityProvider("VaultGithubIdP", {
-  userPoolId: userPool.id,
-  providerName: "GitHub",
-  providerType: "OIDC",           // GitHub supports OIDC since 2023
-  providerDetails: {
-    client_id: githubClientIdParam.value,
-    client_secret: githubClientSecretParam.value,
-    attributes_request_method: "GET",
-    oidc_issuer: "https://token.actions.githubusercontent.com",
-    authorize_scopes: "openid user:email read:user",
-    // Or use GitHub's OAuth endpoints directly if OIDC discovery fails:
-    // authorize_url: "https://github.com/login/oauth/authorize",
-    // token_url: "https://github.com/login/oauth/access_token",
-    // attributes_url: "https://api.github.com/user",
-    // jwks_uri: "https://token.actions.githubusercontent.com/.well-known/jwks",
-  },
-  attributeMapping: {
-    email: "email",
-    username: "sub",
-    "custom:github_username": "login",
-    given_name: "name",
-    picture: "avatar_url",
-  },
-});
-```
-
-**Caution:**
-GitHub's native OIDC issuer (`https://token.actions.githubusercontent.com`) is designed for GitHub Actions, not user login. If Cognito's OIDC discovery fails against that issuer, fall back to the commented-out block that points at GitHub's OAuth 2.0 endpoints directly, or deploy a GitHub OIDC proxy like [`github-cognito-openid-wrapper`](https://github.com/TimothyJones/github-cognito-openid-wrapper). Confirm the chosen approach before promoting the change to `prod`.
-
-#### Step 3, Update the User Pool Client
-
-In the same `infra/cognito.ts` file, update the `vault-client-dev2` user pool client so it accepts the new IdP. Change:
-
-```typescript
-supportedIdentityProviders: ["COGNITO"]
-```
-
-to:
-
-```typescript
-supportedIdentityProviders: ["COGNITO", "GitHub"]
-```
-
-(Use `["GitHub"]` if you intend to disable native Cognito sign-in entirely.)
-
-Also update `callbackUrls` to include the installer's deep-link or localhost callback URL so the OAuth redirect reaches the running installer process.
-
-Deploy the SST stack and verify with:
-
-```bash
-aws --profile indigo cognito-idp list-identity-providers \
-  --user-pool-id us-east-1_fOMM6hDMZ
-```
-
-You should see `GitHub` in the `Providers` array.
-
-#### After Setup
-
-Once Step 3 ships, the **Continue with GitHub** button on installer screen 2 will open the Cognito hosted UI, hand off to GitHub OAuth, and return to the installer through the `hq-installer://` deep link with an authorization code. The installer exchanges that code for a Cognito ID token and stores it in the Keychain, the user never sees any of this.
-
-You do not need to repeat this procedure for subsequent installers. Every hq-installer release that targets the same Cognito pool automatically picks up the new IdP.
-
 ### Team Commands (v0)
 
 Source: https://docs.hq.computer/hq/products/hq-pro/commands-v0/
@@ -4160,13 +3987,11 @@ The `/setup` personalization phases are **re-implemented natively** as React for
 
 #### Authentication
 
-The installer authenticates against the shared **hq-pro Cognito user pool** (`us-east-1_fOMM6hDMZ`). This is the same pool used by the `hq-cloud-api` web app at `hq.computer` and the React Native mobile app, so a single Cognito identity works across every HQ surface.
+The installer authenticates against the shared **hq-pro Cognito user pool**. This is the same pool used by the `hq-cloud-api` web app at `hq.computer` and the React Native mobile app, so a single Cognito identity works across every HQ surface.
 
 - **Sign-in / sign-up**: email + password with a verification code flow.
 - **GitHub OAuth**: one-click federation via Cognito's hosted UI, returned to the app through a `hq-installer://` deep link.
 - **Token storage**: Cognito tokens live in the macOS Keychain under the service prefix `com.indigoai.hq-installer`, never in plain files.
-
-GitHub federation requires a one-time [Cognito admin setup](https://docs.hq.computer/hq/products/hq-pro/cognito-setup/) against the hq-pro user pool.
 
 #### System Requirements
 
@@ -4310,8 +4135,6 @@ Sign in to or create an **AWS Cognito** account in the shared hq-pro user pool. 
 - **Sign up**, email + password + confirm password. You'll receive a verification code by email; enter it to confirm.
 - **Continue with GitHub**, opens GitHub OAuth in a browser and returns to the app via a `hq-installer://` deep link.
 
-GitHub federation requires a one-time admin setup in the Cognito pool. See [Cognito setup](https://docs.hq.computer/hq/products/hq-pro/cognito-setup/).
-
 On success, your Cognito ID token is stored in the macOS Keychain under `com.indigoai.hq-installer`.
 
 #### Screen 3, Set up your team
@@ -4439,7 +4262,7 @@ The verification code from your confirmation email was wrong or expired. Check y
 
 ##### "GitHub sign in failed"
 
-Most likely the Cognito pool is missing the GitHub IdP. Ask your administrator to complete the [Cognito setup procedure](https://docs.hq.computer/hq/products/hq-pro/cognito-setup/). Until that ships, use the email+password tabs instead.
+GitHub sign-in may not be available for your account. Use the email+password tabs instead.
 
 #### Screen 3, Team
 
