@@ -37,9 +37,9 @@ Product overview, pricing and use cases live on the product site: https://hqforw
 - [Operate and troubleshoot](https://docs.hq.computer/hq/products/fleet-agents/operations/): Monitor Fleet Agent health, control its lifecycle, use the CLI, and resolve common setup or channel failures
 - [Agent sizes and billing](https://docs.hq.computer/hq/products/fleet-agents/sizes-and-billing/): The four Fleet Agent box sizes and their prices, legacy prices for existing customers, and how size changes are approved and billed
 - [HQ Deploy Platform](https://docs.hq.computer/hq/products/hq-deploy/introduction/): A complete PaaS for deploying static and SSR web applications to AWS
-- [Authentication](https://docs.hq.computer/hq/products/hq-deploy/authentication/): Dual auth system, Clerk JWT, API keys, and AWS SigV4
+- [Authentication](https://docs.hq.computer/hq/products/hq-deploy/authentication/): Dual auth system, Clerk JWT and API keys
 - [CloudFormation Template](https://docs.hq.computer/hq/products/hq-deploy/cfn-template/): Parameterized IaC template for provisioning customer data plane resources
-- [Deploy CLI](https://docs.hq.computer/hq/products/hq-deploy/cli/): The hq-deploy CLI, framework detection, dual auth, and one-command deploys
+- [Deploy CLI](https://docs.hq.computer/hq/products/hq-deploy/cli/): The hq-deploy CLI, framework detection, API key login, and one-command deploys
 - [In-Context Comments](https://docs.hq.computer/hq/products/hq-deploy/comments/): Viewers leave feedback directly on a gated deploy, anchored to a point or a region, tagged to their identity, behind the same access gate as the deploy
 - [Custom Deploy Domains (Enterprise)](https://docs.hq.computer/hq/products/hq-deploy/custom-domains/): Serve every deploy under your own domain, {app}.your-domain.com, with automated wildcard certificates and DNS validation
 - [DNS & Domains](https://docs.hq.computer/hq/products/hq-deploy/dns-domains/): App registration, subdomain generation, and Route 53 DNS management
@@ -54,7 +54,6 @@ Product overview, pricing and use cases live on the product site: https://hqforw
 - [Pricing API](https://docs.hq.computer/hq/products/hq-pro/pricing-api/): The public GET /v1/pricing endpoint that states the HQ usage card, box sizes, signup options, legacy plans and billing rules
 - [Billing and usage](https://docs.hq.computer/hq/products/hq-pro/billing-and-usage/): The HQ usage card, the vault fee, the 30-day trial and its $500 cap, the $10 of usage included each month, the spend limit, boxes and deploy extras
 - [Requesting Access](https://docs.hq.computer/hq/products/hq-pro/access/): How new users get into HQ Cloud and HQ Pro, the demo-gated access flow
-- [Cognito Setup (Admin)](https://docs.hq.computer/hq/products/hq-pro/cognito-setup/): One-time procedure to register GitHub as a federated identity provider in the hq-pro Cognito user pool
 - [Team Commands (v0)](https://docs.hq.computer/hq/products/hq-pro/commands-v0/): In-HQ slash commands for team invites and bidirectional sync
 - [GitHub Auth](https://docs.hq.computer/hq/products/hq-pro/github-auth/): GitHub OAuth replacing Cognito, device flow, self-signed JWTs, DynamoDB storage
 - [Team Onboarding](https://docs.hq.computer/hq/products/hq-pro/onboarding/): CLI-native team onboarding, admin creation and member invite acceptance

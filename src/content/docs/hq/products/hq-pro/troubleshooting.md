@@ -27,7 +27,7 @@ The verification code from your confirmation email was wrong or expired. Check y
 
 ### "GitHub sign in failed"
 
-Most likely the Cognito pool is missing the GitHub IdP. Ask your administrator to complete the [Cognito setup procedure](/hq/products/hq-pro/cognito-setup/). Until that ships, use the email+password tabs instead.
+GitHub sign-in may not be available for your account. Use the email+password tabs instead.
 
 ## Screen 3 — Team
 

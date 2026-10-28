@@ -1,6 +1,6 @@
 ---
 title: Deploy CLI
-description: The hq-deploy CLI — framework detection, dual auth, and one-command deploys.
+description: The hq-deploy CLI — framework detection, API key login, and one-command deploys.
 ---
 
 The `hq-deploy` CLI is the primary interface for deploying apps to the HQ Deploy platform. Install globally or run via npx.
@@ -14,7 +14,6 @@ The `hq-deploy` CLI is the primary interface for deploying apps to the HQ Deploy
 | `hq-deploy init` | Scaffold enterprise CloudFormation templates |
 | `hq-deploy apps` | List your deployed applications |
 | `hq-deploy logs` | View deploy and application logs |
-| `hq-deploy auth-mode` | Switch between `platform` and `aws-sso` auth |
 
 ## Framework Detection
 
@@ -59,25 +58,11 @@ hq-deploy deploy
 
 ## Authentication
 
-### Platform Mode (default)
-
 ```bash
 hq-deploy login
 # Enter API key: hqd_xxxxxxxxxxxxxxxx
 # Stored in ~/.hq-deploy/config.json (mode 0600)
 ```
-
-### AWS SSO Mode
-
-```bash
-hq-deploy auth-mode set aws-sso
-hq-deploy deploy --profile my-aws-profile
-# Reads AWS credentials → STS GetCallerIdentity
-# Maps account ID to org → deploys directly to S3/ECR/ECS
-# Bypasses control plane API entirely
-```
-
-AWS SSO mode is designed for enterprise customers who want deploys to go directly to their own AWS account without routing through the control plane.
 
 ## Enterprise Init
 

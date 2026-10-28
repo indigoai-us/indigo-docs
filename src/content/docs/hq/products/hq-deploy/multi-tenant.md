@@ -11,17 +11,13 @@ HQ Deploy is multi-tenant from the ground up. Every resource is scoped to an org
 POST /api/orgs
 {
   "name": "Acme Corp",
-  "slug": "acme-corp",
-  "auth_mode": "aws-sso",
-  "aws_account_id": "123456789012"
+  "slug": "acme-corp"
 }
 ```
 
 | Field | Purpose |
 |-------|---------|
 | `slug` | Unique identifier, used in URLs and file paths |
-| `auth_mode` | `platform` (Clerk/API key) or `aws-sso` (SigV4) |
-| `aws_account_id` | Required for `aws-sso` mode, validated format |
 
 ## Org Context Resolution
 
@@ -31,7 +27,6 @@ Every authenticated request resolves an org through middleware:
 Resolution priority:
 1. Clerk JWT claim (orgId)
 2. API key lookup → associated org
-3. AWS account ID match → org
 ```
 
 The resolved org is attached to `req.org` and available to all downstream handlers.
@@ -56,7 +51,6 @@ On first boot, a default org is seeded:
 
 ```
 slug: 'indigo'
-auth_mode: 'platform'
 ```
 
 Existing records without an `org_id` are backfilled to this default org. The seed is idempotent (`INSERT ... ON CONFLICT DO NOTHING`).

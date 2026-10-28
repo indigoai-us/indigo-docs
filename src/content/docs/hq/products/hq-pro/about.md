@@ -22,7 +22,7 @@ sidebar:
 - [GitHub Auth](/hq/products/hq-pro/github-auth/) — federated sign-in
 - [Onboarding](/hq/products/hq-pro/onboarding/) — creating and joining teams
 - [HQ Installer](/hq/products/hq-pro/overview/) — the native macOS onboarding wizard
-- [Installer Quickstart](/hq/products/hq-pro/quickstart/) · [Cognito Setup](/hq/products/hq-pro/cognito-setup/) · [Troubleshooting](/hq/products/hq-pro/troubleshooting/)
+- [Installer Quickstart](/hq/products/hq-pro/quickstart/) · [Troubleshooting](/hq/products/hq-pro/troubleshooting/)
 - [Setup channel lifecycle](/hq/products/hq-pro/setup-channel-lifecycle/) — #setup → company → cloud → billing → first agent in the desktop app
 
 ## Related capabilities

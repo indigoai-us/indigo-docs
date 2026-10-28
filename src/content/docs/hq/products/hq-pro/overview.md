@@ -50,13 +50,11 @@ The `/setup` personalization phases are **re-implemented natively** as React for
 
 ## Authentication
 
-The installer authenticates against the shared **hq-pro Cognito user pool** (`us-east-1_fOMM6hDMZ`). This is the same pool used by the `hq-cloud-api` web app at `hq.computer` and the React Native mobile app, so a single Cognito identity works across every HQ surface.
+The installer authenticates against the shared **hq-pro Cognito user pool**. This is the same pool used by the `hq-cloud-api` web app at `hq.computer` and the React Native mobile app, so a single Cognito identity works across every HQ surface.
 
 - **Sign-in / sign-up**: email + password with a verification code flow.
 - **GitHub OAuth**: one-click federation via Cognito's hosted UI, returned to the app through a `hq-installer://` deep link.
 - **Token storage**: Cognito tokens live in the macOS Keychain under the service prefix `com.indigoai.hq-installer` — never in plain files.
-
-GitHub federation requires a one-time [Cognito admin setup](/hq/products/hq-pro/cognito-setup/) against the hq-pro user pool.
 
 ## System Requirements
 
