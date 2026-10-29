@@ -26,23 +26,24 @@ HQ uses managed and serverless compute to minimize the host-level attack surface
 
 ## Network architecture
 
-HQ's vault data plane runs inside a dedicated VPC designed for network isolation:
+HQ's vault data plane runs inside a dedicated VPC:
 
-- Private subnets only. Compute in this VPC has no direct inbound internet exposure.
-- No NAT gateway. Rather than routing egress out to the internet, services in this VPC reach AWS APIs through VPC endpoints (for example, Amazon S3, AWS Secrets Manager, Amazon SES, and Amazon Bedrock).
+- The vault's own compute and databases sit in private subnets with no direct inbound internet exposure. Services in the VPC reach AWS APIs through VPC endpoints (gateway endpoints for Amazon S3 and DynamoDB, interface endpoints for services such as AWS Secrets Manager, Amazon SES, and Amazon Bedrock).
 - Tight security groups. Interface-endpoint, database, and mount-target security groups permit only the specific required ports from within the VPC CIDR (e.g., 443 to endpoints; the database port only from the application security group).
 - Databases are not publicly accessible. Managed PostgreSQL is private to the VPC; DynamoDB is reached over the AWS network.
 - Lambda functions that call third-party APIs over the internet (for example, analytics writes to ClickHouse Cloud) run outside this VPC.
 
-Workloads that must reach third-party services run in separate networks:
+Hosted-agent workloads share the vault VPC and can reach the internet:
 
-- The agent meeting service runs in its own VPC, in public subnets with public IPs, behind a public load balancer with an HTTPS listener. Its security group accepts traffic only from the load balancer. It reaches OpenAI and Recall.ai over the internet.
-- In production, hosted-agent worker subnets reach third-party model APIs (OpenAI, xAI) through a NAT gateway. Replacing this with an in-VPC hostname-allowlist proxy is planned.
+- Hosted company-agent instances run in two public subnets of the vault VPC, with public IPs and a route to an internet gateway. Their security group has no inbound rules; operator access is through AWS Systems Manager Session Manager.
+- In production, hosted-agent worker tasks run in the vault's private subnets, and those subnets route internet traffic through a NAT gateway so the workers can reach third-party model APIs. Replacing this with an in-VPC hostname-allowlist proxy is planned.
+
+The agent meeting service runs in its own VPC, in public subnets with public IPs, behind a public load balancer with an HTTPS listener. Its security group accepts traffic only from the load balancer. It reaches OpenAI and Recall.ai over the internet.
 
 Internet-facing entry points include API Gateway, the Cognito hosted sign-in UI, CloudFront/Lambda@Edge, and the meeting service's load balancer.
 
 :::note[Honest note]
-A small number of egress security-group rules are broader than strictly necessary (all-outbound) although they sit in private, no-NAT subnets; tightening these to least-privilege egress is on the roadmap.
+A small number of egress security-group rules are broader than strictly necessary (all-outbound); tightening these to least-privilege egress is on the roadmap.
 :::
 
 ## Identity and access management (cloud IAM)

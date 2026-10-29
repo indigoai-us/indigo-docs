@@ -3,10 +3,10 @@ title: Subprocessors
 description: The third parties Indigo engages to process customer data when providing HQ, what they do, the data involved, and where they process it.
 ---
 
-A subprocessor is a third party that Indigo engages to process customer data in the course of providing HQ. This page lists the current subprocessors, what they do, the category of data involved, and, where HQ's configuration sets it, where they process it. It covers the HQ product (desktop app, CLI, web console, and cloud services), not Indigo's marketing website. For the broader posture, see [Security & Trust](/hq/security/1-overview/).
+A subprocessor is a third party that Indigo engages to process customer data in the course of providing HQ. This page lists the current subprocessors, what they do, the category of data involved, and, where HQ's configuration sets it, where they process it. It covers the HQ product (desktop app, CLI, web console, and cloud services), including the HQ services that receive sign-up and onboarding events from the HQ website. It does not cover the hosting or analytics of Indigo's marketing website itself. For the broader posture, see [Security & Trust](/hq/security/1-overview/).
 
 :::note[AI providers and training]
-Indigo does **not** use customer data to train any models. HQ's server-side AI runs mainly on **AWS Bedrock**. Live meeting voice for agents also sends meeting audio and text to **OpenAI** and **xAI**. Local agent tools run on your machine using your own model-provider account; that is a customer-connected tool, not an Indigo subprocessor.
+Indigo does **not** use customer data to train any models. HQ's server-side AI runs mainly on **AWS Bedrock**. Live meeting voice for agents also sends meeting audio and text to **OpenAI**. Local agent tools run on your machine using your own model-provider account, and hosted agents call the model provider whose sign-in or API key their owner supplied. Those providers are customer-connected tools, not Indigo subprocessors.
 :::
 
 ## Core subprocessors
@@ -16,10 +16,10 @@ Indigo does **not** use customer data to train any models. HQ's server-side AI r
 | **Amazon Web Services (AWS)** | Primary cloud hosting: compute, storage (S3), databases (DynamoDB), KMS, SSM Parameter Store, networking. **Bedrock** for AI inference: Claude Sonnet 4.6, Claude Haiku 4.5, and Amazon Titan Text Embeddings V2. | Customer content and metadata stored in HQ; secrets; content submitted to AI features. | United States (`us-east-1`). Claude Haiku 4.5 uses US cross-region inference, and Claude Sonnet 4.6 uses global cross-region inference, so Bedrock may process those requests in other AWS regions. |
 | **Google** | Sign-in (OIDC federation). | Email address and basic profile from the user's Google account. | — |
 | **Microsoft** (Entra ID and Microsoft accounts) | Sign-in (OIDC federation) for work, school, and personal Microsoft accounts. | Email address and basic profile from the user's Microsoft account. | — |
-| **WorkOS** | Brokers Microsoft sign-in when that sign-in path is enabled. | Email address and basic profile passed through during sign-in. | — |
+| **WorkOS** | Brokers Microsoft sign-in when that sign-in path is turned on (configured in production, not yet in use). | Email address and basic profile passed through during sign-in. | — |
 | **Sentry** | Error and performance monitoring for the backend, web console, desktop app, and CLI. | Diagnostic data (errors, stack traces, request context). Authentication tokens and home-directory paths are scrubbed before sending; not intended to receive customer content. | — |
 | **ClickHouse Cloud** | Analytics store. | Product usage events, and S3 server access log records for vault buckets (bucket, object path, requester, source IP, time, operation). | — |
-| **Vercel** | Hosts the web console and the public status page; Vercel KV caches web-console data. | Request metadata; cached account, membership, and vault-listing data, keyed per user. | — |
+| **Vercel** | Hosts the web console; Vercel KV caches web-console data. | Request metadata; cached account, membership, and vault-listing data, keyed per user. | — |
 | **Stripe** | Billing and payments. | Billing contact details, subscription and invoice records. Card details are collected by Stripe. | — |
 | **Resend** | Transactional and lifecycle email (invitations, notifications, billing notices). | Recipient email address and name; email content. | — |
 | **Slack** (Indigo's workspace) | Internal operational alerts and routing of support and feedback submissions to Indigo staff. | Support and feedback content, the submitter's identity, and operational alert details. | — |
@@ -31,17 +31,18 @@ Indigo does **not** use customer data to train any models. HQ's server-side AI r
 |---|---|---|---|
 | **Recall.ai** | Meeting bots and desktop meeting recording; transcription. | Meeting audio and video, transcripts, participant names. HQ calls Recall's `us-west-2` API region. | Meeting features are used. |
 | **OpenAI** | Live meeting voice for agents: realtime voice sessions, speech synthesis, and a text model that answers questions about the meeting so far. | Meeting audio, transcript text, and agent responses. | An agent takes part in a meeting by voice. |
-| **xAI** | Speech synthesis for agents in meetings. | Text the agent is about to speak. | An agent takes part in a meeting by voice. |
 | **Cloudflare** | Runs commands in an isolated cloud sandbox. | The command, the secret values the caller selected for it, and any files a skill job needs. | Cloud sandbox runs are enabled and used. |
 | **Name.com** | Domain registration. | The domain name and the registrant contact details the company owner enters. | A company buys a custom domain through HQ. |
 | **Neon** | Postgres database for partner-directory listings. | Business contact and listing details submitted in a partner application. | A company applies to or manages a partner-directory listing. |
-| **Meta** (Conversions API) | Measures sign-ups that came from Meta ads. | For visitors who accepted marketing tracking on the HQ website: hashed email address, IP address, user agent, and Meta ad-click identifiers. | The visitor accepted marketing tracking and the integration is enabled. |
+| **Meta** (Conversions API) | Measures sign-ups that came from Meta ads. | For visitors who accepted marketing tracking on the HQ website: hashed email address, hashed company ID, hashed country, IP address, user agent, and Meta ad-click identifiers. | The visitor accepted marketing tracking and the integration is enabled (off by default). |
+| **Vyg** (customer data platform) | Tracks sign-up and onboarding events. | From HQ's servers: lifecycle events (sign-up, install, checkout started or completed) with the account's email address. From the desktop app: onboarding events with the HQ website visitor ID and hashed account IDs, with no email address or name. | The integration is enabled (each sender is off by default). |
 
 ## Customer-connected tools (not Indigo subprocessors)
 
 When you connect your own accounts or run local agents with your own credentials, HQ acts on your behalf using credentials you supply. These are **your** systems, governed by your agreements with those providers, not subprocessors engaged by Indigo:
 
 - **Your model providers** — Claude Code, Cursor, and Codex run locally with your own Anthropic, OpenAI, or other provider credentials.
+- **Your model providers for hosted agents** — hosted agents run on Indigo's AWS infrastructure but call Anthropic, OpenAI, or xAI with the subscription sign-in or API key the agent's owner supplies. Prompts and agent context go to that provider under the owner's account terms.
 - **Your calendars** — when you connect Google Calendar or Microsoft 365, HQ reads calendar events to schedule meeting features.
 - **Your Slack workspace** — when you connect the Slack integration, HQ reads and sends messages on your behalf.
 - **Your GitHub and other connected apps** — when you connect repositories or apps through HQ integrations, HQ uses the credentials you provide.

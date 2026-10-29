@@ -9,16 +9,16 @@ The `hq-deploy` CLI is the primary interface for deploying apps to the HQ Deploy
 
 | Command | Description |
 |---------|-------------|
-| `hq-deploy deploy` | Build and deploy the current project (`--link` links the directory to an HQ Deploy project and exits) |
+| `hq-deploy deploy` | Build and deploy the current project (see [Deploy flags](#deploy-flags)) |
 | `hq-deploy login` | Authenticate with an HQ Cognito access token or a legacy API key |
 | `hq-deploy logout` | Remove stored credentials |
 | `hq-deploy init` | Scaffold a CloudFormation template for self-hosted infrastructure into the project (local files only) |
-| `hq-deploy logs` | View bounded, scrubbed logs for a deployment |
+| `hq-deploy logs` | View bounded, scrubbed logs for a deployment (`-a, --app`, `-n, --lines`, `--cursor`, `--correlation`, `--deployment`, `--env`) |
 | `hq-deploy inspect` | Inspect an app's deployments, environments, and health |
 | `hq-deploy access` | Set an app to public, password, or private, and manage its allowlist |
-| `hq-deploy domains` | Manage an app's URLs and custom domains, and the company's base domain |
-| `hq-deploy promote` | Point an environment at an existing healthy deployment |
-| `hq-deploy rollback` | Restore a previous healthy deployment |
+| `hq-deploy domains` | Manage an app's URLs and custom domains, and the company's base domain (`domains edit <domain>` requires `--env`) |
+| `hq-deploy promote` | Point an environment at an existing healthy deployment. Requires `--deployment <id>`; `--env` defaults to `production`. Static apps only |
+| `hq-deploy rollback` | Restore a previous healthy deployment. Requires `--reason <text>`; `--deployment` and `--env` are optional. Static apps only |
 | `hq-deploy config explain` | Print the resolved deploy plan and where each field came from |
 | `hq-deploy doctor` | Run read-only deployment diagnostics |
 
@@ -37,7 +37,22 @@ The CLI detects your framework by scanning the project:
 | 5 | `hono` in `package.json` dependencies | Fetch adapter (per-app Lambda) |
 | 6 | (fallback) | Static |
 
-A project with an `api/` directory of backend routes is detected as the `app` type. The CLI does not deploy that type yet and exits with guidance.
+A project with an `api/` directory of backend routes is detected as the `app` type. The CLI does not deploy that type yet and exits with guidance; `hq-deploy deploy --type static` deploys the frontend as a static site and ignores `api/`. Next.js and Hono projects with an `api/` directory still deploy through their adapters.
+
+## Deploy flags
+
+| Flag | Effect |
+|------|--------|
+| `-t, --type <type>` | Deployment type: `static`, `ssr`, or `app` (default `auto`, which uses detection) |
+| `-d, --dir <directory>` | Project directory to deploy (default `.`) |
+| `-p, --path <app-root>` | Application root directory (default: current directory) |
+| `-e, --env <environment>` | Target environment (default `production`). Next.js and Hono accept only `production` |
+| `--no-build` | Skip the build step |
+| `--app-id <appId>` | Application ID to deploy to |
+| `--link` | Link this directory to an HQ Deploy project and exit |
+| `--json` | Print one versioned result object to stdout |
+
+Next.js and Hono apps have one live production deployment that each deploy replaces. `promote`, `rollback`, and non-production `--env` work for static apps only; for Next.js and Hono they fail with `FRAMEWORK_SINGLE_DEPLOYMENT`.
 
 ## Deploy Flow
 
@@ -77,7 +92,7 @@ Remix and server-mode Astro still route to the older Docker/ECR/ECS container pa
 
 ## App URLs
 
-The deploy prints the URL the API returns for the app. Today that is `https://{app}.indigo-hq.com`. The same edge also serves `https://{app}.hq.work`, and the CLI's lifecycle commands (`inspect`, `logs`, `domains`, `promote`, `rollback`) use `hq.work` as their default base domain (override with `BASE_DOMAIN`). See [Custom Domains](/hq/products/hq-deploy/custom-domains/) for your own hostnames.
+The deploy prints the URL the API returns for the app. By default that is `https://{app}.indigo-hq.com`; a company with a live base domain claimed through `hq-deploy domains base add` gets `https://{app}.{its-domain}`. The same edge also serves `https://{app}.hq.work`, and the CLI's lifecycle commands (`inspect`, `logs`, `domains`, `promote`, `rollback`) use `hq.work` as their default base domain (override with `BASE_DOMAIN`). See [Custom Domains](/hq/products/hq-deploy/custom-domains/) for your own hostnames.
 
 ## Authentication
 
@@ -111,7 +126,7 @@ hq-deploy init
 | Flag | Effect |
 |------|--------|
 | `-y, --yes` | Skip the prompts and use the defaults |
-| `--template` | Print the CloudFormation template to stdout and write no files |
+| `--template` | Print the CloudFormation template to stdout and write no files (the prompts still run unless `--yes` is passed) |
 | `-d, --dir <directory>` | Target directory (default `.`) |
 
 `init` checks for AWS credentials with `aws sts get-caller-identity` and only warns if none are found. You deploy the generated template yourself. See [CloudFormation Template](/hq/products/hq-deploy/cfn-template/).

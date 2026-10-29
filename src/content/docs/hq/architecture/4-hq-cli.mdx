@@ -227,7 +227,7 @@ Cloud sync has no init step and no CLI-managed background daemon. Each `hq sync`
 
 ```bash
 hq login                 # Cognito sign-in; tokens cached in ~/.hq/cognito-tokens.json
-hq cloud provision ...   # make a company cloud-backed (entity + bucket + initial sync)
+hq cloud provision company <slug>   # make a company cloud-backed (entity + bucket + initial sync)
 hq sync now              # push local changes, then pull remote updates
 ```
 

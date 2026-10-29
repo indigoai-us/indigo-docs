@@ -13,7 +13,6 @@ Workers are reusable task definitions that run inside an HQ session. [Fleet Agen
 |------|---------|
 | CodeWorker | Implements features, fixes bugs, refactors |
 | ContentWorker | Drafts content, maintains voice consistency |
-| SocialWorker | Social media posting, engagement |
 | ResearchWorker | Analysis, market research, competitive intel |
 | OpsWorker | Reports, monitoring, automation |
 | PersonaWorker | A worker that runs as a chat bot, such as the Setup bot |
@@ -56,7 +55,7 @@ Multi-perspective content review at `core/workers/public/content-*/`.
 | **content-sales** | Conversion | Conversion copy, CTAs, value props |
 | **content-product** | Accuracy | Feature accuracy, technical claims verification |
 | **content-legal** | Compliance | Regulatory compliance, claim verification |
-| **content-shared** | Shared library | Shared analysis tools, scoring, reporting |
+| **content-shared** | Shared code | TypeScript library for analysis, scoring, and reporting. It has no `worker.yaml`, so it is not in the registry or the count of 43 |
 
 ## Other Teams
 
@@ -95,7 +94,7 @@ worker:
   version: "1.0"
 
 execution:
-  mode: on-demand        # on-demand | scheduled | event-triggered
+  mode: on_demand        # most bundled workers use on_demand; the template uses on-demand
   max_runtime: 30m
 
 context:
@@ -106,8 +105,8 @@ context:
 
 verification:
   post_execute:
-    - tests-pass
-    - no-lint-errors
+    - check: typescript
+      command: npm run typecheck
   approval_required: false
 
 tasks:
@@ -136,7 +135,7 @@ The wizard asks for:
 4. Knowledge context paths
 5. Execution rules
 
-It then asks whether the worker belongs to one company or ships with HQ, and generates it at `companies/{co}/workers/{id}/` or `core/workers/public/{id}/`:
+It then asks whether the worker belongs to one company or ships with HQ, and generates it at `companies/{co}/workers/{id}/` or `core/workers/public/{id}/`. The default is company scope. Choose `core/` only for a worker meant to ship with HQ releases: `/update-hq` replaces `core/`, so a worker you add there for yourself is lost on the next update. The generated folder:
 ```
 {id}/
 ├── worker.yaml

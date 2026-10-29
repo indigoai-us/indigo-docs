@@ -16,18 +16,21 @@ description: Install the HQ desktop app on macOS or Windows, then finish setup i
 2. Open **HQ** and sign in.
 3. Choose where your HQ workspace should live (the default is `~/hq`).
 4. Select **Install** and let HQ finish setup. If you don't have a company yet,
-   HQ asks you to name one or join an invite, then pick a plan.
+   HQ asks you to name one or join an invite, then sign up free. Start free.
+   $10 of usage included every month.
 5. On the **HQ is ready** screen, select **Open HQ Desktop**, or open the
    workspace in an AI tool with **Open in Claude Code** or **Open in Codex**.
    **Open in Grok** also appears when the Grok CLI is installed.
 
-**Open HQ Desktop** opens the desktop app, where a Setup bot walks you through
-the rest of setup in a chat. The AI tool buttons open the selected tool in your
-workspace so you can run `/setup` there.
+**Open HQ Desktop** opens the desktop app. Run Setup on `#welcome` to start the
+Setup bot, which walks you through the rest of setup in a chat. The AI tool
+buttons open the selected tool in your workspace so you can run `/setup` there.
 
 ## Finish setup in your AI tool
 
-Claude Code opens with `/setup` ready to run. In Codex, open the prompt and run:
+The Claude Code desktop app opens with a prompt that runs the setup wizard.
+Codex opens with `/setup` typed in the prompt. In the Claude Code CLI or Grok,
+run:
 
 ```bash
 /setup
@@ -57,6 +60,8 @@ Phase 2 writes your profile here:
 personal/
 ├── knowledge/
 │   ├── profile.md
+│   ├── systems-of-record.md
+│   ├── social-presence.md   (only if you shared public profiles)
 │   └── voice-style.md
 ├── policies/
 ├── workers/
@@ -64,6 +69,7 @@ personal/
 ├── skills/
 └── hooks/
 agents-profile.md
+agents-companies.md
 ```
 
 Add a company with `/newcompany {slug}`. Company folders live at

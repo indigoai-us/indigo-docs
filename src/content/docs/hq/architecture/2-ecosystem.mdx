@@ -9,7 +9,7 @@ HQ is a set of independently versioned repos that compose through published npm 
 
 | Repo | Ships as | What it is |
 |------|----------|------------|
-| **hq-core** | GitHub releases (tarball) | The scaffold for an HQ instance: skills, policies, scripts, and runtime config for Claude Code (`.claude/`), Codex (`.codex/`), Cursor (`.cursor/`), and Grok (`.grok/`). Changes land in hq-core-staging first. |
+| **hq-core** | GitHub releases (tarball) | The scaffold for an HQ instance: skills, policies, scripts, and runtime config for Claude Code (`.claude/`), Codex (`.codex/`), and Grok (`.grok/`), plus a Cursor rules file (`.cursor/rules/hq.mdc`). Changes land in hq-core-staging first. |
 | **create-hq** | `npx create-hq` | The terminal installer. Downloads the hq-core scaffold, checks dependencies, and offers hq-cli and the recommended packs. |
 | **hq-cli** | `@indigoai-us/hq-cli` | The `hq` CLI: sign-in, packs, cloud sync, files, secrets, DMs, integrations, bots, and diagnostics. |
 | **hq-cloud** | `@indigoai-us/hq-cloud` | The sync engine behind the CLI and the desktop app. Ships the `hq-sync-runner` binary. |

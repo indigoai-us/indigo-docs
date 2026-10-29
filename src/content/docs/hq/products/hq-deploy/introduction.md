@@ -14,11 +14,13 @@ HQ Deploy is a **platform-as-a-service** built on AWS that lets you deploy web a
 ```
 Developer                    Control Plane                  AWS Data Plane
 ─────────                    ─────────────                  ──────────────
-hq-deploy deploy ──────────► POST /api/apps/:id/deploy
+hq-deploy deploy ──────────► Control plane API
                               │
-                              ├─ Static? ──► S3 upload + CloudFront invalidation
+                              ├─ Static? ──► POST /api/apps/:id/deploy
+                              │              → S3 upload + CloudFront invalidation
                               │
-                              └─ Next.js / Hono? ──► per-app Lambda function
+                              └─ Next.js / Hono? ──► POST /api/deploys + /complete
+                                                     → per-app Lambda function
                                                               │
                                                               ▼
                                                     {app}.indigo-hq.com ◄── edge routing
@@ -33,9 +35,9 @@ hq-deploy deploy ──────────► POST /api/apps/:id/deploy
 
 - **Framework detection** — Automatically identifies Next.js, Hono, Astro, Vite, and plain static sites.
 - **HQ sign-in** — HQ Cognito tokens and HQ API keys (`hqk_`); see [Authentication](/hq/products/hq-deploy/authentication/).
-- **Multi-tenant** — Each org gets isolated resources. Cross-tenant access is impossible at the query level.
+- **Multi-tenant** — Every app belongs to an org, and API routes check that the caller's org owns the app before reading or changing it. See [Multi-Tenant Orgs](/hq/products/hq-deploy/multi-tenant/).
 - **Infrastructure template** — `hq-deploy init` writes a CloudFormation template you can deploy in your own AWS account.
-- **Promote and rollback** — Each deploy is kept; `hq-deploy promote` and `hq-deploy rollback` point an environment at an earlier healthy deployment.
+- **Promote and rollback (static apps)** — Each static deploy is kept; `hq-deploy promote` and `hq-deploy rollback` point an environment at an earlier healthy deployment. Next.js and Hono apps have one live production deployment that each new deploy replaces, so promote, rollback, and non-production `--env` are not available for them.
 - **[In-context comments](/hq/products/hq-deploy/comments/)** — Viewers leave feedback directly on a gated deploy, anchored to a point or a region and tagged to their identity, behind the same access gate as the deploy.
 
 ## Projects That Built This

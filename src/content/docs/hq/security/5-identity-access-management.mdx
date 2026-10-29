@@ -9,7 +9,7 @@ This page covers how users and machines authenticate to HQ, how requests are aut
 
 HQ uses AWS Cognito as its identity platform (a dedicated user pool and identity pool). Sign-in is federated:
 
-- Users sign in through Google or Microsoft (OIDC). Microsoft sign-in covers work and school accounts (Entra ID) and personal Microsoft accounts. In production, a WorkOS-brokered Microsoft sign-in path is also configured.
+- Users sign in through Google or Microsoft (OIDC). Microsoft sign-in covers work and school accounts (Entra ID) and personal Microsoft accounts. In production, a WorkOS-brokered Microsoft sign-in path is also configured but is not yet used by the sign-in buttons.
 - GitHub is not a sign-in provider.
 - Native self-registration is blocked. The pool setting `allowAdminCreateUserOnly` is `false`, and a pre-sign-up check refuses every native `SignUp` request while allowing federated sign-ins and accounts that HQ's own services create (machine, agent, and test identities).
 - The identity pool does not permit unauthenticated identities and enforces server-side token checks.
@@ -24,7 +24,7 @@ Because Google or Microsoft is the front door, customers inherit and control the
 
 ## Tokens and session management
 
-- Token types and lifetimes: short-lived access and ID tokens (1 hour). Refresh tokens last 90 days for the main client used by the desktop app, CLI, and web console; 30 days for some other web clients; and 1 day for machine clients.
+- Token types and lifetimes: short-lived access and ID tokens (1 hour). Refresh tokens last 90 days for the main client used by the desktop app, CLI, and web console; 30 days for some other web clients; and 1 day for most machine clients. Hosted agent machines (Outposts) are the exception: each signs in as its own Cognito user with a permanent machine password, through a dedicated client that issues 24-hour access and ID tokens and 3,650-day (10-year) refresh tokens.
 - Client storage: on desktop, the primary token store is `~/.hq/cognito-tokens.json` with owner-only permissions (`0600`), shared with the `hq` CLI. Signed macOS builds also mirror the tokens to the macOS Keychain; when the file and the Keychain differ, the file wins, and the Keychain copy is used only if the file cannot be read.
 - Revocation: CLI sign-out revokes the refresh token with Cognito; account deletion signs the user out of all sessions. Membership/authorization changes take effect on the next request because access credentials are recomputed per request and never cached (see [Tenant Isolation](/hq/security/3-tenant-isolation/)).
 
@@ -49,6 +49,7 @@ HQ runs autonomous agents, which require their own identities:
 - Scoped agent identities: machine principals are issued as dedicated Cognito identities carrying a company claim, so their access is constrained to a single organization, enforced from the verified claim at request time.
 - API keys: issued as high-entropy bearer keys, shown to the operator once, and stored only as a SHA-256 hash — the plaintext is not retained server-side.
 - Local/CLI agents authenticate using the signed-in user's own Cognito tokens; they do not hold a separate long-lived secret.
+- Hosted agent machines (Outposts) each have their own Cognito user with a permanent machine password and a 10-year refresh token (see [Tokens and session management](#tokens-and-session-management)). Their delegated claims name the owning person for authorization.
 
 ### Owner delegation
 
@@ -84,7 +85,8 @@ Customers can:
 ## Honest limitations
 
 - No native (in-platform) MFA yet; MFA is currently inherited from the customer's identity provider.
-- Refresh tokens are long-lived (up to 90 days) and not rotated on use.
+- Refresh tokens are long-lived (90 days for the main desktop, CLI, and web console client; 10 years for hosted agent machine identities) and not rotated on use.
+- Hosted agent machine identities authenticate with a permanent machine password.
 - The desktop and CLI token file relies on filesystem permissions rather than encryption.
 - The main user-pool client also enables Cognito password (`USER_PASSWORD_AUTH`) and choice-based (`USER_AUTH`, including email one-time code) flows beyond what federated sign-in requires; tightening this is on the roadmap.
 

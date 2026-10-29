@@ -16,7 +16,7 @@ Commands are skills in `.claude/skills/`. Run any command inside your AI tool wi
 | `/conduct` | Orchestrator mode: coordinate only, sending small tasks to subagents and worker areas to standing HQ lanes |
 
 ### /checkpoint
-Saves git state, active files, and a summary. Use when you want to bookmark progress. HQ also asks the agent to run `/checkpoint` right before Claude Code autocompacts the conversation.
+Saves git state, active files, and a summary. Use when you want to bookmark progress. When Claude Code autocompacts the conversation, a hook tells the agent to run `/checkpoint` on its next turn.
 
 ### /handoff
 Writes a thread at `workspace/threads/` and a `handoff.json` with the context needed to resume in a fresh session. Run it before you end a session that has work in progress.

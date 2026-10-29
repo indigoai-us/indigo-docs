@@ -49,7 +49,7 @@ This page pre-answers the common questions a security reviewer asks, organized b
 | Is customer data segregated per tenant? | ✅ | Dedicated S3 bucket per tenant and per-request scoped credentials. New vaults also get a dedicated KMS key; some existing vaults use a shared Indigo-managed key or SSE-S3 until re-keyed. ([Tenant Isolation](/hq/security/3-tenant-isolation/)) |
 | Is data classified and minimized? | ✅ | Classification defined; credentials/datasets/workers excluded from sync by default with first-push protection. |
 | Can customers export and delete their data? | 🟡 | Export and deletion supported on request. A self-service account-deletion flow with a 30-day company purge is built but off by default. Automated hard-delete offboarding on roadmap (soft-tombstone today). |
-| Do you use customer data to train AI models? | ❌ (we do not) | Indigo does not train models on customer data. Server-side AI runs mainly on AWS Bedrock; live meeting voice uses OpenAI and xAI; local agent tools use the customer's own model-provider account. ([Subprocessors](/hq/security/2-subprocessors/)) |
+| Do you use customer data to train AI models? | ❌ (we do not) | Indigo does not train models on customer data. Server-side AI runs mainly on AWS Bedrock; live meeting voice uses OpenAI; hosted agents and local agent tools use the model-provider account their owner supplies. ([Subprocessors](/hq/security/2-subprocessors/)) |
 
 ## DCS — Datacenter Security
 
@@ -97,9 +97,9 @@ This page pre-answers the common questions a security reviewer asks, organized b
 
 | Question | Resp. | Notes |
 |---|:--:|---|
-| Is the network segmented/isolated? | ✅ | Vault data plane: dedicated VPC, private subnets only, no NAT, VPC endpoints; private databases. The meeting service runs in public subnets behind a load balancer, and production hosted-agent workers use a NAT gateway for model-API egress. |
-| Is compute hardened / patched? | ✅ | Predominantly serverless/managed (AWS-patched); containers isolated in private network. |
-| Are security groups least-privilege? | 🟡 | Ingress tightly scoped; a few egress rules broader than necessary (private/no-NAT) being tightened. |
+| Is the network segmented/isolated? | ✅ | Vault data plane: dedicated VPC; private subnets reach AWS services through VPC endpoints; private databases. Hosted-agent workloads share the vault VPC and reach the internet through public subnets with an internet gateway or, in production, a NAT gateway on the vault's private subnets. The meeting service runs in its own VPC, in public subnets behind a load balancer. |
+| Is compute hardened / patched? | ✅ | Predominantly serverless/managed (AWS-patched). The meeting service and hosted-agent instances run in public subnets with ingress limited by security groups; hosted-agent instances accept no inbound connections. |
+| Are security groups least-privilege? | 🟡 | Ingress tightly scoped; a few egress rules broader than necessary being tightened. |
 
 ## IPY — Interoperability & Portability
 
@@ -140,7 +140,7 @@ This page pre-answers the common questions a security reviewer asks, organized b
 | Do you have a vulnerability disclosure channel? | ✅ | [Vulnerability Disclosure](/hq/security/11-vulnerability-disclosure/) + security@hqforwork.com. |
 | Do you run automated vulnerability scanning? | 🟡 | Dependabot dependency alerts and gitleaks secret scanning on hq-pro, hq-cli, and hq-desktop-app; internal review + adversarial testing. Not yet on every repository. |
 | Have you had a third-party penetration test? | ❌ | Not yet; planned with published summary. |
-| Are software builds integrity-protected? | 🟡 | Signed (minisign, Ed25519) auto-updates. Developer ID signing, notarization, and Authenticode signing depend on the release workflow's signing setting; with it off, macOS builds are ad-hoc signed and not notarized. |
+| Are software builds integrity-protected? | ✅ | macOS builds are Developer ID-signed and Apple-notarized; Windows installers are Authenticode-signed through Azure Trusted Signing; auto-updates are signed (minisign, Ed25519) and verified before install. |
 
 ## UEM — Universal Endpoint Management
 
@@ -155,9 +155,9 @@ This page pre-answers the common questions a security reviewer asks, organized b
 | Question | Resp. | Notes |
 |---|:--:|---|
 | Is customer data used to train models? | ❌ (we do not) | Indigo does not train models on customer data. |
-| Which model provider is used? | ✅ | Server-side AI: Claude models and Amazon Titan embeddings via AWS Bedrock; OpenAI and xAI for live meeting voice. Local agent tools (Claude Code, Cursor, Codex): the customer's own model-provider account. See [Subprocessors](/hq/security/2-subprocessors/). |
+| Which model provider is used? | ✅ | Server-side AI: Claude models and Amazon Titan embeddings via AWS Bedrock; OpenAI for live meeting voice. Hosted agents: Anthropic, OpenAI, or xAI, using the subscription or API key the agent owner supplies. Local agent tools (Claude Code, Cursor, Codex): the customer's own model-provider account. See [Subprocessors](/hq/security/2-subprocessors/). |
 | Is there human oversight of AI actions? | ✅ (customer-side) | Customers review/approve agent actions; HQ surfaces decisions and risky/irreversible actions for confirmation. |
-| Is AI input/output logged or retained? | 🟡 | Processed to deliver the capability. Retention by AWS Bedrock, OpenAI, and xAI follows each provider's terms; local agent retention follows the customer's own provider terms. Indigo does not retain inputs for training. |
+| Is AI input/output logged or retained? | 🟡 | Processed to deliver the capability. HQ has not enabled Bedrock model-invocation logging. Retention by AWS Bedrock and OpenAI follows each provider's terms; hosted and local agent retention follows the terms of the provider account the customer supplied. Indigo does not retain inputs for training. |
 
 :::note
 Responses are accurate to the best of our knowledge and are provided for security evaluation. They do not constitute a warranty or contract unless incorporated by Indigo in writing. For anything not covered, contact security@hqforwork.com.

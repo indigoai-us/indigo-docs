@@ -112,12 +112,17 @@ Different chat clients present MCP tools with different UI labels, but the conne
 | --- | --- |
 | Identity | `hq_whoami`, `hq_companies_list`, `hq_company_ping` |
 | Files | `hq_files_list`, `hq_files_read`, `hq_files_write`, `hq_files_stat`, `hq_files_create`, `hq_files_update`, `hq_files_delete`, `hq_files_restore`, `hq_files_share` |
-| Knowledge | `hq_knowledge_list`, `hq_knowledge_get`, `hq_knowledge_capture` (plus `hq_knowledge_search` on local MCP servers only) |
+| Grounding | `hq_context_grounding` (identity, companies, and content types for the caller; call once before other HQ tools), `hq_content_get` (one content item by ID) |
+| Knowledge | `hq_knowledge_list`, `hq_knowledge_get`, `hq_knowledge_capture`, `hq_knowledge_map` (a company's knowledge structure, filing rules, and INDEX.md files), `hq_knowledge_file` (files one knowledge document and adds it to INDEX.md), `hq_knowledge_find` (company-scoped knowledge search, cloud), plus `hq_knowledge_search` on local MCP servers only |
 | Projects | `hq_projects_list`, `hq_project_get`, `hq_project_status`, `hq_project_journal_append` |
 | Policies | `hq_policies_list`, `hq_policy_get` |
 | Secrets | `hq_secrets_list`, `hq_secrets_schema`, `hq_secrets_generate_link` |
 | Deploy | `hq_deploy_site` |
-| Personal vault | `hq_personal_capture` |
+| Personal vault | `hq_personal_capture`, `hq_personal_files_list`, `hq_personal_files_read` |
+| Library | `hq_library_search`, `hq_library_get`, `hq_library_link`, `hq_library_add` (the company asset library of images, video, and other files) |
+| Messages | `hq_messages_contacts`, `hq_messages_inbox`, `hq_messages_thread`, `hq_messages_send`, `hq_messages_channels`, `hq_messages_channel_read`, `hq_messages_channel_send` |
+| Agent wake-up | `hq_agent_wake_webhook_set`, `hq_agent_wake_webhook_status`, `hq_agent_wake_webhook_clear` (a webhook HQ calls when a direct message reaches an agent's inbox) |
+| Feedback | `hq_feedback` (file a bug report or feature request, like `/hq-bug`) |
 | Skills | `hq_skill_list`, `hq_skill_get`, `hq_skill_create`, `hq_skill_update`, `hq_skill_set_state`, `hq_skill_tags_set`, `hq_skill_access_get`, `hq_skill_access_set`, `hq_skill_access_grant`, `hq_skill_access_revoke`, `hq_skill_improvements_list`, `hq_skill_improvement_post`, `hq_skill_improvement_resolve`, `hq_skill_improvement_withdraw` |
 | Team Agents | `hq_agents_list`, `hq_agent_run`, `hq_agent_result` |
 | Integrations | `hq_integrations_catalog`, `hq_integrations_discover`, `hq_integrations_connect`, `hq_integrations_status`, `hq_integrations_list`, `hq_integrations_read`, `hq_integrations_call` |
@@ -131,7 +136,7 @@ Some clients also expose the standard MCP `search` and `fetch` surface. Use that
 HQ MCP has two search paths:
 
 - `search` and `fetch` are the general MCP content discovery pair. Search returns matching chat-visible records, and fetch rechecks permission before returning the canonical content.
-- `hq_knowledge_search` is the `qmd`-backed search tool for local MCP servers. The cloud connector does not register it; in the cloud, use `search` and `fetch`.
+- `hq_knowledge_search` is the `qmd`-backed search tool for local MCP servers. The cloud connector does not register it; in the cloud, use `search` and `fetch`, or `hq_knowledge_find` for knowledge search scoped to one company.
 
 Production cloud MCP does not shell out to `qmd`. If a cloud client reports a `qmd` missing error, it is using an old connector bundle or a local MCP path, not the current production cloud path.
 

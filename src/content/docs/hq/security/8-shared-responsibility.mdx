@@ -21,7 +21,7 @@ This page makes the division explicit.
 - Encryption — at rest (AWS KMS or S3-managed keys) and in transit (enforced TLS).
 - Platform access control — authentication via Cognito/SSO, JWT authorization on every route, role- and path-based permissions.
 - Infrastructure security — private-network architecture, least-privilege cloud IAM, secrets management, monitoring, and audit logging.
-- Application security — secure SDLC, CI security gates including tenant-isolation tests, signed desktop updates.
+- Application security — secure SDLC, CI security gates including tenant-isolation tests, signed and notarized desktop builds, and signed updates.
 - Availability and durability — operating the managed services, S3 versioning, database point-in-time recovery.
 - Incident response — detection, investigation, and customer breach notification for incidents affecting the platform (see [Business Continuity & Incident Response](/hq/security/9-business-continuity-incident-response/)).
 - Subprocessor management — vetting and disclosing the third parties that process customer data (see [Subprocessors](/hq/security/2-subprocessors/)).
@@ -41,7 +41,7 @@ Because HQ amplifies what a team can do, customer-side configuration is a real p
 
 ## Gray areas, made explicit
 
-- AI model inputs. When you use HQ's AI capabilities, the content you provide is sent to the model provider to produce a result. Indigo sends it only to the providers listed in [Subprocessors](/hq/security/2-subprocessors/), and Indigo does not train models on it; you decide what content to submit.
+- AI model inputs. When you use HQ's AI capabilities, the content you provide is sent to the model provider to produce a result. Indigo sends it only to the providers listed in [Subprocessors](/hq/security/2-subprocessors/) or, for a hosted agent, to the model provider whose sign-in or API key the agent's owner supplied, and Indigo does not train models on it; you decide what content to submit.
 - Externally shared artifacts. Indigo secures the sharing mechanism (single-use, expiring, scoped tokens); you decide what to share and with whom, and revoke by letting links expire or removing the underlying grant.
 
 ## Summary table

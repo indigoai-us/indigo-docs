@@ -63,7 +63,7 @@ HQ saves session state so work survives context limits.
 
 - **Threads** (`workspace/threads/`) — Session summaries with git state, written by `/checkpoint` and `/handoff`
 - **Checkpoints** (`workspace/checkpoints/`) — Legacy copies written by `/checkpoint`
-- **Before autocompact** — Claude Code compacts older turns at 60% context (`CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` in `.claude/settings.json`). A hook asks the agent to run `/checkpoint` first. Run `/handoff` yourself when you want to continue in a fresh session.
+- **Before autocompact** — Claude Code compacts older turns at 60% context (`CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` in `.claude/settings.json`). When it does, a hook tells the agent to run `/checkpoint` on its next turn. Run `/handoff` yourself when you want to continue in a fresh session.
 
 ```mermaid
 graph LR
@@ -80,7 +80,7 @@ The `workspace/` directory is the runtime workspace:
 | Directory | Purpose |
 |-----------|---------|
 | `threads/` | Auto-saved session state (JSON) |
-| `checkpoints/` | Manual saves via `/checkpoint` |
+| `checkpoints/` | Legacy copies written by `/checkpoint` |
 | `learnings/` | Captured insights from task execution |
 | `orchestrator/` | Project execution state |
 | `reports/` | Generated reports |

@@ -37,12 +37,12 @@ The JSON body contains:
   a setup call), and `selfHosted`, the label and link for
   [Use HQ free, self-hosted or on-prem](/hq/guide/use-hq-for-free/)
 - `plans[]`: legacy plans for existing customers, which move to usage
-  pricing on 19 December 2026. Each one carries
-  `newSignupsUntil`, the instant it closed to new signups.
+  pricing on 19 December 2026. Each one carries `newSignupsUntil`, the
+  instant it closed to new signups, or `null` for a plan still offered.
 - `agentRungs[]`: the legacy box sizes with their instance types and monthly
   prices, for accounts created before the usage card
 - `addOns`: legacy Outpost and meeting-hours pricing
-- the grandfather rule for companies on the earlier Workforce price
+- `grandfather`: the rule for companies on the earlier Workforce price
 - `billingRules`: hosted agents billed per box from the first, and trial and
   cancellation behavior
 - `writerModes`: a description of each legacy agent-overage billing mode

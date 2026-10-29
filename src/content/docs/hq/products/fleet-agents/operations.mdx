@@ -36,7 +36,7 @@ hq agents start <agent-uid>
 hq agents retry <agent-uid>
 ```
 
-`provision` accepts `--size small`, `medium`, `large`, or `xlarge`. The legacy names `basic`, `power`, and `dev` are also accepted; on usage pricing they map to `small`, `medium`, and `large`. It prints the selected capacity and company-specific monthly price before asking for confirmation. Use `--yes` only when that quote has already been approved for an automated flow.
+`provision` takes `--size`. The accepted names depend on the company's size ladder. Companies on usage pricing (accounts created from 16 October 2026) use `small`, `medium`, `large`, or `xlarge`; there the legacy names `basic`, `power`, and `dev` also work and map to `small`, `medium`, and `large`. Companies still on the earlier ladder use `basic`, `power`, or `dev`. The CLI refuses a size the company's ladder does not offer. It prints the selected capacity and company-specific monthly price before asking for confirmation. Use `--yes` only when that quote has already been approved for an automated flow.
 
 Add `--json` to supported read or update commands for machine-readable output. Rename and removal are also available:
 

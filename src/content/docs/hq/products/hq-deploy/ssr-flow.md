@@ -19,7 +19,7 @@ hq-deploy deploy
 
 - The local build needs a Node 20 Linux x64 environment that matches the Lambda runtime (Amazon Linux 2023). On other hosts the CLI stops with an error that says so.
 - The server function zip must fit Lambda's size limits (50 MB zipped for a direct upload, 250 MB unzipped including the shared layer). The CLI checks this before uploading.
-- Each deploy publishes an immutable Lambda version. `hq-deploy promote` and `hq-deploy rollback` point an environment at an existing healthy deployment.
+- Each deploy publishes a new Lambda version. Next.js and Hono apps have a single live production deployment, and the next `hq-deploy deploy` replaces it. `hq-deploy promote`, `hq-deploy rollback`, and `hq-deploy deploy --env` with a non-production environment apply to static apps only; for Next.js and Hono they fail with `FRAMEWORK_SINGLE_DEPLOYMENT`.
 
 ## Hono
 

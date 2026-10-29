@@ -49,8 +49,8 @@ One container-deployment pipeline currently authenticates to AWS with long-lived
 ## Build integrity and distribution
 
 - Auto-updates for the desktop app are cryptographically signed (minisign, Ed25519); clients verify the update signature before applying it, preventing tampered updates.
-- The release workflow can sign macOS builds with an Apple Developer ID certificate and notarize them with Apple, and sign Windows builds with Authenticode. Both are controlled by a release setting (`RELEASE_UNVERIFIED`, which defaults to on). While it is on, macOS builds are ad-hoc signed and not notarized, and Windows builds are not Authenticode-signed, so Gatekeeper and SmartScreen do not verify the publisher at install time. Update signatures are produced in both modes.
-- When Developer ID signing runs, the certificate is imported into a temporary keychain on the CI runner.
+- Release builds of the macOS app are signed with an Apple Developer ID certificate and notarized by Apple, with the notarization ticket stapled to the app and the DMG. Windows installers (MSI and NSIS) are Authenticode-signed through Azure Trusted Signing. macOS Gatekeeper and Windows SmartScreen can verify the publisher at install time.
+- The Developer ID certificate is imported into a temporary keychain on the CI runner, which is removed at the end of the job.
 - All CI secrets are masked in build logs.
 
 ## Application-layer protections
@@ -79,7 +79,7 @@ HQ has not yet undergone an independent third-party penetration test. Engaging a
 | Type-check / lint / test / tenant-isolation CI gates | In place |
 | Lockfile-pinned, frozen-install dependencies | In place |
 | Signed auto-updates | In place |
-| Developer ID signing + notarization (macOS), Authenticode (Windows) | Supported in the release workflow; depends on release setting |
+| Developer ID signing + notarization (macOS), Authenticode via Azure Trusted Signing (Windows) | In place |
 | Required-status-check enforcement everywhere | In progress |
 | Dependabot + gitleaks on hq-pro, hq-cli, hq-desktop-app | In place |
 | Dependabot + gitleaks on remaining repositories | Not yet configured |

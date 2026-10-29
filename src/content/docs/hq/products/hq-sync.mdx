@@ -28,7 +28,7 @@ in, choose a workspace location, and select **Install**. The final **HQ is
 ready** screen offers **Open in Claude Code** and **Open in Codex**, plus
 **Open in Grok** when the Grok CLI is installed.
 
-Selecting either tool completes onboarding, opens the workspace there, and
+Selecting any of these tools completes onboarding, opens the workspace there, and
 hands control to the compact sync popover. There are no additional desktop
 onboarding screens to dismiss. To go to the desktop workspace instead, select
 **Open HQ Desktop**.
@@ -40,7 +40,7 @@ The desktop app is a **GUI over the engine, not its own sync implementation**. I
 ```mermaid
 graph LR
     tray["HQ desktop app<br/>(menu bar / tray UI)"] -->|spawns| runner["hq-sync-runner<br/>(@indigoai-us/hq-cloud)"]
-    runner <-->|bidirectional sync| s3["AWS S3<br/>(per-entity prefix)"]
+    runner <-->|bidirectional sync| s3["AWS S3<br/>(company and personal vaults)"]
     runner -->|ndjson events| tray
 ```
 

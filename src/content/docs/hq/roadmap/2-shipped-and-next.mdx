@@ -15,7 +15,7 @@ HQ installs through the HQ desktop app (macOS and Windows) or from a terminal wi
 - **Desktop:** `hq-desktop-app` replaces the separate hq-sync, hq-sync-win, and hq-installer apps. It ships signed builds for macOS and Windows with auto-update.
 - **Cloud apps:** `hq-console` (web console at `hq.computer`), `hq-deploy` (artifact data plane), and `hq-pro` (vault, teams, `VaultApi`, shared Cognito identity) are deployed on Vercel and AWS.
 - **Content packs:** `hq-packages` distributes optional packs via `hq install`.
-- **Runtimes:** the scaffold ships configuration for Claude Code, Codex, Cursor, and Grok.
+- **Runtimes:** the scaffold ships configuration for Claude Code, Codex, and Grok, plus a rules file for Cursor (`.cursor/rules/hq.mdc`).
 
 ## hq-core 16.0
 
@@ -31,14 +31,12 @@ HQ installs through the HQ desktop app (macOS and Windows) or from a terminal wi
 - **Permission mode `auto`.** `.claude/settings.json` ships `defaultMode: "auto"`. A v15 change to Plan mode was unintended and has been reverted.
 - **Model alias `opus`.** Sessions and subagents use the `opus` alias, which Claude Code resolves to its newest Opus model. The 1M-context variant (`opus[1m]`) stays opt-in per command.
 
-### Skills
+### New skills
 
-- **`/humanize`** revises human-facing prose to remove generated-text tells.
-- **`/work-broadcast`** composes team announcements with a draft-confirm step before sending.
-- **`/hq-heal`** triages a runtime error mid-session and proposes a fix.
-- **`/ontology`** is the interface to the hq-pro ontology (entity graph and per-company brief).
-- **`/hq-share`** drafts a short factual note describing what is being shared, for the sender to review.
 - **`/conduct-join`** attaches an already-running session to a `/conduct` session.
+- **`/new-agent`** provisions a fleet agent end to end and verifies it for a defined job.
+- **`/new-hire`** onboards a human teammate: invite, grants, onboarding packet, and follow-through.
+- **`/project-summary`** renders a project's `prd.json` or `brainstorm.md` as a branded page and deploys it behind a gate.
 
 ### Structure
 

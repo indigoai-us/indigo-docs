@@ -12,14 +12,14 @@ sidebar:
 ## What it provides
 
 - **Vault — capability-based access.** Encrypted S3 storage with a deny-all default, KMS encryption, and STS-scoped capabilities. Access is granted as narrow, time-bound capabilities rather than broad credentials. This is what the [hq-secrets](/hq/products/capabilities/hq-secrets/) and [hq-share](/hq/products/capabilities/hq-share/) CLI capabilities operate against.
-- **Shared Cognito identity.** One identity pool that every cloud app trusts — `hq-console` signs in against it (OIDC) and `hq-deploy` verifies JWTs minted by it. Neither runs its own user store.
+- **Shared Cognito identity.** One Cognito user pool that every cloud app trusts — `hq-console` signs in against it (OIDC) and `hq-deploy` verifies JWTs minted by it. Neither runs its own user store.
 - **Companies and memberships.** Companies, members, and roles (`owner`, `admin`, `member`, `guest`).
 - **Sign-in.** Google and Microsoft accounts, federated through the shared Cognito pool. There is no email-and-password sign-up.
 - **Install.** New users install the HQ desktop app (macOS and Windows) from [hqforwork.com/install](https://www.hqforwork.com/install).
 
 ## In this section
 
-- [Requesting Access](/hq/products/hq-pro/access/) — the demo-gated flow for joining an existing company
+- [Joining a company](/hq/products/hq-pro/access/) — owner and admin invites, and the demo-gated request flow for the demo sandbox
 - [Billing and usage](/hq/products/hq-pro/billing-and-usage/) — the usage card, trial, spend limit and boxes
 - [Pricing API](/hq/products/hq-pro/pricing-api/) — the public `GET /v1/pricing` statement
 - [Setup channel lifecycle](/hq/products/hq-pro/setup-channel-lifecycle/) — #setup → company → cloud → billing → first agent in the desktop app

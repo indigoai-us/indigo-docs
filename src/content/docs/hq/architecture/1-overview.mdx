@@ -5,7 +5,7 @@ description: System architecture of the HQ ecosystem — the split repos, data f
 
 ## System Architecture
 
-HQ ships as a set of independently versioned repos: a scaffold and its installer, a CLI, a cloud sync engine, a desktop app, an admin console, and shared cloud infrastructure. The user works in HQ through an agent runtime (Claude Code, Codex, Cursor, or Grok) on the local HQ directory, and optionally through the HQ desktop app and the web console. Cloud sync connects the local directory to per-company vaults on S3. See the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/) for how the repos compose.
+HQ ships as a set of independently versioned repos: a scaffold and its installer, a CLI, a cloud sync engine, a desktop app, an admin console, and shared cloud infrastructure. The user works in HQ through an agent runtime (Claude Code, Codex, or Grok; Cursor gets a rules file only) on the local HQ directory, and optionally through the HQ desktop app and the web console. Cloud sync connects the local directory to per-company vaults on S3. See the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/) for how the repos compose.
 
 ```mermaid
 graph TD
@@ -35,7 +35,7 @@ graph TD
 
 ```mermaid
 graph LR
-    agent["Agent runtime<br/>(Claude Code, Codex,<br/>Cursor, Grok)"] <-->|"reads/<br/>writes"| local["Local HQ<br/>directory"]
+    agent["Agent runtime<br/>(Claude Code, Codex,<br/>Grok)"] <-->|"reads/<br/>writes"| local["Local HQ<br/>directory"]
     local <-->|sync| cloud["hq-cloud<br/>(sync engine)"]
     cloud <--> api["hq-pro VaultApi<br/>hqapi.hq.computer"]
     api --> s3["S3 company<br/>vaults"]
@@ -79,7 +79,7 @@ State lives in the filesystem. Workers read knowledge, write reports, update thr
 
 ### 5. Web and mobile
 
-The web surface is hq-console at `hq.computer`. Native iOS and Android apps are built from the hq-native-mobile repo. The cloud API (`VaultApi` in hq-pro) is served at `https://hqapi.hq.computer`.
+The web surface is hq-console at `hq.computer`. Native iOS (beta) and Android apps are built from the hq-native-mobile repo. The cloud API (`VaultApi` in hq-pro) is served at `https://hqapi.hq.computer`.
 
 ## Repo Graph
 

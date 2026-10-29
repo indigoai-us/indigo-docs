@@ -9,7 +9,7 @@
 // are written into dist/, so the deployed copies are rebuilt on every deploy
 // and are never hand-edited.
 
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -131,6 +131,17 @@ const sections = readSidebar().map((s) => ({
   pages: s.urls.map((url) => ({ url, ...parsePage(sourceFor(url)) })),
 }));
 const today = new Date().toISOString().slice(0, 10);
+
+// Every content page except the home page should be in the sidebar. A page
+// left out of the sidebar would be dropped from both files, so fail instead.
+const emitted = new Set(sections.flatMap((s) => s.pages.map((p) => sourceFor(p.url))));
+const contentFiles = readdirSync(contentDir, { recursive: true })
+  .filter((f) => /\.mdx?$/.test(f) && !/^index\.mdx?$/.test(f))
+  .map((f) => join(contentDir, f));
+const missing = contentFiles.filter((f) => !emitted.has(f));
+if (missing.length) {
+  throw new Error(`Pages not in the sidebar, so missing from llms files:\n${missing.join("\n")}`);
+}
 
 const index = [`# HQ documentation`, "", INTRO, "", `Last updated: ${today}`, "", PRODUCT_SITE];
 for (const s of sections) {

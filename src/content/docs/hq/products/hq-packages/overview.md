@@ -65,7 +65,8 @@ hq packs list                    # installed packs and the curated catalog
 hq packs list --check-updates    # also check each pack for updates
 hq packs update [name]           # re-install the latest version
 hq packs uninstall <name>        # un-wire and archive a pack
-hq remove <slug>                 # remove an installed package (archives it first)
 ```
 
-`hq packages list` and `hq packages update` are equivalent forms. Installed packs are tracked by their presence under `core/packages/`; there is no separate registry file.
+`hq packages list` shows the same view as `hq packs list`. Installed content packs are tracked by their presence under `core/packages/`; they have no separate registry file.
+
+`hq remove <slug>` (also `hq packages remove`) and `hq packages update` are older commands for the legacy package layout under `packages/installed/`, tracked in `packages/registry.yaml`. They do not act on content packs in `core/packages/`. Use `hq packs uninstall` and `hq packs update` for packs.

@@ -46,7 +46,7 @@ npx create-hq ~/my-hq --minimal   # scaffold only, skip recommended packs
 | `--tag <version>` | Fetch a specific hq-core version tag (for example `v16.0.0`) |
 | `--local-template <path>` | Use a local hq-core directory instead of fetching from GitHub |
 
-`create-hq` downloads the latest hq-core release from GitHub (or the `--tag` version, or `--local-template`), scaffolds the directory, and can install the recommended packs declared in `core/core.yaml`. Prerequisites: Node.js 22.13 or later and git are required. The GitHub CLI, Claude Code, qmd, yq, and the `hq` CLI are optional; the installer offers to install them. (The Vercel CLI is not an HQ dependency — `/deploy` uses hq-deploy; install Vercel yourself only if you deploy your own projects to it.)
+`create-hq` downloads the latest hq-core release from GitHub (or the `--tag` version, or `--local-template`), scaffolds the directory, and can install the recommended packs declared in `core/core.yaml`. It runs `git init` in the new HQ and makes an initial commit, "Initial HQ setup via create-hq" (no remote; the HQ root stays local). When qmd is installed, it registers the HQ as a qmd collection and runs a first `qmd update` to index it for search; otherwise it skips that step. Prerequisites: Node.js 22.13 or later and git are required. The GitHub CLI, Claude Code, qmd, yq, and the `hq` CLI are optional; the installer offers to install them. (The Vercel CLI is not an HQ dependency — `/deploy` uses hq-deploy; install Vercel yourself only if you deploy your own projects to it.)
 
 ### What the scaffold contains
 

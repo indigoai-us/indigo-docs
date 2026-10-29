@@ -30,7 +30,7 @@ Because data lives in physically separate buckets, there is no shared object nam
 
 When provisioning creates a new vault, it also creates a dedicated KMS customer-managed key (CMK) for that vault and uses it as the bucket's default encryption key. Keys are symmetric, rotated automatically on an annual cycle, and tagged so that IAM policies can gate KMS usage on the tag.
 
-Not every existing vault has its own key yet. Some existing person and agent vaults use a shared Indigo-managed KMS key, and some older vaults use S3-managed encryption (SSE-S3). Provisioning keeps an existing vault's encryption as it is; moving those vaults to their own key is a separate migration that re-encrypts their objects.
+Not every existing vault has its own key yet. Some existing vaults use a shared Indigo-managed KMS key, and some older vaults use S3-managed encryption (SSE-S3). Provisioning keeps an existing vault's encryption as it is; moving those vaults to their own key is a separate migration that re-encrypts their objects.
 
 Where a vault has its own key, decrypting its objects requires access to that specific key, which the access-brokering layer grants only to that tenant's authorized members. For vaults on the shared key or SSE-S3, separation between tenants rests on the bucket boundary and the scoped STS session described below.
 
