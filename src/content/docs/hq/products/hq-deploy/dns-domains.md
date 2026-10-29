@@ -3,7 +3,7 @@ title: DNS & Domains
 description: App registration, subdomain generation, and Route 53 DNS management.
 ---
 
-Every deployed app gets a subdomain under the platform domain (e.g., `my-app.indigo-hq.com`). DNS records are managed automatically via Route 53.
+Every deployed app gets a subdomain under the platform domain (e.g., `my-app.indigo-hq.com`). The same edge also serves each app at `my-app.hq.work`, which the CLI's lifecycle commands use as their default base domain. The URL a deploy prints is the one the API returns, which today is the `indigo-hq.com` form. DNS records are managed automatically via Route 53.
 
 Any company can replace the platform domain with its own base domain, or point a custom hostname at a single app — see [Custom Deploy Domains](/hq/products/hq-deploy/custom-domains/).
 

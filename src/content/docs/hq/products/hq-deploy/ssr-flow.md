@@ -1,70 +1,40 @@
 ---
 title: SSR Deploys
-description: Server-rendered app deployment via ECS Fargate, ECR, and ALB.
+description: Server-rendered app deployment — Next.js through OpenNext and Hono through the Fetch adapter, each on a per-app Lambda.
 ---
 
-SSR deploys run your server-rendered application as a Docker container on ECS Fargate, fronted by an Application Load Balancer with host-based routing.
+Server-rendered apps run on a per-app AWS Lambda function. Next.js apps are built with OpenNext; Hono apps are packaged through the Fetch adapter. Static assets are still served from S3 through CloudFront.
 
-## Infrastructure
-
-The SSR infrastructure is provisioned once per environment:
-
-| Resource | Purpose |
-|----------|---------|
-| **ECS Fargate Cluster** | `hq-deploy-ssr` in us-east-1, Container Insights enabled |
-| **ECR Repository** | `hq-deploy-apps`, immutable tags, lifecycle policy (last 10 per app) |
-| **ALB** | HTTPS listener with wildcard ACM cert, HTTP→HTTPS redirect |
-| **CloudFront** | ALB as second origin, `CachingDisabled` policy, `X-CF-Secret` header verification |
-
-## Deploy Lifecycle
+## Next.js
 
 ```
-building → pushing → deploying → stabilizing → live
+hq-deploy deploy
+  │
+  ├─ 1. Adapter checks: supported Next.js version, routing translation, compatibility checks
+  ├─ 2. Build with a pinned OpenNext version → server function zip + static assets
+  ├─ 3. Upload the server function and assets
+  └─ 4. API deploys the server function to the app's Lambda,
+        publishes a new version, and points the app at it
 ```
 
-1. **Building** — Docker image is built from the project's Dockerfile (or a generated one). Tagged as `hq-deploy-apps:{app-id}:{version}`.
-2. **Pushing** — Image is pushed to ECR.
-3. **Deploying** — A new ECS task definition is registered (0.25 vCPU, 0.5 GB RAM, PORT=3000).
-4. **Stabilizing** — ECS performs a rolling update with `minimumHealthyPercent=100` and `maximumPercent=200`. The service must stabilize within 5 minutes.
-5. **Live** — Once stable, the deploy record is marked live.
+- The local build needs a Node 20 Linux x64 environment that matches the Lambda runtime (Amazon Linux 2023). On other hosts the CLI stops with an error that says so.
+- The server function zip must fit Lambda's size limits (50 MB zipped for a direct upload, 250 MB unzipped including the shared layer). The CLI checks this before uploading.
+- Each deploy publishes a new Lambda version. Next.js and Hono apps have a single live production deployment, and the next `hq-deploy deploy` replaces it. `hq-deploy promote`, `hq-deploy rollback`, and `hq-deploy deploy --env` with a non-production environment apply to static apps only; for Next.js and Hono they fail with `FRAMEWORK_SINGLE_DEPLOYMENT`.
 
-## ALB Host-Based Routing
+## Hono
 
-Each app gets its own ALB target group with a host-based routing rule:
+Hono is detected from the `hono` dependency in `package.json`. The CLI resolves the app's Fetch entrypoint, builds a deploy manifest, and uploads the source as a `fetch` deploy. The API bundles it into a per-app Lambda.
 
-```
-Rule: Host = {subdomain}.indigo-hq.com → Target Group for {app-id}
-Priority: app DB id + 100 offset
-Deregistration delay: 30 seconds
-```
+## Per-app function
 
-## Lambda@Edge Routing (SSR Path)
+Each Next.js or Hono app gets:
 
-The same Lambda@Edge function that handles static routing also handles SSR:
+- its own Lambda function and its own IAM role, with no long-lived keys
+- an app identity registered with the HQ vault, so the function can read the secrets bound to the app
+- a route on the shared front door that maps the app's subdomain to its function
 
-1. Extracts subdomain from `Host` header
-2. Checks app type in DynamoDB (60-second cache TTL)
-3. If SSR → forwards request to ALB origin
-4. If Static → forwards to S3 origin
-5. If unknown → returns 404
+Secret values are never written into the function's environment; it receives references only.
 
-## ECS Task Configuration
+## Legacy container path (dormant)
 
-```
-CPU: 0.25 vCPU
-Memory: 0.5 GB
-Port: 3000
-Health check: GET /health
-Logs: /hq-deploy/ssr/{app-id} (CloudWatch)
-Max revisions: 10
-```
-
-The health check endpoint (`GET /health`) is mandatory — your app must respond with a 200 status on this path for the rolling deploy to succeed.
-
-## Zero-Downtime Deploys
-
-Rolling deploys ensure zero downtime:
-
-- `minimumHealthyPercent=100` — The old task keeps running until the new one is healthy
-- `maximumPercent=200` — Both old and new tasks run simultaneously during transition
-- **5-minute stabilization timeout** — If the new task doesn't become healthy, the deploy is marked failed and the old task continues serving traffic
+Earlier versions deployed server-rendered apps as Docker containers on ECS Fargate behind an Application Load Balancer. That path is dormant. Remix and server-mode Astro apps still route to it in the CLI, but it is not supported for new apps. Use Next.js, Hono, or a static build.

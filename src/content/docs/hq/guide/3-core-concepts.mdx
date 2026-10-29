@@ -1,6 +1,6 @@
 ---
 title: Core Concepts
-description: The mental model behind HQ — workers, knowledge, commands, checkpoints, and the INDEX.md system.
+description: The mental model behind HQ — workers, knowledge, slash commands, checkpoints, and the INDEX.md system.
 ---
 
 ## Workers
@@ -21,43 +21,49 @@ graph LR
     exec --> checkpoint["Auto-checkpoint"]
 ```
 
-**Types:** CodeWorker, ContentWorker, SocialWorker, ResearchWorker, OpsWorker, Library
+**Types:** CodeWorker, ContentWorker, ResearchWorker, OpsWorker, PersonaWorker, Library
+
+Bundled workers live in `core/workers/public/`. Your own workers go in `personal/workers/` or `companies/{co}/workers/`. The list of all workers is `core/workers/registry.yaml`, which HQ regenerates from each `worker.yaml`.
 
 ## Knowledge Bases
 
-Persistent memory stored as markdown and structured files. Knowledge bases are **git repos symlinked into HQ**, enabling independent versioning.
+Persistent memory stored as markdown and structured files. Knowledge bases are plain directories inside HQ.
 
 ```
-knowledge/
-├── Ralph/              # Coding methodology
-├── workers/            # Worker framework docs
-├── hq-core/            # Thread schema, checkpoints
-├── ai-security/        # Security practices
-├── design-styles/      # Image generation guides
-├── dev-team/           # Dev team patterns
-├── loom/               # Agent patterns (reference)
-└── projects/           # Project templates
+core/knowledge/public/
+├── Ralph/                  # Coding methodology
+├── agent-browser/          # Browser automation
+├── ai-security-framework/  # Security practices
+├── brand-voice/            # Brand-voice packs
+├── dev-team/               # Dev team patterns
+├── getting-started/        # HQ cheatsheet
+├── hq-core/                # HQ system docs
+├── loom/                   # Agent patterns (reference)
+├── projects/               # Project templates
+└── workers/                # Worker framework docs
 ```
 
-Each knowledge base can be its own git repo, cloned into `repos/public/` or `repos/private/` and symlinked.
+Your own knowledge goes in `personal/knowledge/` or `companies/{co}/knowledge/`. Keep these as real directories, not symlinks, so cloud sync uploads their contents.
 
 ## Commands
 
-Slash commands orchestrate workflows. Run them inside Claude Code with `/command-name`.
+Slash commands (skills in `.claude/skills/`) orchestrate workflows. Run them inside your AI tool with `/command-name`.
 
 **Categories:**
-- **Session** — `/checkpoint`, `/handoff`, `/reanchor`, `/nexttask`, `/remember`, `/learn`
-- **Workers** — `/run`, `/newworker`, `/metrics`
+- **Session** — `/startwork`, `/checkpoint`, `/handoff`, `/learn`
+- **Workers** — `/run`, `/newworker`
 - **Projects** — `/prd`, `/run-project`, `/execute-task`
-- **System** — `/search`, `/search-reindex`, `/cleanup`, `/setup`, `/exit-plan`
+- **System** — `/search`, `/cleanup`, `/setup`
+
+See [Commands](/hq/guide/4-commands/) for more.
 
 ## Checkpoints & Threads
 
-HQ automatically saves session state so work survives context limits.
+HQ saves session state so work survives context limits.
 
-- **Threads** (`workspace/threads/`) — Auto-saved session summaries with git state
-- **Checkpoints** (`workspace/checkpoints/`) — Manual saves via `/checkpoint`
-- **Auto-handoff** — When context reaches 70% capacity, HQ automatically runs `/handoff`
+- **Threads** (`workspace/threads/`) — Session summaries with git state, written by `/checkpoint` and `/handoff`
+- **Checkpoints** (`workspace/checkpoints/`) — Legacy copies written by `/checkpoint`
+- **Before autocompact** — Claude Code compacts older turns at 60% context (`CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` in `.claude/settings.json`). When it does, a hook tells the agent to run `/checkpoint` on its next turn. Run `/handoff` yourself when you want to continue in a fresh session.
 
 ```mermaid
 graph LR
@@ -74,11 +80,12 @@ The `workspace/` directory is the runtime workspace:
 | Directory | Purpose |
 |-----------|---------|
 | `threads/` | Auto-saved session state (JSON) |
-| `checkpoints/` | Manual saves via `/checkpoint` |
+| `checkpoints/` | Legacy copies written by `/checkpoint` |
 | `learnings/` | Captured insights from task execution |
 | `orchestrator/` | Project execution state |
 | `reports/` | Generated reports |
-| `social-drafts/` | Content pipeline drafts |
+| `insights/` | Insight files written by `/learn` |
+| `drafts/` | Drafts |
 
 ## INDEX.md System
 
@@ -103,7 +110,7 @@ Or use the built-in command: `/search "your query"`
 
 HQ learns from task execution:
 
-- `/learn` — Auto-captures insights after tasks
-- `/remember` — Manual rule injection
-- Rules are injected directly into source files (worker.yaml, command .md, CLAUDE.md)
-- Max 20 global rules, deduplicated, event log at `workspace/learnings/`
+- `/learn` — Captures a learning after a task, or manually when you run it. `/learn --hard` records a hard-enforcement rule.
+- Rules become policy files in `personal/policies/`, `companies/{co}/policies/`, or a repo's `.claude/policies/`
+- Insights become files under `workspace/insights/` or `companies/{co}/knowledge/insights/`
+- `/learn` never writes to `core/`, because `/update-hq` replaces it

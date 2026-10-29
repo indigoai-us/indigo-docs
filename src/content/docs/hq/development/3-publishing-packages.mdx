@@ -1,87 +1,61 @@
 ---
 title: Publishing Packages
-description: Per-repo npm + release workflow for the HQ ecosystem packages.
+description: Per-repo release workflow for the HQ ecosystem packages and apps.
 ---
 
-Each HQ package ships from its **own** repo on its **own** version — there is no shared version and no single tag that publishes everything. See the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/) for the full topology.
+Each HQ package ships from its own repo on its own version. There is no shared version and no single tag that publishes everything. See the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/) for the full topology.
 
-## npm organization
+## Release mechanisms
 
-The CLI and sync engine publish under the `@indigoai-us` npm scope. Content packs publish as `@indigoai-us/hq-pack-*`. The desktop and cloud apps are not npm packages — they release as a signed app or a cloud deploy.
+| Repo | Ships as | Package manager | Release mechanism |
+|------|----------|-----------------|-------------------|
+| hq-cli | `@indigoai-us/hq-cli` | pnpm | Push a `v*` tag; `publish.yml` publishes to npm |
+| hq-cloud | `@indigoai-us/hq-cloud` | pnpm | Push a `v*` tag; `publish.yml` publishes to npm |
+| create-hq | `create-hq` | npm | Push a `v*` tag; `publish.yml` publishes to npm |
+| hq-packages | `packages/hq-pack-*` | npm | `release.yml` on push to main publishes changed packs |
+| hq-core | scaffold release | — | hq-core-staging → `promote-to-hq-core` → `release: v<ver>` PR on hq-core |
+| hq-desktop-app | macOS and Windows app | pnpm | Push a `v*` tag; `release.yml` builds, signs, and publishes a GitHub Release |
+| hq-console / hq-pro / hq-deploy | cloud apps | pnpm / pnpm / npm | Deploy from main: Vercel for hq-console; a deploy workflow after CI passes for hq-pro and hq-deploy |
 
-| Repo | Ships as | Scoped | Release mechanism |
-|------|----------|--------|-------------------|
-| hq-cli | `@indigoai-us/hq-cli` | Yes | `npm publish` from the repo |
-| hq-cloud | `@indigoai-us/hq-cloud` | Yes | `npm publish` from the repo |
-| hq-packages | `@indigoai-us/hq-pack-*` | Yes | `npm publish` per pack |
-| hq-core | `npx create-hq` scaffold | — | latest scaffold pulled by `create-hq` |
-| hq-sync | macOS app | — | `v*` tag → signed DMG + `latest.json` |
-| hq-console / hq-pro / hq-deploy | cloud apps | — | Vercel / SST deploy |
+## npm packages (hq-cli, hq-cloud, create-hq)
 
-## Prerequisites
-
-- npm account with publish access to the `@indigoai-us` org
-- `NPM_TOKEN` secret set in the target repo's GitHub settings
-- Two-factor authentication enabled on the npm account
-
-## Publishing an npm package (hq-cli, hq-cloud)
-
-Work in the relevant repo. Each is standalone — bump only that repo's version.
-
-### 1. Bump the version
+The three npm packages share one release pattern. The tag is the version:
 
 ```bash
-cd hq-cli           # or hq-cloud
-npm version patch   # or minor / major
+git push origin v5.346.0
 ```
 
-### 2. Build, typecheck, test
+The `publish.yml` workflow calls the shared `indigoai-us/.github` `_npm-publish.yml` reusable workflow, which stamps `package.json` from the tag, builds, publishes to npm with OIDC trusted publishing (no `NPM_TOKEN`), and pushes a `chore(release)` commit back to main. There is no manual version bump and no release PR. A `workflow_dispatch` run does a dry-run of the build, pack, and smoke steps.
+
+hq-cli enforces a branch policy: `-alpha.N` and `-beta.N` tags may only be cut from a non-main branch. Stable and `-rc` tags are not restricted.
+
+### Release notes
+
+hq-cli and hq-cloud collect release notes as fragments. For a user-facing change, add one file at `changelog.d/<branch-slug>.md` with Markdown bullets describing the user-visible effect. Do not edit `CHANGELOG.md` in a PR; the release workflow folds the fragments into the new version section. For changes with no user impact, use the `no-changelog` PR label (see hq-cli `CONTRIBUTING.md`).
+
+### Dependency between hq-cli and hq-cloud
+
+hq-cli pins an exact `@indigoai-us/hq-cloud` version. When a change spans both, release hq-cloud first, then update the pin in hq-cli and release hq-cli.
+
+## Scaffold (hq-core)
+
+hq-core changes land in `indigoai-us/hq-core-staging`. To release, an operator dispatches the `promote-to-hq-core` workflow there. It rsyncs the staging tree into an hq-core PR titled `release: v<version>`. When that PR merges, `auto-tag-release.yml` tags the commit and `release.yml` cuts the GitHub release. The version is `hqVersion` in `core/core.yaml`. Existing instances pick up a release with `/update-hq` or `hq rescue`; new instances get it from `npx create-hq` or the desktop app.
+
+## Desktop app (hq-desktop-app)
 
 ```bash
-npm run build && npm run typecheck && npm test
+git tag -a vX.Y.Z -m "HQ vX.Y.Z"
+git push origin vX.Y.Z
 ```
 
-### 3. Publish
+`versions.toml` is the single source of truth for the app version. The release workflow stamps `[product].version` in `versions.toml` and the generated files (`apps/sync/package.json`, `tauri.conf.json`, `Cargo.toml`, `Cargo.lock`) from the tag, builds signed macOS and Windows installers with updater manifests, publishes the GitHub Release, and pushes a `chore(release)` commit to main. `pnpm version:app` runs the same stamp locally (for example `pnpm version:app --set-version X.Y.Z-beta.1` when cutting a beta). Supported tags are `vX.Y.Z`, `vX.Y.Z-beta.N`, and `vX.Y.Z-alpha.N`. See `docs/RELEASE.md` in the repo.
+
+## Content packs (hq-packages)
+
+Each pack carries its own `version` in `package.yaml`. On each push to main, `release.yml` runs the pack tests and publishes changed packs to npm with OIDC trusted publishing. hq-core's `core/core.yaml` references the recommended packs by GitHub source, for example:
 
 ```bash
-npm publish --access public
+hq install github:indigoai-us/hq-packages#packages/hq-pack-design-styles
 ```
 
-> **Dependency note:** `hq-cli` depends on a published `@indigoai-us/hq-cloud`. When a change spans both, publish `hq-cloud` first, then bump `hq-cli`'s dependency range and publish `hq-cli`.
-
-## Automated publishing (CI/CD)
-
-Each package repo has its own release workflow that triggers on a version tag pushed **in that repo**:
-
-```yaml
-on:
-  push:
-    tags: ['v*']
-```
-
-Typical steps: checkout → setup Node → `npm ci` → build → typecheck → `npm publish`. Because the repos are independent, a tag in `hq-cli` publishes only `hq-cli`; it never touches `hq-cloud` or the apps.
-
-## Releasing the scaffold (hq-core)
-
-`hq-core` is the `create-hq` seed, not an npm package. Users always pull the latest scaffold via `npx create-hq`, so "releasing" means landing changes on the repo's main branch and bumping `hqVersion` in `core.yaml`. Existing instances upgrade with `/update-hq`.
-
-```bash
-# scaffold a throwaway instance to test changes
-npx create-hq ~/test-hq
-```
-
-## Releasing the desktop app (hq-sync)
-
-The menubar app releases by pushing a `v*` tag, which runs the sign/notarize/DMG workflow and publishes `latest.json` for auto-update. Bump the version in `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json` together before tagging.
-
-## Releasing a content pack (hq-packages)
-
-Each pack carries its own `version` in `package.yaml` and publishes as `@indigoai-us/hq-pack-<name>`. Users install with `hq install @indigoai-us/hq-pack-<name>` — see [hq-packages](/hq/products/hq-packages/overview/).
-
-## Version strategy (per package)
-
-- **Major**: breaking changes to the package's interface
-- **Minor**: new features / commands
-- **Patch**: bug fixes, content updates
-
-Each repo versions independently, so compatibility is expressed through dependency ranges (e.g. `hq-cli` declaring `@indigoai-us/hq-cloud` `~5.25.0`) rather than a shared release train.
+See [hq-packages](/hq/products/hq-packages/overview/).

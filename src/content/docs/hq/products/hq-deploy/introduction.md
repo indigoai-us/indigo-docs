@@ -1,46 +1,48 @@
 ---
 title: HQ Deploy Platform
-description: A complete PaaS for deploying static and SSR web applications to AWS.
+description: A PaaS for deploying static sites and server-rendered web applications to AWS.
 sidebar:
   order: 1
 ---
 
 > Part of the split [HQ ecosystem](/hq/architecture/2-ecosystem/). HQ Deploy is the `hq-deploy` data plane; deployments are visible in the [hq-console](/hq/products/hq-console/) admin UI, and it trusts the shared identity provisioned by [hq-pro](/hq/products/hq-pro/about/).
 
-HQ Deploy is a **platform-as-a-service** built on AWS that lets you deploy web applications with a single CLI command. It supports both static sites (S3 + CloudFront) and server-rendered apps (ECS Fargate + ALB).
+HQ Deploy is a **platform-as-a-service** built on AWS that lets you deploy web applications with a single CLI command. It supports static sites (S3 + CloudFront) and server-rendered Next.js and Hono apps (a per-app AWS Lambda function).
 
 ## How It Works
 
 ```
 Developer                    Control Plane                  AWS Data Plane
 ─────────                    ─────────────                  ──────────────
-hq-deploy deploy ──────────► POST /api/apps/:id/deploy
+hq-deploy deploy ──────────► Control plane API
                               │
-                              ├─ Static? ──► S3 upload + CloudFront invalidation
+                              ├─ Static? ──► POST /api/apps/:id/deploy
+                              │              → S3 upload + CloudFront invalidation
                               │
-                              └─ SSR? ────► Docker build + ECR push + ECS rolling deploy
+                              └─ Next.js / Hono? ──► POST /api/deploys + /complete
+                                                     → per-app Lambda function
                                                               │
                                                               ▼
-                                                    {app}.indigo-hq.com ◄── Lambda@Edge routing
+                                                    {app}.indigo-hq.com ◄── edge routing
+                                                    {app}.hq.work
 ```
 
-1. **You run `hq-deploy deploy`** — the CLI detects your framework (Next.js, Remix, Astro, Vite, etc.), builds your project, and uploads the output.
+1. **You run `hq-deploy deploy`** — the CLI detects your framework (Next.js, Hono, Astro, Vite, or plain static), builds your project, and uploads the output.
 2. **The control plane processes the deploy** — creates an app record, provisions DNS, and routes the build artifact to the right infrastructure.
-3. **Lambda@Edge handles routing** — inspects the `Host` header, looks up the app in DynamoDB, and routes to either S3 (static) or ALB (SSR).
+3. **The edge handles routing** — inspects the `Host` header, looks up the app, and routes to S3 (static) or to the app's function (server-rendered).
 
 ## Key Features
 
-- **Framework detection** — Automatically identifies Next.js, Remix, Astro, Vite, and plain static sites.
-- **Dual auth** — Clerk JWT for the web dashboard, platform API keys for the CLI.
-- **Multi-tenant** — Each org gets isolated resources. Cross-tenant access is impossible at the query level.
-- **Enterprise self-hosting** — Provision the full stack in a customer's AWS account via CloudFormation.
-- **Zero-downtime SSR deploys** — ECS rolling updates with `minimumHealthyPercent=100`.
-- **Upgrade management** — ChangeSet previews with dry-run mode for enterprise stack updates.
+- **Framework detection** — Automatically identifies Next.js, Hono, Astro, Vite, and plain static sites.
+- **HQ sign-in** — HQ Cognito tokens and HQ API keys (`hqk_`); see [Authentication](/hq/products/hq-deploy/authentication/).
+- **Multi-tenant** — Every app belongs to an org, and API routes check that the caller's org owns the app before reading or changing it. See [Multi-Tenant Orgs](/hq/products/hq-deploy/multi-tenant/).
+- **Infrastructure template** — `hq-deploy init` writes a CloudFormation template you can deploy in your own AWS account.
+- **Promote and rollback (static apps)** — Each static deploy is kept; `hq-deploy promote` and `hq-deploy rollback` point an environment at an earlier healthy deployment. Next.js and Hono apps have one live production deployment that each new deploy replaces, so promote, rollback, and non-production `--env` are not available for them.
 - **[In-context comments](/hq/products/hq-deploy/comments/)** — Viewers leave feedback directly on a gated deploy, anchored to a point or a region and tagged to their identity, behind the same access gate as the deploy.
 
 ## Projects That Built This
 
-The deploy platform was constructed across a series of sequential projects, each building on the last:
+The deploy platform was constructed across a series of sequential projects, each building on the last. Later work replaced several of them: Clerk auth gave way to HQ Cognito sign-in, the ECS container path for SSR is dormant, and the enterprise init and upgrade commands were not shipped in the CLI.
 
 1. **Repo scaffold** — TypeScript strict mode, ESLint, directory structure
 2. **Domain hosting** — Route 53, ACM cert, S3 bucket, CloudFront

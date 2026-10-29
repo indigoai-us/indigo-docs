@@ -1,6 +1,6 @@
 ---
 title: Projects
-description: Project management in HQ — PRDs, the Ralph loop, and autonomous execution.
+description: Project management in HQ — PRDs at companies/{co}/projects/{name}/prd.json, the Ralph loop, and autonomous execution.
 ---
 
 ## Overview
@@ -8,18 +8,16 @@ description: Project management in HQ — PRDs, the Ralph loop, and autonomous e
 Projects in HQ are structured task definitions that workers execute autonomously. The workflow:
 
 ```
-/prd "Build X"  →  /run-project  →  /execute-task (per story)
+/prd "Build X"  →  /run-project {project}  →  /execute-task (per story)
 ```
 
 ## Starting from a brainstorm
 
 `/brainstorm "idea"` explores approaches before you commit to a plan. It ends with three choices: **Plan it now** (writes `prd.json` in the same session, reusing your brainstorm answers), **Upgrade to deep-plan**, or **Stop here**.
 
-`/plan` is deprecated and forwards to `/prd`.
-
 ## Project glossary: GLOSSARY.md
 
-Project and repo glossaries used by the `tdd`, `diagnose`, and `wayfinder` skills are now named `GLOSSARY.md`. The old name, `CONTEXT.md`, is still read for one release. Rename existing files with:
+Project and repo glossaries used by the `tdd`, `diagnose`, and `wayfinder` skills are named `GLOSSARY.md`. The old name, `CONTEXT.md`, is no longer read. Rename existing files with:
 
 ```bash
 git mv CONTEXT.md GLOSSARY.md
@@ -31,32 +29,37 @@ git mv CONTEXT.md GLOSSARY.md
 /prd "Build a REST API for user management"
 ```
 
-This generates a `prd.json` at `projects/{project-name}/prd.json`:
+`/prd` asks which company the project belongs to, then writes `prd.json` and a `README.md` to `companies/{co}/projects/{name}/`. Personal projects go under `personal/projects/`. A shortened `prd.json`:
 
 ```json
 {
-  "project": {
-    "name": "user-management-api",
-    "description": "REST API for user CRUD operations",
-    "repo": "https://github.com/org/repo",
-    "branch": "feature/user-api"
-  },
-  "stories": [
+  "name": "user-management-api",
+  "description": "REST API for user CRUD operations",
+  "branchName": "feature/user-api",
+  "userStories": [
     {
       "id": "US-001",
       "title": "User registration endpoint",
-      "description": "POST /api/users with email/password",
-      "acceptance_criteria": [
+      "description": "As a new user, I want to register with email and password so that I can sign in",
+      "acceptanceCriteria": [
         "Returns 201 with user object",
         "Validates email format",
         "Hashes password before storage"
       ],
-      "status": "pending",
-      "assigned_to": null
+      "priority": 1,
+      "passes": false,
+      "dependsOn": []
     }
-  ]
+  ],
+  "metadata": {
+    "goal": "Ship a user management API",
+    "repoPath": "repos/private/my-api",
+    "baseBranch": "main"
+  }
 }
 ```
+
+After it writes the files, `/prd` saves a checkpoint so you can start execution in a fresh session.
 
 ## The Ralph Loop
 
@@ -73,50 +76,22 @@ Projects execute via the Ralph methodology — an iterative loop of planning, ex
 ### Running a Project
 
 ```bash
-/run-project
+/run-project {project}
 ```
 
 The orchestrator:
 - Reads the PRD
-- Tracks state in `workspace/orchestrator/`
-- Routes stories to appropriate workers
+- Tracks state in `workspace/orchestrator/{project}/`
+- Routes stories to appropriate workers through HQ worker lanes
 - Validates completion
 - Updates PRD status
-
-## Starter Projects
-
-HQ ships with 3 starter project templates:
-
-### Personal Assistant
-```bash
-# Located at starter-projects/personal-assistant/
-```
-- Email digest automation
-- Task scanning across tools
-- Daily briefing generation
-
-### Social Media Worker
-```bash
-# Located at starter-projects/social-media/
-```
-- Content creation for X and LinkedIn
-- Scheduling and publishing
-- Audience engagement tracking
-
-### Code Worker
-```bash
-# Located at starter-projects/code-worker/
-```
-- Autonomous coding via Ralph loop
-- Git branch management
-- Test-driven development
 
 ## Task Execution
 
 Individual tasks execute through `/execute-task`:
 
 ```bash
-/execute-task
+/execute-task {project}/US-001
 ```
 
 This runs a single story through the worker pipeline:
@@ -129,7 +104,7 @@ This runs a single story through the worker pipeline:
 
 ## Project State
 
-Project execution state is tracked in `workspace/orchestrator/`:
+Project execution state is tracked in `workspace/orchestrator/{project}/`:
 - Current story being executed
 - Worker assignments
 - Completion status

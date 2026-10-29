@@ -1,101 +1,46 @@
 ---
 title: Deploying Infrastructure
-description: Deploy HQ's AWS infrastructure using SST for serverless backend, auth, storage, and CDN.
+description: How HQ's shared AWS infrastructure in hq-pro is defined with SST and deployed.
 ---
+
+HQ's shared cloud infrastructure (the vault, team platform, `VaultApi`, and the Cognito identity pool) lives in the `hq-pro` repo. hq-console deploys separately on Vercel, and hq-deploy has its own CloudFormation templates under `infra/`.
 
 ## Prerequisites
 
-- AWS Account with admin access
-- AWS CLI v2 configured (`aws configure`)
-- Node.js 18+
-- Domain name for PWA (optional, default: hq.indigoai.com)
+- Access to the `indigoai-us/hq-pro` repo
+- pnpm 10 and Node.js
+- AWS CLI v2 with credentials for the target account (only for non-production stages)
 
-## SST Overview
+## SST
 
-HQ uses SST (Serverless Stack) v2 for infrastructure-as-code. SST wraps AWS CDK with a better DX for serverless apps.
+hq-pro uses SST 4 (`sst` 4.7.2 in `package.json`) with the AWS provider. The config is `sst.config.ts` at the repo root; the resources it composes are under `infra/` (for example `infra/vault-service.ts` defines `VaultApi`, and `infra/cognito.ts` defines the user pool clients).
 
-The config lives at `infra/sst.config.ts` and defines:
+### Stages
 
-- Cognito User Pool + Client
-- S3 Bucket with CORS
-- API Gateway v2 with JWT authorizer
-- Lambda functions for file and auth operations
-- CloudFront Static Site for PWA
+| Stage | Purpose |
+|-------|---------|
+| `hq-prod` | Production. Resources are retained on removal. The API is served at `https://hqapi.hq.computer`. |
+| `hq-dev` | Shared development stage. |
+| other names | Ephemeral stages. Resources are removed when the stage is removed. |
 
-## Deploy
+## Production deploys
 
-### First-time setup
+Production deploys run through CI only. Merge to `main`; after the CI workflow passes, the `Deploy Prod` workflow (`.github/workflows/deploy-prod.yml`) sends the merged SHA to a serialized CodeBuild runner, which runs `sst deploy --stage hq-prod` and then the post-deploy migrations. Routine local production deploys are blocked. The emergency break-glass path is documented in hq-pro's `docs/runbooks/hq-pro-continuous-deploy.md`.
+
+## Development stages
 
 ```bash
-cd infra
-npx sst deploy --stage prod
+pnpm install
+pnpm deploy --stage <stage>   # deploy a non-production stage
+pnpm dev                      # sst dev with live Lambda reloading
 ```
 
-SST will:
-
-1. Bootstrap a CDK toolkit stack in your AWS account
-2. Create all resources defined in `sst.config.ts`
-3. Output the API URL, User Pool ID, Client ID, and site URL
-
-### Staging environments
+To remove an ephemeral stage:
 
 ```bash
-npx sst deploy --stage dev
-npx sst deploy --stage staging
-```
-
-Each stage gets isolated resources (separate Cognito pool, S3 bucket, API).
-
-### Live development
-
-```bash
-npx sst dev
-```
-
-Starts SST in dev mode with live Lambda reloading. Changes to Lambda functions hot-reload without redeploying.
-
-## Post-Deploy Configuration
-
-After first deploy, you'll need the outputs:
-
-1. **API URL** — Set as `VITE_API_URL` in `apps/web/.env`
-2. **User Pool ID** — Set as `VITE_USER_POOL_ID`
-3. **Client ID** — Set as `VITE_USER_POOL_CLIENT_ID`
-4. **Site URL** — Configure DNS if using custom domain
-
-## Custom Domain
-
-To use `hq.indigoai.com`:
-
-1. Add domain to Route 53 (or configure external DNS)
-2. Update `sst.config.ts` StaticSite with `customDomain` property
-3. Redeploy — SST handles ACM certificate provisioning
-
-## Monitoring
-
-- **CloudWatch Logs** — Lambda function logs
-- **S3 Metrics** — Storage usage per user
-- **API Gateway** — Request counts, latency, error rates
-- **Cognito** — User sign-ups, sign-ins
-
-## Tear Down
-
-```bash
-npx sst remove --stage prod
+pnpm sst remove --stage <stage>
 ```
 
 :::caution
-This deletes all resources including the S3 bucket and user data. Only use for non-production stages.
+Removing a stage deletes its resources, including stored data. Never run this against `hq-prod`.
 :::
-
-## Cost Estimates
-
-| Service       | Pricing                          |
-|---------------|----------------------------------|
-| Cognito       | Free for first 50,000 MAU        |
-| S3            | ~$0.023/GB/month                 |
-| Lambda        | Free for first 1M requests/month |
-| API Gateway   | $1/million requests              |
-| CloudFront    | $0.085/GB transfer               |
-
-For a small team (&lt;100 users), expect &lt;$10/month.
