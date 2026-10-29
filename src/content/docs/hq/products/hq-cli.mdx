@@ -1,42 +1,44 @@
 ---
 title: hq-cli
-description: The hq CLI — module management and cloud sync, the operator's entry point to the HQ ecosystem.
+description: The hq CLI (@indigoai-us/hq-cli), the terminal interface to HQ — sync, packs, files, secrets, agents, messaging, and more.
 ---
 
 **hq-cli** ships the `hq` command — the ongoing management CLI for an HQ instance. It is published to npm as **`@indigoai-us/hq-cli`** (currently **5.x**).
 
 ## What it is
 
-- The operator-facing CLI: *"HQ by Indigo management CLI — modules and cloud sync."*
+- The operator-facing CLI for HQ. It covers about 70 top-level commands: sync and cloud, packs and modules, files and access, secrets, agents and bots, DMs, meetings, integrations, billing, deploy, work mesh, lanes, and more. The full list is in the [hq CLI reference](/hq/products/hq-cli-reference/).
 - Provides the `hq` binary (plus an `hq-auth-refresh` helper).
-- Built on Node ≥22, ESM + TypeScript, Commander 12. Depends on `@indigoai-us/hq-cloud` for sync.
+- Requires Node ≥20 (`engines.node` in `package.json`); ESM + TypeScript, Commander 12. Depends on `@indigoai-us/hq-cloud` for sync. (The `create-hq` installer has a higher floor, Node ≥22.13.)
 
 > The public seed-mirror may show an early placeholder version (e.g. `0.1.0`). The current, canonical CLI is `@indigoai-us/hq-cli` **5.x** — that's the one to install.
 
 ## Who uses it / when
 
-Everyone operating an HQ instance from the terminal. After [hq-core](/hq/products/hq-core/) scaffolds the directory, the `hq` CLI is how you manage modules and drive cloud sync day to day.
+Everyone operating an HQ instance from the terminal. After [hq-core](/hq/products/hq-core/) scaffolds the directory, the `hq` CLI is how you sign in, sync, install packs, and work with vault files, secrets, and agents from the terminal.
 
 ## Key commands
 
 ```bash
 # module management
 hq modules list             # show module inventory
-hq modules add <repo-url>   # clone + register a module
-hq modules sync             # update all modules to pinned commits
+hq modules add <repo-url>   # register a module in the manifest (does not clone)
+hq modules sync             # clone or update all modules to pinned commits
 
-# cloud sync (delegates to @indigoai-us/hq-cloud)
-hq sync init                # authenticate
-hq sync start               # start background sync
-hq sync status              # health
-hq sync stop                # stop background sync
+# sign-in and cloud sync (delegates to @indigoai-us/hq-cloud)
+hq login                    # sign in (or sign in to the HQ desktop app)
+hq cloud provision company <slug>   # make a local company cloud-backed
+hq sync now                 # push local changes, then pull remote updates
+hq sync push                # push only
+hq sync pull                # pull only
+hq sync status              # local sync journal summary
 hq sync doctor --reconcile-conflicts [--yes]   # clean up legacy .conflict-* twins (dry-run by default)
 
 # vault files
 hq access <path-or-query>   # can't find or open a file? never-existed / not-synced (fetched) / no-access (asks the owner)
 
 # packs (content packs)
-hq install @indigoai-us/hq-pack-<name>   # install a content pack
+hq install github:indigoai-us/hq-packages#packages/<pack>   # install a content pack
 hq packs list                            # installed packs + the curated catalog
 hq packs update [name]                   # re-install the latest (--check-only to peek)
 hq packs uninstall <name>                # un-wire + archive a pack cleanly
@@ -45,7 +47,7 @@ hq packs uninstall <name>                # un-wire + archive a pack cleanly
 hq run / hq secrets exec                 # schema-driven secret access
 
 # Fleet Agents
-hq agents provision "Fleet Scout" --company acme --size power
+hq agents provision "Fleet Scout" --company acme --size medium
 hq agents list --company acme
 
 # work mesh (native REST + ~/.hq/work-mesh/cache — no pack helper)
@@ -62,9 +64,11 @@ hq meetings import <transcript.json> --company <slug>
 
 `hq access <path-or-query>` (5.109+) is the one command for "I can't find or open this file." It resolves an exact vault key or a fuzzy name (it never auto-picks between several matches), then reports exactly one outcome: `never-existed` (exit 2), `local`/`not-synced` (exit 0), or `no-access` (exit 3). When the file exists and you can read it but it is not on disk, it fetches and pins it the same way `hq files get` does, repairing sync with `hq sync doctor` and retrying once if the fetch fails. When you lack access it names the grantor, shows their email, asks one yes/no question, and sends them a DM whose copy-prompt is the exact `hq files share … --permission read` command; repeat requests for the same prefix are deduped for 24 hours. `--json` never sends without `--yes`; `--no-fix` diagnoses only. Every access-denied error from `hq files …` and `hq sync …` now ends with `Run: hq access <path>`. See [hq-share](/hq/products/capabilities/hq-share/#requesting-access).
 
-Pack commands accept `--json` for machine-readable output — the [hq-sync](/hq/products/hq-sync/) menubar app uses this to power its Packages window.
+`hq install` also accepts a bare slug, which resolves through the HQ marketplace, an npm `@scope/name[@version]`, a git URL, or a local path. The `github:` form above is what `core/core.yaml` uses for recommended packs.
 
-Fleet Agent creation accepts `--size basic`, `--size power`, or `--size dev`. Before provisioning, the CLI prints the selected capacity and company-specific monthly price and asks for confirmation. See [Create an agent](/hq/products/fleet-agents/create/) and [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/).
+Pack commands accept `--json` for machine-readable output. The [HQ desktop app](/hq/products/hq-sync/) uses it for **Library → Installed**.
+
+Fleet Agent creation accepts `--size small`, `medium`, `large`, or `xlarge`. The legacy names `basic`, `power`, and `dev` are still accepted and map to `small`, `medium`, and `large`. Before provisioning, the CLI prints the selected capacity and company-specific monthly price and asks for confirmation. See [Create an agent](/hq/products/fleet-agents/create/) and [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/).
 
 `hq meetings import` lets a company owner add a normalized historical transcript to the company knowledge pipeline. The JSON file identifies the company, recorder, source, participants, provenance, timestamps, and timestamped transcript segments. Imports are immutable by `externalSourceId`: submitting the same file again reports `unchanged`, while submitting different content with the same ID reports a conflict instead of overwriting the original. Imported meeting paths are pipeline-managed and remain excluded from ordinary `hq sync push` uploads.
 
@@ -84,10 +88,11 @@ For a handoff, match the intended company, exact prefix, recipient, and permissi
 
 ## How it composes
 
-`hq-cli` handles two concerns: **module management** (the [module system](/hq/architecture/8-module-system/)) and **cloud sync**. Sync subcommands lazily `import("@indigoai-us/hq-cloud")` only when invoked, so module commands work even without the cloud engine present. The same engine is also driven by the [hq-sync](/hq/products/hq-sync/) menubar app.
+`hq-cli` is a broad CLI, not only module management and sync. Sync and cloud commands call the `@indigoai-us/hq-cloud` engine, which is a dependency of the CLI. The same engine is also driven by the [HQ desktop app](/hq/products/hq-sync/). Module management uses the [module system](/hq/architecture/8-module-system/). For every command and subcommand, see the [hq CLI reference](/hq/products/hq-cli-reference/).
 
 ## Related
 
 - [hq-cli architecture](/hq/architecture/4-hq-cli/) — module management + sync bridge internals
+- [hq CLI reference](/hq/products/hq-cli-reference/) — every public command, generated from the CLI's command catalog
 - [hq-cloud](/hq/products/hq-cloud/) — the sync engine the CLI depends on
 - [hq-secrets](/hq/products/capabilities/hq-secrets/) — `hq run` / `hq secrets exec` capability

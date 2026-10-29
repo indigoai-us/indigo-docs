@@ -1,24 +1,22 @@
 ---
 title: hq-core
-description: The HQ scaffold and starter kit — the create-hq seed that bootstraps a new HQ instance.
+description: The HQ scaffold — the hq-core release that create-hq downloads to bootstrap a new HQ instance (hqVersion 16.x).
 ---
 
-**hq-core** is the HQ scaffold: the starter kit copied into a new HQ instance by `npx create-hq`. It is the seed that every HQ directory grows from.
+**hq-core** is the HQ scaffold: the starter kit that `npx create-hq` downloads from GitHub and lays down as a new HQ instance. It is the seed that every HQ directory grows from.
 
 ## What it is
 
-- The **create-hq scaffold** — distributed as a seed, not as an npm package. Its version is tracked as `hqVersion` in `core.yaml` (currently **15.x**).
+- The **create-hq scaffold** — distributed as a GitHub release of `indigoai-us/hq-core`, not as an npm package. Its version is tracked as `hqVersion` in `core/core.yaml` (currently **16.0.x**). The same file sets `requiresHqCli`, the minimum [`hq` CLI](/hq/products/hq-cli/) version the scaffold needs.
 - A minimal scaffold for orchestrating autonomous AI workers across sessions. HQ is a team AI operating system that scales from solo operator to enterprise.
-- Ships **minimal on purpose** — rich capabilities install separately as `@indigoai-us/hq-pack-*` content packs.
+- Ships the orchestration layer and the engineering surface (`/tdd`, `/review`, `/execute-task`, `/run-project`, `/architect`, `/land`, and related workers and policies). Other capabilities install separately as content packs.
 
-### v15.0.0: engineering surface is now a pack
+### Engineering surface ships in core
 
-As of v15.0.0, the engineering toolkit no longer ships inside core. The dev skills (`/tdd`, `/review`, `/execute-task`, `/run-project`, `/architect`, `/diagnose`, `/land`, and more), the coding workers (qa-tester, security-scanner, and others), plus their knowledge bases and policies now live in the installable `hq-pack-engineering` pack. Vanilla core is a pure orchestration layer that founders, ops, and knowledge-work tenants can use without coding tooling they will never touch.
-
-Upgrading is transparent. `/update-hq` auto-installs `hq-pack-engineering` and symlinks every capability back to its original path before removing the inline copies, so existing commands keep working with no prompts. Fresh `npx create-hq` installs stay lean; add the pack on demand:
+hq-core v15.0.0 moved the engineering toolkit into a separate `hq-pack-engineering` pack. A later release reversed that: the engineering skills, workers, knowledge, and policies ship in core again, and `hq-pack-engineering` is no longer a recommended package. Nothing needs installing. If you upgraded from a version that installed the pack, remove the redundant copy once:
 
 ```bash
-hq install github:indigoai-us/hq-packages#packages/hq-pack-engineering
+hq packs uninstall hq-pack-engineering
 ```
 
 ## Who uses it / when
@@ -32,15 +30,27 @@ Anyone standing up a new HQ instance. You touch hq-core once at install time; af
 npx create-hq ~/my-hq
 
 # full vs minimal install
-npx create-hq ~/my-hq --full      # prompts to install recommended packs
-npx create-hq ~/my-hq --minimal   # bare scaffold
+npx create-hq ~/my-hq --full      # install all recommended packs without prompting
+npx create-hq ~/my-hq --minimal   # scaffold only, skip recommended packs
 ```
 
-`create-hq` scaffolds the directory, runs `setup.sh`, and can install the recommended packs declared in `core.yaml`. Prerequisites: Claude Code and the GitHub CLI are required; qmd, Codex, and ggshield are optional/recommended. (The Vercel CLI is not an HQ dependency — `/deploy` uses hq-deploy; install Vercel yourself only if you deploy your own projects to it.)
+| Flag | Effect |
+|---|---|
+| `[directory]` | Where to create HQ (prompts if omitted; the prompt defaults to `hq`) |
+| `--skip-deps` | Skip dependency checks |
+| `--skip-cli` | Don't install `@indigoai-us/hq-cli` globally |
+| `--skip-sync` | Don't prompt for cloud sync setup |
+| `--skip-packages` | Don't prompt for package discovery and installation |
+| `--minimal` | Install the hq-core scaffold only |
+| `--full` | Install the scaffold plus all recommended content packs without prompting |
+| `--tag <version>` | Fetch a specific hq-core version tag (for example `v16.0.0`) |
+| `--local-template <path>` | Use a local hq-core directory instead of fetching from GitHub |
+
+`create-hq` downloads the latest hq-core release from GitHub (or the `--tag` version, or `--local-template`), scaffolds the directory, and can install the recommended packs declared in `core/core.yaml`. Prerequisites: Node.js 22.13 or later and git are required. The GitHub CLI, Claude Code, qmd, yq, and the `hq` CLI are optional; the installer offers to install them. (The Vercel CLI is not an HQ dependency — `/deploy` uses hq-deploy; install Vercel yourself only if you deploy your own projects to it.)
 
 ### What the scaffold contains
 
-`core.yaml` defines the rule tiers (locked / reviewable / open) and recommended packages. The scaffold lays down the `.claude/` command + skill tree, `modules/`, `companies/`, and `workers/` — the structure the rest of the ecosystem plugs into via the [module system](/hq/architecture/8-module-system/).
+`core/core.yaml` defines the rule tiers (locked / reviewable / open) and recommended packages. The scaffold lays down the runtime folders (`.claude/` skills, `.codex/`, `.agents/`, `.cursor/`, `.grok/`), `core/` (workers, knowledge, policies, scripts), `companies/`, `personal/`, `repos/`, and `workspace/`.
 
 ## Composition
 
@@ -49,6 +59,5 @@ npx create-hq ~/my-hq --minimal   # bare scaffold
 
 ## Related
 
-- [create-hq architecture](/hq/architecture/3-create-hq/) — the installer internals
 - [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/) — how the seed relates to the other repos
 - [hq-cli](/hq/products/hq-cli/) — the CLI you use after scaffolding

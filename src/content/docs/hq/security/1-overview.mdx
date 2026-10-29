@@ -11,9 +11,9 @@ HQ has two layers. The **local layer** is the HQ directory and the desktop/CLI t
 
 ## Executive summary
 
-HQ Cloud is hosted on AWS in the United States (`us-east-1`). The team product (HQ Pro) uses tenant-isolated storage: each customer organization receives a **dedicated S3 bucket and a dedicated AWS KMS key**, and access is brokered through **short-lived AWS STS sessions** that are recomputed per request and scoped to the tenant, the permitted paths, and the allowed operation.
+HQ Cloud is hosted on AWS in the United States (`us-east-1`). HQ uses tenant-isolated storage: each customer organization and each person receives a **dedicated S3 bucket**, and access is brokered through **short-lived AWS STS sessions** that are recomputed per request and scoped to the tenant, the permitted paths, and the allowed operation. New vaults get a **dedicated AWS KMS key**; some existing vaults are encrypted with a shared Indigo-managed KMS key or with S3-managed keys (SSE-S3) until they are re-keyed.
 
-Indigo does not use customer data to train models. HQ's own cloud-side AI features run on **AWS Bedrock** (Claude models hosted inside AWS), which does not train on or retain request data. The local agent tools (Claude Code, Cursor, Codex) run on your machine using **your own model-provider credentials** — that traffic goes from your machine to the provider you chose, and Indigo does not broker it.
+Indigo does not use customer data to train models. Most of HQ's cloud-side AI features run on **AWS Bedrock** (Claude models). Live meeting voice for agents uses **OpenAI** and **xAI** APIs called from Indigo's servers. The local agent tools (Claude Code, Cursor, Codex) run on your machine using **your own model-provider credentials** — that traffic goes from your machine to the provider you chose, and Indigo does not broker it. See [Subprocessors](/hq/security/2-subprocessors/) for the full list.
 
 Indigo is **not yet SOC 2 or ISO certified**. The product is designed to align with the SOC 2 Trust Services Criteria, and readiness work is in progress. Implemented controls and current limitations are listed below.
 
@@ -21,31 +21,32 @@ Indigo is **not yet SOC 2 or ISO certified**. The product is designed to align w
 
 | Question | Answer |
 |---|---|
-| Where is customer data hosted? | AWS `us-east-1`, United States. |
-| How are tenants separated? | HQ Pro: a separate S3 bucket and a separate KMS key per organization, plus per-request scoped STS credentials. HQ Cloud (personal): a single bucket with per-user prefix isolation and per-user scoped STS. |
-| Is data encrypted at rest? | Yes. SSE-KMS (AES-256) with a tenant-specific, Indigo-managed KMS customer-managed key. |
+| Where is customer data hosted? | HQ's primary stores are in AWS `us-east-1`, United States. Some subprocessors process data in other locations; see [Subprocessors](/hq/security/2-subprocessors/). |
+| How are tenants separated? | A separate S3 bucket per organization and per person, plus per-request scoped STS credentials. New vaults also get their own KMS key. |
+| Is data encrypted at rest? | Yes. New vaults use SSE-KMS with a dedicated, Indigo-managed KMS key. Some existing vaults use a shared Indigo-managed KMS key or SSE-S3 until they are re-keyed. |
 | Is data encrypted in transit? | Yes. TLS is enforced; bucket policy denies non-TLS requests. |
-| How do users authenticate? | AWS Cognito with Google Workspace OIDC SSO and GitHub federated sign-in. Desktop/CLI use OAuth2 Authorization Code with PKCE. |
+| How do users authenticate? | AWS Cognito with federated sign-in through Google and Microsoft (work, school, and personal accounts). Native self-registration is blocked. Desktop/CLI use OAuth2 Authorization Code with PKCE. |
 | How is authorization enforced? | Organization roles plus path-scoped capabilities, translated into short-lived, narrowed AWS credential policies. |
-| Is there audit logging? | Yes. CloudTrail data events on customer storage (with log-file validation) and an application audit trail for credential issuance and administrative actions. |
-| Are prompts or outputs used for model training? | No. Indigo does not train on customer data. Cloud AI runs on AWS Bedrock, which does not train on API data. |
+| Is there audit logging? | Yes. An application audit trail for credential issuance and administrative actions, AWS CloudTrail management events (with log-file validation), and S3 server access logs on vault buckets. |
+| Are prompts or outputs used for model training? | No. Indigo does not train on customer data. See [Subprocessors](/hq/security/2-subprocessors/) for the AI providers HQ uses. |
 | Can Indigo sign a DPA? | Yes, on request. GDPR and CCPA/CPRA support is available. |
 | Any certifications today? | Not yet. SOC 2 and ISO certifications have not been completed. |
 
 ## Deployment model
 
-HQ is **local-first with optional cloud sync**. The HQ directory and the agent tooling run on the customer's own machine (macOS today; Windows support is in progress). HQ Cloud is an optional layer that syncs content to AWS so it is available across people and devices.
+HQ is **local-first with optional cloud sync**. The HQ directory and the agent tooling run on the customer's own machine (macOS and Windows; Linux is not supported yet). HQ Cloud is an optional layer that syncs content to AWS so it is available across people and devices.
 
 This matters for security review because the customer's endpoint is part of the trust boundary: local files, locally configured credentials, and locally run AI agents are governed by the customer's own machine and policies. The [shared responsibility](#shared-responsibility) section makes the split explicit.
 
 ## Tenant isolation
 
-Tenant isolation is HQ's strongest control. The team vault (HQ Pro) does not rely only on an application-level tenant check in a shared store:
+Tenant isolation is HQ's strongest control. The vault does not rely only on an application-level tenant check in a shared store:
 
-- Each organization receives a **separate S3 bucket** (`hq-vault-cmp-…`) and a **separate KMS key** (automatic annual rotation, deletion protection).
+- Each organization receives a **separate S3 bucket** (`hq-vault-cmp-…`), and each person receives a personal bucket (`hq-vault-prs-…`).
+- New vaults receive a **dedicated KMS key** with automatic annual rotation. Some existing vaults use a shared Indigo-managed KMS key or SSE-S3 until they are re-keyed.
 - The vault defaults to **deny-all**. Access is granted as narrow, time-bound **capabilities**, not broad credentials.
 - Every request **recomputes** organization membership and path permissions before issuing credentials.
-- Access uses **short-lived AWS STS sessions** — 15 minutes by default, capped at one hour — scoped to one tenant bucket, one tenant key, and the authorized path.
+- Access uses **short-lived AWS STS sessions** — 15 minutes by default, capped at one hour — scoped to one tenant bucket, that vault's key, and the authorized path.
 - Requests **fail closed**: if a safe, scoped policy cannot be represented, the session is issued a deny-all policy rather than a broader one.
 - CI includes **blocking end-to-end tests** that attempt cross-tenant access and assert denial.
 
@@ -54,41 +55,40 @@ graph TD
     user["User"] --> cognito["Cognito + SSO"]
     cognito -->|JWT| vault["Vault service"]
     vault -->|recompute membership + path perms| sts["STS<br/>(scoped, 15&nbsp;min)"]
-    sts -->|one bucket, one key, one path scope| s3["Tenant S3 bucket<br/>(SSE-KMS, tenant key)"]
+    sts -->|one bucket, one key, one path scope| s3["Tenant S3 bucket<br/>(encrypted at rest)"]
 ```
-
-The personal tier (HQ Cloud) uses a single bucket with **per-user prefix isolation** (`users/{userId}/hq/`); every file operation is scoped to the authenticated user's prefix, and STS credentials are scoped to that prefix and expire after one hour.
 
 ## Identity and access management
 
-HQ uses AWS Cognito for authentication and identity federation. **Google Workspace OIDC SSO** is the primary self-service path, and **GitHub federated sign-in** is supported for onboarding. Native password self-registration is not the intended path for teams.
+HQ uses AWS Cognito for authentication and identity federation. Users sign in through **Google** or **Microsoft** (work, school, or personal accounts). Native self-registration in the Cognito pool is refused by a pre-sign-up check; machine and agent identities are created by HQ's own services.
 
-Desktop and CLI authentication uses **OAuth2 Authorization Code with PKCE (S256)**, validates state, and uses a local loopback redirect. Access and ID tokens last **one hour**; refresh tokens last **30 days**. Desktop tokens are stored in the OS keychain where available, with a restricted local-file fallback otherwise.
+Desktop and CLI authentication uses **OAuth2 Authorization Code with PKCE (S256)**, validates state, and uses a local loopback redirect. Access and ID tokens last **one hour**; refresh tokens for the desktop, CLI, and web console last **90 days**. Desktop tokens are stored in `~/.hq/cognito-tokens.json` with owner-only file permissions; signed macOS builds also keep a copy in the macOS Keychain.
 
-Authorization combines **organization roles** with **path-scoped capabilities** (entitlement packs and ACLs). Customers can invite and remove members, assign roles, grant or revoke path access, and revoke sharing by removing a grant or letting a capability link expire.
+Authorization combines **organization roles** (`owner`, `admin`, `member`, `guest`) with **path-scoped capabilities** (entitlement packs and ACLs). Customers can invite and remove members, assign roles, grant or revoke path access, and revoke sharing by removing a grant or letting a capability link expire.
 
 Staff administrative access is restricted and logged; administrative and impersonation actions are recorded in the application audit trail. Customers' own identity-provider policy (MFA strength, conditional access, deprovisioning) remains part of the customer's posture.
 
 ## Encryption, sharing, and secrets
 
-- **At rest** — customer content is encrypted with **SSE-KMS (AES-256)** using a tenant-specific, Indigo-managed KMS customer-managed key, with S3 bucket keys enabled.
+- **At rest** — new vaults are encrypted with **SSE-KMS** using a dedicated, Indigo-managed KMS key, with S3 bucket keys enabled. Some existing vaults use a shared Indigo-managed KMS key or S3-managed encryption (SSE-S3, AES-256) until they are re-keyed.
 - **In transit** — TLS is enforced. Bucket policy includes an explicit **deny** for non-TLS (`aws:SecureTransport: false`) requests. S3 Public Access Block is enabled and object versioning is on.
 - **Share links** — [hq-share](/hq/products/capabilities/hq-share/) mints **single-use, time-limited capability tokens** encrypted with **AES-256-GCM**. Tokens are pinned to specific paths, capped at write permission (they cannot grant admin), and enforce single use via an atomic nonce claim. The default lifetime is 15 minutes.
-- **Secrets** — [hq-secrets](/hq/products/capabilities/hq-secrets/) stores application and customer secrets in **AWS SSM Parameter Store (SecureString)** or **AWS Secrets Manager**. Secrets are fetched into a process environment and are not printed to the terminal or committed to source control.
+- **Secrets** — [hq-secrets](/hq/products/capabilities/hq-secrets/) stores customer secrets in **AWS SSM Parameter Store** as `SecureString` parameters, encrypted with the AWS-managed SSM key. Secrets are fetched into a process environment and are not printed to the terminal or committed to source control.
 
 ## AI and model-provider use
 
-HQ uses AI in two distinct places, and they have different data paths:
+HQ uses AI in these places, and they have different data paths:
 
 | Surface | Where it runs | Provider | Notes |
 |---|---|---|---|
 | Local agent work | On the customer's machine | The **customer's own** model-provider account (Claude Code, Cursor, Codex) | Indigo does not broker this. Traffic goes from the customer's machine to the provider they configured, under that provider's terms. |
-| Cloud-side AI (HQ Pro) | Indigo's AWS backend | **AWS Bedrock** (Claude models hosted in AWS, `us-east-1`) | Powers features such as meeting-signal extraction and ontology synthesis. Bedrock does not train on or retain request data. |
+| Cloud-side AI | Indigo's AWS backend | **AWS Bedrock**: Claude Sonnet 4.6 (global cross-region inference), Claude Haiku 4.5 (US cross-region inference), Amazon Titan Text Embeddings V2 (`us-east-1`) | Powers features such as meeting-signal extraction, ontology synthesis, and semantic search. With cross-region inference, Bedrock may process a request in an AWS region other than `us-east-1`. |
+| Live meeting voice for agents | Indigo's meeting service on AWS | **OpenAI** (realtime voice, speech, and a text model for questions about the meeting so far) and **xAI** (speech) | Used when an agent takes part in a meeting by voice. Meeting audio and transcript text are sent to these providers. |
 
 Indigo does **not** train models on customer data. Model inputs are limited to the content submitted or referenced for the requested action. Customers decide what content to submit to AI features.
 
 :::note[On "Anthropic"]
-HQ's cloud-side AI uses **Claude models through AWS Bedrock**, so the data path stays inside AWS rather than going to Anthropic's own API. Anthropic is the model provider behind Bedrock; it is listed in [Subprocessors](/hq/security/2-subprocessors/) for clarity, with its no-training stance noted. Local agent traffic uses the customer's own provider account and is a customer-connected tool, not an Indigo subprocessor.
+HQ's Claude usage on the server side goes through **AWS Bedrock**, not Anthropic's own API. Local agent traffic uses the customer's own provider account and is a customer-connected tool, not an Indigo subprocessor.
 :::
 
 ## Infrastructure and network security
@@ -97,22 +97,23 @@ HQ Cloud runs on managed AWS services, defined as code with SST v3 and reviewed 
 
 - **Compute** — AWS Lambda behind Amazon API Gateway (HTTP API with a JWT authorizer); long-running workloads use Amazon ECS Fargate.
 - **Storage** — Amazon S3 for customer content; Amazon DynamoDB for metadata, access-control, and audit tables (point-in-time recovery enabled).
-- **Network** — a dedicated VPC with private subnets and **no NAT gateway**; AWS service access is routed through **VPC interface endpoints**. Databases are not publicly accessible.
-- **Keys** — AWS KMS, one customer-managed key per tenant, with automatic annual rotation and deletion protection.
+- **Network** — the vault network is a dedicated VPC with private subnets and **no NAT gateway**; AWS service access from it is routed through **VPC interface endpoints**. Databases are not publicly accessible. Workloads that must reach third-party APIs run outside that VPC: the agent meeting service runs in public subnets behind a public load balancer, and in production hosted-agent workers reach third-party model APIs through a NAT gateway.
+- **Keys** — AWS KMS. New vaults get their own key with automatic annual rotation; some existing vaults use a shared Indigo-managed key or SSE-S3 until they are re-keyed.
 
-Internet-facing surfaces are limited to managed entry points (API Gateway, Cognito hosted sign-in, and static web delivery). HQ does not operate its own data centers; physical and environmental controls are inherited from AWS.
+HQ does not operate its own data centers; physical and environmental controls are inherited from AWS.
 
 ## Application security and SDLC
 
-Development uses Git with reviewed pull requests, environment separation, and CI gates: type-checking, linting, automated tests, and **blocking cross-tenant isolation end-to-end tests**. Dependencies are pinned with committed lockfiles and frozen installs in CI.
+Development uses Git with reviewed pull requests, environment separation, and CI gates: type-checking, linting, automated tests, and **blocking cross-tenant isolation end-to-end tests**. Dependencies are pinned with committed lockfiles and frozen installs in CI. Dependabot and gitleaks secret scanning run on the hq-pro, hq-cli, and hq-desktop-app repositories.
 
-Desktop applications (the [HQ Installer](/hq/products/hq-pro/overview/) and the [HQ Sync](/hq/products/hq-sync/) menubar app) are **code-signed with an Apple Developer ID certificate, notarized by Apple, and distributed through cryptographically signed updates** (the updater verifies a minisign signature before applying an update).
+Desktop app updates are **cryptographically signed** (the updater verifies a minisign signature before applying an update). The release workflow can sign macOS builds with an Apple Developer ID certificate and notarize them, and sign Windows builds with Authenticode; both are controlled by a release setting. When that setting is off, macOS builds are ad-hoc signed and not notarized.
 
 HQ has **not yet completed an independent third-party penetration test**. Internal security review and adversarial testing are used while an external assessment is planned.
 
 ## Monitoring, audit, and investigation
 
-- **CloudTrail** data events are enabled on customer storage buckets, with multi-region coverage and **log-file validation** for tamper evidence.
+- **CloudTrail** records AWS management events, with multi-region coverage and **log-file validation** for tamper evidence. CloudTrail data events on vault buckets were turned off on 2026-09-24.
+- **S3 server access logs** are configured on person and company vault buckets and loaded into ClickHouse for analysis and investigation. AWS delivers these logs on a best-effort basis: records can arrive hours late and a small fraction may not arrive, so they are not a complete audit record.
 - An **application audit trail** (DynamoDB) records security-relevant events such as credential issuance, the requesting identity and source IP, the paths and operations involved, and administrative actions.
 - **CloudWatch** is used for application logs, metrics, and alarms.
 - **Sentry** is used for error and performance monitoring, with authentication tokens and local filesystem paths scrubbed before transmission; it is not intended to receive customer content.
@@ -139,14 +140,17 @@ State these plainly during review:
 - **Native in-platform MFA is not available**; MFA is enforced through the customer's identity provider.
 - **Refresh-token rotation is not yet enabled.**
 - Customer-owned keys (BYOK) and end-to-end (zero-knowledge) encryption are not offered; tenant keys are Indigo-managed in AWS KMS.
-- Automated dependency-vulnerability scanning and SBOM generation are planned but not yet fully implemented.
+- Not every existing vault has its own KMS key yet; some use a shared Indigo-managed key or SSE-S3 until they are re-keyed.
+- S3 data access is recorded through best-effort S3 server access logs, not CloudTrail data events.
+- Dependabot covers the hq-pro, hq-cli, and hq-desktop-app repositories only; SBOM generation is not implemented.
+- Desktop builds are notarized only when the release workflow's signing setting is on.
 - Some internal administrative functions retain broader permissions than the steady-state customer data path; they are restricted and audited.
 
 ## Detailed topics
 
 This overview is the summary. Deeper, reviewer-oriented detail lives in the rest of this section:
 
-- [Tenant Isolation](/hq/security/3-tenant-isolation/) — per-company bucket + key, scoped STS, fail-closed
+- [Tenant Isolation](/hq/security/3-tenant-isolation/) — per-company bucket, KMS keys, scoped STS, fail-closed
 - [Data Security & Encryption](/hq/security/4-data-security-encryption/) — classification, keys, retention, deletion
 - [Identity & Access Management](/hq/security/5-identity-access-management/) — SSO, PKCE, tokens, RBAC, staff access
 - [Infrastructure & Network Security](/hq/security/6-infrastructure-network-security/) — AWS region, VPC, IaC, secrets

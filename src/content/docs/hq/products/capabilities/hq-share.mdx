@@ -12,16 +12,23 @@ sidebar:
 ## Usage
 
 ```
-/hq-share <path>... [--company <slug>] [--no-open]
+/hq-share <path>... [--with <principal>] [--permission read|write] [--company <slug>] [--no-open] [--no-draft]
 ```
 
 ```bash
-/hq-share reports/q3/
-/hq-share reports/q3/ docs/handbook/ --company indigo
-/hq-share announcements/ --no-open      # print URL only (headless contexts)
+/hq-share 'reports/q3/*'                                     # everything under reports/q3/
+/hq-share 'reports/q3/*' 'docs/handbook/*' --company indigo
+/hq-share 'announcements/*' --no-open                        # print URL only (headless contexts)
+/hq-share 'reports/q3/*' --no-draft                          # skip the drafted note step
+/hq-share 'invoices/*' --with grp_finance --permission read  # direct grant, no browser
 ```
 
-Under the hood this runs `hq files share <paths...>`, which mints the token and opens the picker.
+Path patterns follow the vault ACL conventions:
+
+- `prefix/*` shares everything under the folder, recursively. Quote it so the shell does not expand the `*`.
+- A trailing slash (`reports/q3/`) is a **private folder**: it lets the recipient create files directly inside it but does not grant access to any existing child.
+
+Prefixes are relative to the company vault; do not prepend `companies/<slug>/`. `--with` selects the direct-grant path (see below); without it, `/hq-share` runs `hq files share <paths...>`, which mints the token and opens the picker.
 
 ## From HQ MCP
 
@@ -40,14 +47,14 @@ See [HQ MCP](/hq-in-chat/) for the full MCP tool surface.
 3. **Mint + open** — the CLI prints the share-session URL, the normalized paths, and an `Expires:` timestamp, and opens the picker page.
 4. **Pick recipients** — choose humans, active agents, groups, or "Share with All" and per-recipient `read`/`write`; all grants submit in one batch. Agent selections are stored under their stable `agt_*` identity.
 
-Default token TTL is **15 minutes** (bounded 60s–7d).
+Default token TTL is **15 minutes**. `hq files share --expires` accepts up to **24h** (for example `--expires 1h`); the server accepts 60s–7d for other callers.
 
 ## Single-use capability URLs
 
 A share-session URL is a live, encrypted, **single-use** capability: any holder can redeem it to write ACLs in the issuer's name. Handle it accordingly:
 
 - At mint time it is surfaced **once**, only as a Markdown inline link whose label carries purpose + expiry and whose href carries the token — never as bare visible text.
-- It is **never** echoed again in any later turn, summary, commit message, PR body, journal, or other persisted artifact. Everywhere after minting, use the redacted form `https://hq.{co}.com/share-session/<TOKEN_REDACTED>`.
+- It is **never** echoed again in any later turn, summary, commit message, PR body, journal, or other persisted artifact. Everywhere after minting, use the redacted form `https://hq.computer/share-session/<TOKEN_REDACTED>`.
 - Tokens are single-use — if a recipient hits `expired` (403) or `nonce_already_claimed` (409), mint a fresh link rather than extending the old one.
 
 > This page intentionally shows only the redacted placeholder. Real share-session tokens never appear in documentation.

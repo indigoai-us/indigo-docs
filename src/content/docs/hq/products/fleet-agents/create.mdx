@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-Create Fleet Agents from the **Agents** page for a company in HQ Console or with `hq agents provision`. Both paths let you choose the box size and show the company-specific monthly price before anything is provisioned. The setup creates the agent's identity, membership, vault workspace, managed runtime, and selected authentication method as one resumable flow.
+Create Fleet Agents from the **Bots** page for a company in HQ Console or with `hq agents provision`. Both paths let you choose the box size and show the company-specific monthly price before anything is provisioned. The setup creates the agent's identity, membership, vault workspace, managed runtime, and selected authentication method as one resumable flow.
 
 ## Before you start
 
@@ -28,15 +28,15 @@ Choose an agent handle and complete its public profile. The handle becomes part 
 
 ## 2. Choose a size and review the cost
 
-Choose **Basic**, **Power**, or **Dev** based on the work the agent will perform. The Console shows the capacity and applicable monthly price on each card. Contract pricing, plan inclusions, sponsorships, and account-specific overrides can change the amount, including making a size $0 for a company that is not billed per agent.
+Choose **Small**, **Medium**, **Large**, or **XLarge** based on the work the agent will perform. Accounts still on the earlier ladder see **Basic**, **Power**, and **Dev** instead. The Console shows the capacity and applicable monthly price on each card. Contract pricing, plan inclusions, sponsorships, and account-specific overrides can change the amount, including making a size $0 for a company that is not billed per agent.
 
 The CLI exposes the same choice and quote:
 
 ```bash
-hq agents provision "Fleet Scout" --company acme --size power
+hq agents provision "Fleet Scout" --company acme --size medium
 ```
 
-Before provisioning, the CLI prints the selected size, capacity, and company-specific monthly price, then asks for confirmation. Add `--yes` only for an already-reviewed automated flow.
+`--size` accepts `small`, `medium`, `large`, or `xlarge`. The legacy names `basic`, `power`, and `dev` are also accepted; on usage pricing they map to `small`, `medium`, and `large`. Before provisioning, the CLI prints the selected size, capacity, and company-specific monthly price, then asks for confirmation. Add `--yes` only for an already-reviewed automated flow.
 
 See [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/) for the size ladder and plan inclusions.
 

@@ -14,6 +14,7 @@ for five minutes (`Cache-Control: max-age=300`).
 The JSON body contains:
 
 - `version` and `generatedAt`
+- `currency` (`usd`) and `interval` (`month`)
 - `usage`: the usage card for accounts created from 16 October 2026
   - `version` and `newSignupsFrom`, the instant the card applies to new
     signups
@@ -26,9 +27,14 @@ The JSON body contains:
   - `boxes[]`: each box size with its instance type and monthly price (small
     t3.small, medium t3.medium, large t3.large, xlarge t3.xlarge)
   - `free`: what is never billed (deploys, DMs, background AI)
-  - `domains`: the custom hostname and custom base domain add-on prices
-- `signup`: the options shown to new signups (sign up free, book a setup
-  call) and the link to
+  - `domains`: the custom hostname and custom base domain add-on prices, and
+    `purchase`, the rules for buying a domain through HQ (registrar cost plus
+    a yearly markup, yearly renewal, refund grace period)
+  - `spendLimit.defaultUsd`: the default monthly spend limit ($100)
+  - `cardPrompt`: the usage point at which HQ asks for a card (`atUsd`, $10)
+    and the rule as text
+- `signup`: `options[]`, the options shown to new signups (sign up free, book
+  a setup call), and `selfHosted`, the label and link for
   [Use HQ free, self-hosted or on-prem](/hq/guide/use-hq-for-free/)
 - `plans[]`: legacy plans for existing customers, which move to usage
   pricing on 19 December 2026. Each one carries
@@ -39,6 +45,8 @@ The JSON body contains:
 - the grandfather rule for companies on the earlier Workforce price
 - `billingRules`: hosted agents billed per box from the first, and trial and
   cancellation behavior
+- `writerModes`: a description of each legacy agent-overage billing mode
+  (`legacy-halt`, `tiered`)
 
 Every number comes from the billing catalog and the usage rate card, so the
 statement matches what HQ charges. New fields are added without removing
@@ -57,13 +65,29 @@ The `usage` block, shortened:
     "trial": { "days": 30, "capUsd": 500 },
     "meters": [
       { "id": "member-sync", "label": "Sync", "unit": "sync", "unitUsd": 0.10 },
+      { "id": "integration-call", "label": "Gateway call", "unit": "call", "unitUsd": 0.001 },
       { "id": "vault", "label": "Vault", "unit": "vault-month", "unitUsd": 5.00, "waivedInTrial": true }
     ],
     "boxes": [
       { "size": "small", "instanceType": "t3.small", "monthlyUsd": 100 }
     ],
     "free": ["deploys", "dms", "background-ai"],
-    "domains": { "standardUsd": 20, "premiumUsd": 500 }
+    "domains": {
+      "standardUsd": 20,
+      "premiumUsd": 500,
+      "purchase": {
+        "basis": "registrar-cost",
+        "markupUsdPerYear": 3,
+        "renewal": "yearly",
+        "chargedBeforeRenewal": true,
+        "refundGraceDays": 5
+      }
+    },
+    "spendLimit": { "defaultUsd": 100 },
+    "cardPrompt": {
+      "atUsd": 10,
+      "rule": "HQ asks for a card once a period's usage passes the $10 included allowance with no card on file."
+    }
   }
 }
 ```

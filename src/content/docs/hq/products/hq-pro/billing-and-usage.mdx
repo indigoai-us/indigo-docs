@@ -10,7 +10,8 @@ account gets $10 of usage each month, and usage past $10 in a month is billed
 at the rates below. New accounts start with a 30-day trial.
 
 No card is needed to sign in, deploy or use DMs. HQ asks for a card the first
-time a month's usage passes $10.
+time a month's usage passes $10. After the trial, usage past $10 with no card
+on file pauses cloud sync until a card is added.
 
 These prices apply to accounts created from 16 October 2026. Existing plans
 move to usage pricing on 19 December 2026, and HQ emails each account
@@ -26,7 +27,7 @@ To run HQ on your own machines with no account and no cloud, see
 | Usage | Price |
 |-------|-------|
 | Sync that moves files (upload, download or delete), per sync | $0.10 |
-| Gateway call: an integration or external MCP call made through HQ | $0.05 |
+| Gateway call: an integration or external MCP call made through HQ | $0.001 ($1 per 1,000 calls) |
 | HQ MCP call | $0.05 |
 | Agent run | $0.05 |
 | Storage in the HQ cloud vault, including old versions of files | $2.00 per GB a month |
@@ -60,8 +61,10 @@ During the trial:
 - Trial usage is capped at $500. Past the cap, cloud sync pauses until the
   trial ends.
 - The vault fee is waived.
-- HQ still asks for a card once the trial's usage passes $10. Until a card is
-  on file, cloud sync pauses with a message that says why.
+- HQ asks for a card once the trial's usage passes $10. During the trial this
+  is a prompt only, and sync keeps working. With no card on file, cloud sync
+  pauses at the end of the trial (day 30) or when trial usage reaches the
+  $500 cap, whichever comes first.
 
 Each owner gets one trial. A second company created by the same owner starts
 without one.

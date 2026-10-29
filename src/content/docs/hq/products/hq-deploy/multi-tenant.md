@@ -25,25 +25,20 @@ Every authenticated request resolves an org through middleware:
 
 ```
 Resolution priority:
-1. Clerk JWT claim (orgId)
-2. API key lookup → associated org
+1. Org claim already on the verified token
+2. Legacy API key → the key owner's org
+3. AWS SigV4 → org mapped to the AWS account
+4. GitHub JWT → the user's org
+5. HQ Cognito JWT → the caller's membership
+6. Personal deploy scope (X-HQ-Deploy-Scope: personal) on deploy and app routes
+7. Admin token → must name the org with the X-Org-Slug header
 ```
 
-The resolved org is attached to `req.org` and available to all downstream handlers.
+The resolved org is attached to the request context and available to all downstream handlers. If no org can be resolved, the request gets `403`.
 
 ## Query Isolation
 
-All database queries are automatically scoped:
-
-```typescript
-// Every query includes org scope
-const apps = await db
-  .select()
-  .from(appsTable)
-  .where(eq(appsTable.orgId, req.org.id));
-```
-
-The `withOrgScope(query, orgId)` helper enforces this pattern. Cross-tenant access returns **404** (not 403) to prevent resource enumeration — an attacker can't distinguish "doesn't exist" from "exists but you can't access it."
+Data lives in a single DynamoDB table, and each org's items share an `ORG#{slug}` partition key. The `withOrgScope(orgSlug)` helper wraps reads and writes and refuses any key outside that org's partition. Cross-tenant access returns **404** (not 403) to prevent resource enumeration — an attacker can't distinguish "doesn't exist" from "exists but you can't access it."
 
 ## Default Org
 
@@ -53,13 +48,14 @@ On first boot, a default org is seeded:
 slug: 'indigo'
 ```
 
-Existing records without an `org_id` are backfilled to this default org. The seed is idempotent (`INSERT ... ON CONFLICT DO NOTHING`).
+The seed is idempotent: it uses a conditional `PutItem` that only writes when the org does not exist yet.
 
 ## Org Lifecycle
 
 | Endpoint | Action |
 |----------|--------|
 | `POST /api/orgs` | Create new org |
-| `GET /api/orgs` | List all orgs (admin only) |
+| `GET /api/orgs` | List the caller's active memberships (the admin token lists all orgs) |
 | `GET /api/orgs/:id` | Get org details |
-| `DELETE /api/orgs/:id` | Soft-delete (preserves data) |
+| `GET /api/orgs/:orgId/members` | List org members |
+| `DELETE /api/orgs/:id` | Soft-delete (sets `deletedAt`, preserves data) |

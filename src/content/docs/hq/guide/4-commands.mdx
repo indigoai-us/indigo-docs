@@ -1,26 +1,25 @@
 ---
 title: Commands
-description: Reference for HQ slash commands.
+description: Reference for the most used HQ slash commands (skills), including session, worker, project, cloud, and team commands.
 ---
 
-Run any command inside Claude Code with `/command-name`.
+Commands are skills in `.claude/skills/`. Run any command inside your AI tool with `/command-name`. This page covers the most used ones; HQ ships more than 100.
 
 ## Session Commands
 
 | Command | Description |
 |---------|-------------|
-| `/reanchor` | Reload HQ context at start of session |
-| `/checkpoint` | Save current session state to `workspace/checkpoints/` |
+| `/startwork` | Resolve current HQ context and surface useful next work options |
+| `/checkpoint` | Save a lightweight session checkpoint to `workspace/threads/` |
 | `/handoff` | Save thread and prepare for session continuation |
-| `/nexttask` | Scan HQ and suggest the next task to work on |
-| `/remember` | Capture a learning or correction (promotes to `/learn`) |
-| `/learn` | Auto-capture insights from completed tasks |
+| `/learn` | Turn reusable findings into scoped policies or insight files. `/learn --hard` records a hard-enforcement rule |
+| `/conduct` | Orchestrator mode: coordinate only, sending small tasks to subagents and worker areas to standing HQ lanes |
 
 ### /checkpoint
-Saves git state, active files, and a summary. Use when you want to bookmark progress.
+Saves git state, active files, and a summary. Use when you want to bookmark progress. HQ also asks the agent to run `/checkpoint` right before Claude Code autocompacts the conversation.
 
 ### /handoff
-Creates a comprehensive thread at `workspace/threads/` with all context needed to resume in a fresh session. Automatically triggered when context reaches 70% capacity.
+Writes a thread at `workspace/threads/` and a `handoff.json` with the context needed to resume in a fresh session. Run it before you end a session that has work in progress.
 
 #### Deficiency report
 
@@ -56,16 +55,12 @@ The problems are still saved in the handoff thread and shown in the summary. Not
 
 `system_info` contains no file paths, email addresses or tokens.
 
-### /nexttask
-Scans projects, workspace, and queues to recommend what to work on next. Considers priority, dependencies, and recent activity.
-
 ## Worker Commands
 
 | Command | Description |
 |---------|-------------|
 | `/run {worker} {skill}` | Execute a worker's skill |
 | `/newworker` | Scaffold a new worker with skills, tools, and knowledge |
-| `/metrics` | View worker execution metrics |
 
 ### /run
 The primary way to invoke workers. Examples:
@@ -92,9 +87,8 @@ Interactive wizard to create a custom worker:
 | `/prd "description"` | Create a Project Requirements Document |
 | `/deep-plan "description"` | Plan a large project with research and a longer interview |
 | `/grill-me "topic"` | Run a decision interview on any topic |
-| `/plan` | Deprecated. Forwards to `/prd` |
-| `/run-project` | Execute a project through the Ralph loop |
-| `/execute-task` | Execute a single task through coordinated workers |
+| `/run-project` | Execute a project's PRD stories through HQ worker lanes |
+| `/execute-task` | Execute one PRD story through coordinated worker phases with test, lint, and typecheck gates |
 
 ### /brainstorm
 Compares approaches and surfaces unknowns through a short interview. The interview runs on the shared HQ interview engine, the same one `/prd` and `/grill-me` use. At the end, `/brainstorm` asks what to do next:
@@ -112,9 +106,6 @@ Runs its interview on the shared interview engine. If the project has a brainsto
 ### /grill-me
 Interviews you about any topic, one question at a time, and saves a summary of your decisions. Pass `--rounds` to batch questions.
 
-### /plan (deprecated)
-`/plan` is deprecated and forwards to `/prd`. Use `/prd` instead. The release that removes `/plan` is listed in the HQ changelog (`core/docs/hq/CHANGELOG.md`).
-
 ### /run-project
 Orchestrates multi-task execution using the Ralph methodology:
 1. Load PRD
@@ -128,8 +119,19 @@ Orchestrates multi-task execution using the Ralph methodology:
 
 | Command | Description |
 |---------|-------------|
-| `/search "query"` | Search HQ with qmd (semantic + full-text) |
-| `/search-reindex` | Rebuild the qmd search index |
-| `/cleanup` | Audit HQ structure, rebuild INDEX.md files |
+| `/search "query"` | Search HQ content and indexed repos with qmd, falling back to grep |
+| `/cleanup` | Audit and clean HQ structures and indexes. `/cleanup --reindex` rebuilds all INDEX.md files |
 | `/setup` | Interactive setup wizard for new installations |
-| `/exit-plan` | Force exit from plan mode when stuck |
+| `/update-hq` | Upgrade HQ from the latest hq-core release |
+
+## Cloud and Team Commands
+
+| Command | Description |
+|---------|-------------|
+| `/hq-sync` | Run a full bidirectional sync for cloud-backed HQ companies |
+| `/hq-files` | Inspect or change HQ vault ACLs, grants, and shared prefixes |
+| `/hq-share` | Share HQ vault paths through single-use links or direct ACL grants |
+| `/hq-secrets` | Use HQ CLI secrets safely through env injection or one-off exec |
+| `/deploy` | Deploy or share generated HQ artifacts through hq-deploy |
+| `/new-hire` | Onboard a teammate end to end: invite, role, groups, secrets, file access, and onboarding packet |
+| `/delegate` | Hand a project to a person or fleet agent: grants, dossier, ownership transfer, and a pickup DM |

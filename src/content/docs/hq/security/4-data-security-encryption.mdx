@@ -9,15 +9,15 @@ This page describes how HQ classifies, encrypts, controls, retains, and deletes 
 
 | Class | Examples | Handling |
 |---|---|---|
-| Customer content | Knowledge documents, project specs, skills, policies a team syncs to HQ. | Stored per-tenant, encrypted at rest with a per-tenant key. |
+| Customer content | Knowledge documents, project specs, skills, policies a team syncs to HQ. | Stored in a per-tenant bucket, encrypted at rest (see below). |
 | Customer metadata | Organization/membership records, file paths, access-control entries. | Stored in control-plane databases, encrypted at rest. |
 | Operational/audit data | Credential-issuance records, administrative actions, access logs. | Stored in audit stores; integrity-protected. |
-| Secrets | API keys, OAuth credentials, signing keys. | Stored in dedicated secret stores; never in source control. |
+| Secrets | API keys, OAuth credentials, signing keys. | Stored in AWS SSM Parameter Store (`SecureString`) or AWS Secrets Manager; never in source control. |
 | Local-only (never synced) | Credentials directories, raw datasets, prompt libraries on a customer machine. | Excluded from cloud sync by default. |
 
 ## Where data lives
 
-All customer data is stored in AWS, region `us-east-1` (United States). HQ does not currently replicate customer data to other regions, so data residency is the United States. Primary stores:
+HQ's primary stores are in AWS, region `us-east-1` (United States). HQ does not replicate these stores to other regions. Some subprocessors process data in other locations, and AI requests through Bedrock cross-region inference may be processed in other AWS regions; see [Subprocessors](/hq/security/2-subprocessors/). Primary stores:
 
 - Amazon S3 — customer content, in a dedicated per-tenant bucket.
 - Amazon DynamoDB — access-control lists, organization/membership/entity metadata, audit records, and short-lived nonce records for single-use tokens.
@@ -25,8 +25,9 @@ All customer data is stored in AWS, region `us-east-1` (United States). HQ does 
 
 ## Encryption at rest
 
-- Customer content (S3): server-side encryption with AWS KMS (SSE-KMS, AES-256) using a dedicated, per-tenant customer-managed key (CMK). S3 Bucket Keys are enabled to reduce KMS request overhead without weakening protection.
-- Key rotation: per-tenant CMKs rotate automatically on an annual cycle.
+- Customer content (S3), new vaults: server-side encryption with AWS KMS (SSE-KMS) using a dedicated customer-managed key (CMK) for the vault. S3 Bucket Keys are enabled to reduce KMS request overhead.
+- Customer content (S3), some existing vaults: a shared Indigo-managed KMS key, or S3-managed encryption (SSE-S3, AES-256), until the vault is re-keyed.
+- Key rotation: vault CMKs and the shared vault key rotate automatically on an annual cycle.
 - Control-plane databases: access-control and entity tables are encrypted with AWS KMS; primary tables additionally have point-in-time recovery enabled.
 
 :::note[Honest note]
@@ -45,14 +46,15 @@ A minimum TLS version (e.g., TLS 1.2+) is not yet pinned uniformly in code acros
 
 ## Key management
 
-- Per-tenant CMKs are created at provisioning time, tagged so that IAM can gate KMS operations on the tag, and used as the bucket's default encryption key.
+- Per-vault CMKs are created when a new vault is provisioned, tagged so that IAM can gate KMS operations on the tag, and used as the bucket's default encryption key. Existing vaults keep their current key until a separate re-keying migration moves them.
 - A separate, dedicated key protects control-plane databases.
 - A dedicated symmetric master key (held in AWS Secrets Manager) protects HQ's capability tokens. This key is environment-scoped; isolating it further per-tenant is noted on the roadmap.
-- KMS keys are configured to resist accidental destruction (deletion protection / retention).
+- The control-plane key and the shared vault key are protected against accidental deletion in infrastructure code, and the shared vault key's policy denies key deletion and disabling to every principal except the account root.
 
 ## Secrets management
 
-- Application secrets are stored in AWS SSM Parameter Store (SecureString) and AWS Secrets Manager, injected at deploy time or read at runtime through private VPC endpoints.
+- Customer secrets managed through HQ Secrets are stored as AWS SSM Parameter Store `SecureString` parameters, encrypted with the AWS-managed SSM key (`aws/ssm`), not a per-tenant key.
+- Application secrets are stored in AWS SSM Parameter Store (SecureString) and AWS Secrets Manager, injected at deploy time or read at runtime.
 - In the primary application, secret values are bound at deployment and the runtime roles are not granted broad `ssm:GetParameter`, reducing runtime exposure.
 - Human-held secrets (the source of truth for credentials) live in HQ Secrets, HQ's own encrypted secrets-management system; credentials are referenced, never pasted inline or committed.
 - No plaintext secrets are stored in source control.
@@ -60,7 +62,8 @@ A minimum TLS version (e.g., TLS 1.2+) is not yet pinned uniformly in code acros
 ## Access control and audit
 
 - Read/write access to customer content is governed by the ACL model and brokered through scoped, short-lived credentials described in [Tenant Isolation](/hq/security/3-tenant-isolation/).
-- AWS CloudTrail records S3 data events across all customer storage buckets, with log-file validation enabled for tamper-evidence.
+- AWS CloudTrail records AWS management events, with log-file validation enabled for tamper-evidence. CloudTrail data events on vault buckets were turned off on 2026-09-24.
+- S3 server access logs are configured on person and company vault buckets and loaded into ClickHouse. AWS delivers these logs on a best-effort basis (records can arrive hours late and a small fraction may not arrive), so they support investigation but are not a complete audit record.
 - An application audit trail records every credential issuance (which principal, which scope) and every administrative/impersonation action.
 - The e-signature service additionally maintains a hash-chained audit log for executed agreements.
 
@@ -87,6 +90,7 @@ When data is shared, HQ mints a capability token rather than widening storage pe
 
 - Retention: customer content is retained for the life of the account. Time-to-live expiry is applied to ephemeral records such as one-time-use nonces and certain audit/event records.
 - Deletion on request: customers may request export and deletion of their data. A self-scoped hard-delete routine exists that empties and removes a bucket and tombstones the associated identity.
+- Self-service account deletion: a self-service flow is built that removes the user's personal data, signs them out of all sessions, and schedules companies where they are the only member for purge after 30 days. It is off by default and is enabled by Indigo through a feature flag; until it is enabled for an account, deletion is handled on request. Copies outside HQ (support and feedback items in Slack and Linear, and Sentry error data) are not removed by this flow and are erased by hand on request.
 
 :::note[Honest note]
 Production tenant offboarding today performs a soft tombstone of the organization; a fully automated hard-delete-on-offboarding routine (destroying bucket, per-tenant key, and metadata) is being productionized and is tracked on the roadmap. Until then, complete deletion is performed as an operational procedure on request.

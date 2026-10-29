@@ -5,12 +5,12 @@ description: Contribution guidelines for the HQ ecosystem repos — how to fork,
 
 ## Getting Started
 
-HQ is split across several repos (see the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/)). Contribute to the specific repo that owns the surface you're changing — e.g. `indigoai-us/hq-cli` for the CLI, `indigoai-us/hq-core` for the scaffold, `indigoai-us/hq-cloud` for the sync engine.
+HQ is split across several repos (see the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/)). Contribute to the repo that owns the surface you're changing: `indigoai-us/hq-cli` for the CLI, `indigoai-us/hq-cloud` for the sync engine, `indigoai-us/create-hq` for the installer, `indigoai-us/hq-desktop-app` for the desktop app. Scaffold changes go to `indigoai-us/hq-core-staging`, not hq-core.
 
-1. Fork the target repo: `gh repo fork indigoai-us/hq-cli` (or `hq-core`, `hq-cloud`, …)
+1. Fork the target repo: `gh repo fork indigoai-us/hq-cli` (or another repo)
 2. Clone your fork and `cd` into it
-3. Install dependencies: `npm ci` (or `pnpm install` for `hq-console` / `hq-pro`)
-4. Build: `npm run build`
+3. Install dependencies: `pnpm install` (hq-cli, hq-cloud, hq-desktop-app, hq-console, hq-pro) or `npm ci` (create-hq, hq-deploy, indigo-docs)
+4. Build: `pnpm run build` (or `npm run build`)
 5. Create a branch: `git checkout -b feature/my-feature`
 
 ## Branch Strategy
@@ -27,16 +27,17 @@ HQ is split across several repos (see the [Ecosystem & Repo Map](/hq/architectur
 ### Code changes
 
 1. Make changes inside the repo that owns the surface (e.g. `hq-cli`, `hq-cloud`)
-2. Build it: `npm run build`
-3. Run typecheck: `npm run typecheck`
-4. Test your changes locally (see Testing guide)
-5. Commit with a clear, descriptive message
+2. Build it: `pnpm run build`
+3. Run typecheck: `pnpm run typecheck`
+4. Test your changes locally (see the [Testing guide](/hq/development/5-testing/))
+5. For a user-facing change in hq-cli or hq-cloud, add a release-note fragment at `changelog.d/<branch-slug>.md` instead of editing `CHANGELOG.md`. Changes with no user impact get the `no-changelog` PR label.
+6. Commit with a clear, descriptive message
 
 ### Scaffold changes (hq-core)
 
-1. Edit the scaffold seed in the `hq-core` repo
-2. Test by scaffolding a throwaway instance: `npx create-hq ~/test-hq`
-3. Verify the change works in a fresh HQ instance
+1. Open the PR against `main` in `indigoai-us/hq-core-staging`
+2. Test in a throwaway instance: `npx create-hq ~/test-hq --local-template <path-to-your-staging-checkout>`
+3. After merge, the change ships in the next hq-core release, cut by the `promote-to-hq-core` workflow (see [Publishing Packages](/hq/development/3-publishing-packages/))
 
 ### Documentation changes (this site)
 
@@ -70,8 +71,9 @@ gh pr create --title "feat: my feature" --body "Description of changes"
 
 ### PR Checklist
 
-- [ ] Code builds without errors (`npm run build`)
-- [ ] TypeScript passes (`npm run typecheck`)
+- [ ] Code builds without errors (`pnpm run build` or `npm run build`)
+- [ ] TypeScript passes (`pnpm run typecheck` or `npm run typecheck`)
+- [ ] Release-note fragment added in `changelog.d/`, or `no-changelog` label applied (hq-cli, hq-cloud)
 - [ ] Tests pass (if applicable)
 - [ ] No secrets or PII in committed files
 - [ ] Documentation updated if needed
@@ -80,7 +82,7 @@ gh pr create --title "feat: my feature" --body "Description of changes"
 ### Review Process
 
 1. Open PR against `main`
-2. CI runs automatically (build + typecheck)
+2. CI runs automatically
 3. Core team reviews
 4. Address feedback
 5. Squash merge when approved
@@ -108,12 +110,11 @@ When proposing significant changes:
 
 | Area | Examples |
 |------|---------|
-| New sync strategies | Copy strategy, two-way merge |
-| PWA features | Offline mode, push notifications, Monaco editor |
+| Module sync strategies | A distinct `copy` strategy (it currently runs the merge implementation) |
 | CLI commands | New module management features |
 | Testing | Unit tests, integration tests, E2E |
 | Documentation | Tutorials, examples, API reference improvements |
-| Template content | New workers, knowledge bases, commands |
+| Scaffold content (hq-core-staging) | New workers, knowledge bases, skills |
 
 ## Questions?
 

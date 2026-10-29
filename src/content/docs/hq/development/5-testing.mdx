@@ -5,120 +5,82 @@ description: Testing strategy and QA processes across the HQ ecosystem repos.
 
 ## Testing Strategy
 
-HQ testing is organized in three tiers:
+Each repo owns its tests and runs them in its own CI. Tests are organized in three tiers.
 
-### Tier 1: Unit Tests
-Per-repo tests for individual functions and modules. Each repo runs its own Vitest suite in its own CI.
+### Tier 1: Unit tests
 
-| Repo | What to Test |
-|---------|-------------|
-| create-hq | scaffold flow, dependency checks, template copying |
-| hq-cli | manifest parsing, module registration, strategy execution |
-| hq-cloud | journal operations, ignore filtering, hash computation |
-| infra | Lambda handler logic (with mocked AWS SDK) |
+Vitest suites, mostly next to the source file (`foo.ts` and `foo.test.ts`).
 
-Framework: Vitest (recommended for TypeScript + ESM).
+| Repo | Examples of what is covered |
+|------|-----------------------------|
+| create-hq | scaffold flow, dependency checks, template fetch |
+| hq-cli | manifest parsing, module registration, strategies, command registration and help catalog |
+| hq-cloud | journal operations, ignore filtering (`.hqignore` / `.hqinclude`), vault client |
+| hq-pro | Lambda handler logic with mocked AWS SDK |
 
 ```bash
-# inside a given repo (e.g. hq-cloud)
 cd hq-cloud
-npm test
+pnpm test          # npm test in create-hq and hq-deploy
 ```
 
-### Tier 2: Integration Tests
-Cross-package and API tests.
+### Tier 2: Integration tests
 
-- **CLI → Cloud**: Test that `hq sync init` correctly calls auth flow
-- **API → S3**: Test Lambda handlers with actual S3 operations (use localstack or test bucket)
-- **PWA → API**: Test API client against running API Gateway
+Cross-package and API tests. Examples:
 
-### Tier 3: End-to-End Tests
-Full user journey tests.
+- hq-cloud `pnpm run test:integration` (builds, then runs the `test/` suite with network allowed)
+- hq-pro `pnpm test:e2e` against a deployed stack, and `pnpm test:compat` (no AWS, no network)
 
-- **Install flow**: `npx create-hq ~/test-hq` creates valid HQ
-- **Sync flow**: File change → upload → verify in S3
-- **PWA flow**: Login → browse files → view file content
+### Tier 3: End-to-end tests
+
+Full user journeys:
+
+- **Install:** `npx create-hq ~/test-hq` (or `--local-template <path>` for an unreleased scaffold) creates a working HQ.
+- **Sync:** sign in, provision a company, change a file, run `hq sync now`, and confirm the change on another machine or in hq-console.
+- **Desktop:** install the app on macOS and Windows, complete onboarding, and confirm background sync.
 
 ## Manual QA Checklist
 
-Before every release, verify:
-
 ### create-hq
-- [ ] `npx create-hq` prompts for directory
-- [ ] Template copies completely (all directories, files)
-- [ ] Git initializes with first commit
-- [ ] Dependency check reports missing tools correctly
-- [ ] `--skip-deps` flag works
-- [ ] `--skip-cli` flag works
-- [ ] `--skip-sync` flag works
+- [ ] `npx create-hq` prompts for a directory when none is given
+- [ ] The hq-core scaffold downloads and extracts completely
+- [ ] Missing required dependencies (Node.js, git) block the install; missing optional ones only warn
+- [ ] `--skip-deps`, `--skip-cli`, `--skip-sync`, `--skip-packages`, `--minimal`, `--full`, `--tag`, and `--local-template` behave as described in `create-hq --help`
 
 ### hq-cli
-- [ ] `hq modules list` shows module inventory
-- [ ] `hq modules add <url>` clones and registers module
-- [ ] `hq modules sync` updates all modules
-- [ ] `hq sync init` opens browser for auth
-- [ ] `hq sync start` starts background daemon
-- [ ] `hq sync stop` terminates daemon
-- [ ] `hq sync status` reports health
+- [ ] `hq modules add <url>` registers the module without cloning
+- [ ] `hq modules sync` clones into `modules/<name>/` and applies the strategy
+- [ ] `hq modules list` shows the module inventory
+- [ ] `hq login` completes and caches tokens in `~/.hq/cognito-tokens.json`
+- [ ] `hq cloud provision` makes a company cloud-backed
+- [ ] `hq sync push`, `hq sync pull`, and `hq sync now` move files in both directions
+- [ ] `hq sync status` reports the journal summary
+- [ ] `hq doctor` reports hook wiring, runtimes, and connection health
 
 ### hq-cloud
-- [ ] Auth flow completes (browser → callback → credentials)
-- [ ] File upload reaches S3
-- [ ] File download matches original
-- [ ] Watcher detects file changes within 5 seconds
-- [ ] Journal tracks sync state correctly
-- [ ] Ignore patterns respected (.git, node_modules, repos/)
-- [ ] Files > 50MB skipped
-- [ ] Daemon survives terminal close
+- [ ] Upload reaches the company vault; download matches the original
+- [ ] Each company's journal is written to `~/.hq/sync-journal.{slug}.json`
+- [ ] `.hqignore` patterns are respected
+- [ ] `hq-sync-runner` emits ndjson progress events
 
-### PWA
-- [ ] Sign up creates account
-- [ ] Sign in redirects to dashboard
-- [ ] File browser shows synced files
-- [ ] Markdown files render correctly
-- [ ] JSON files pretty-print
-- [ ] Navigation works (back, breadcrumbs)
-- [ ] Installable as PWA on mobile
-- [ ] Dark theme renders properly
-
-### Infrastructure
-- [ ] `sst deploy` completes without errors
+### Infrastructure (hq-pro)
+- [ ] The stage deploys without errors
 - [ ] API endpoints return correct responses
-- [ ] CORS allows web app origin
-- [ ] JWT auth rejects invalid tokens
-- [ ] User isolation: User A cannot see User B's files
+- [ ] Invalid JWTs are rejected
+- [ ] One company's member cannot read another company's vault
 
-## Writing Tests
+## Example unit test (hq-cloud)
 
-### Test file location
-Place tests next to source files:
-```
-src/
-├── journal.ts
-├── journal.test.ts
-├── ignore.ts
-└── ignore.test.ts
-```
-
-### Example unit test (hq-cloud journal)
 ```typescript
 import { describe, it, expect } from "vitest";
-import { hashFile, updateEntry } from "./journal.js";
+import { isExpectedIgnore } from "./ignore.js";
 
-describe("journal", () => {
-  it("computes consistent SHA256 hash", async () => {
-    const hash = await hashFile("/path/to/test-file.md");
-    expect(hash).toMatch(/^[a-f0-9]{64}$/);
+describe("isExpectedIgnore", () => {
+  it("classifies the root person-settings exclusion as expected", () => {
+    expect(isExpectedIgnore("person-settings")).toBe(true);
   });
 });
 ```
 
 ## CI Pipeline
 
-Each repo has its own `ci.yml` workflow that runs on every PR and push to main:
-1. `npm ci` — install deps
-2. `npm run build` — build that repo
-3. `npm run typecheck` — TypeScript checking
-4. `npm test` — run that repo's tests
-
-Tests must pass before merging to that repo's main.
+Each repo has its own `ci.yml` (hq-deploy uses `test.yml`) that runs on pull requests. The pnpm repos install with `pnpm install` and run their build, typecheck, lint, and test scripts; create-hq and hq-deploy use npm. Check each repo's workflow for the exact jobs. Tests must pass before merging to that repo's main.

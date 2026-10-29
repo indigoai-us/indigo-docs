@@ -3,9 +3,13 @@ title: CloudFormation Template
 description: Parameterized IaC template for provisioning customer data plane resources.
 ---
 
-The CloudFormation template provisions all AWS resources needed for HQ Deploy in a customer's account. It's parameterized, supports conditional SSR resources, and includes a cross-account IAM role for the control plane.
+The CloudFormation template (`src/infra/cloudformation/template.yaml` in the hq-deploy repo) provisions the HQ Deploy data plane. It's parameterized, supports conditional SSR resources, and includes a cross-account IAM role for the control plane. It is deployed with the repo's own scripts (`scripts/bootstrap.sh`); no `hq-deploy` CLI command deploys it.
+
+`hq-deploy init` is separate: it writes a smaller starter template into your project (see [Deploy CLI](/hq/products/hq-deploy/cli/#init)).
 
 ## Parameters
+
+Selected parameters (the template also takes Cognito, front-door, and throttling parameters):
 
 | Parameter | Required | Default | Description |
 |-----------|----------|---------|-------------|
@@ -57,11 +61,11 @@ The deploy role uses an **ExternalId condition** to prevent the confused deputy 
 
 ## Version Tracking
 
-The template includes `Metadata.Version` which is used by the upgrade flow to detect drift between the installed stack and the latest template version.
+The template records its version in `Metadata.Version`:
 
 ```yaml
 Metadata:
-  Version: "1.0.0"
+  Version: '2.1.0'
 ```
 
-This version is read during `hq-deploy upgrade` to determine what changes need to be applied.
+There is no `hq-deploy upgrade` command; stack updates are applied with the repo's deploy scripts.

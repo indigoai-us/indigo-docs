@@ -42,14 +42,15 @@ step 3 offers the existing **$500 / month team** plan under its display name,
 Workforce. The plan id stays `team`. Stay on Starter is a real action
 (`skipped`). Creating an agent does not require Workforce.
 
-Starter is a hard-capped free plan, not a trial. It covers up to 5 members,
-10 secrets, 10 GB of storage, 1 connected integration, and 500 lifetime
-deployments. MCP and Atlas are not included. Going over a capped ceiling locks
+Starter is a hard-capped free plan, not a trial, and it is closed to new
+signups (since 16 October 2026). It covers up to 5 members, 10 secrets, 10 GB
+of storage and 3 connected integrations. Deploys are unlimited on every plan.
+MCP and Atlas are not included. Going over a capped ceiling locks
 the workspace read-only for creates until an owner trims back under it or
 upgrades; nothing is deleted.
 
-Workforce removes the member, secret, storage, integration and deployment
-ceilings (all of them are unlimited on Workforce) and adds hosted MCP and
+Workforce removes the member, secret, storage and integration ceilings (all
+of them are unlimited on Workforce) and adds hosted MCP and
 Atlas.
 
 ## First agent

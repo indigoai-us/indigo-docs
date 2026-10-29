@@ -25,12 +25,13 @@ engine.
 
 Download HQ from [hqforwork.com/install](https://hqforwork.com/install), sign
 in, choose a workspace location, and select **Install**. The final **HQ is
-ready** screen offers **Open in Claude Code** and **Open in Codex**.
+ready** screen offers **Open in Claude Code** and **Open in Codex**, plus
+**Open in Grok** when the Grok CLI is installed.
 
 Selecting either tool completes onboarding, opens the workspace there, and
 hands control to the compact sync popover. There are no additional desktop
-onboarding screens to dismiss. If you prefer to open the workspace manually,
-select **Finish**.
+onboarding screens to dismiss. To go to the desktop workspace instead, select
+**Open HQ Desktop**.
 
 ## How it works
 
@@ -112,23 +113,23 @@ field validation.
 
 ## Instant DM delivery
 
-HQ Sync also receives **direct messages** — sent with `hq dm` or the `/dm` command — and surfaces them as native macOS notifications, with one-click "Copy prompt" and "Open details" actions and an inline reply. "Open details" opens the full **two-way conversation thread** — your messages and theirs, in order — not just the single notification, so a DM reads as a conversation rather than a one-off alert.
+The desktop app also receives **direct messages** — sent with `hq dm` or the `/dm` command — and surfaces them as native notifications, with one-click "Copy prompt" and "Open details" actions and an inline reply. "Open details" opens the full **two-way conversation thread** — your messages and theirs, in order — not just the single notification, so a DM reads as a conversation rather than a one-off alert.
 
-As of **0.3.0**, DMs arrive **near-instantly** (p95 under 3 seconds, end-to-end) instead of waiting on a polling interval. HQ Sync subscribes to a per-user topic on an AWS IoT Core (MQTT-over-WebSockets) real-time fabric; the moment a DM is stored, a lightweight wake event is published to the recipient's topic and the menubar fetches and shows it immediately.
+As of **0.3.0**, DMs arrive **near-instantly** (p95 under 3 seconds, end-to-end) instead of waiting on a polling interval. The desktop app subscribes to a per-user topic on an AWS IoT Core (MQTT-over-WebSockets) real-time fabric; the moment a DM is stored, a lightweight wake event is published to the recipient's topic and the app fetches and shows it immediately.
 
 ```mermaid
 graph LR
     send["hq dm"] -->|store write| store["DM store<br/>(durable)"]
     store -->|publish wake| iot["AWS IoT Core<br/>(MQTT-over-WSS)"]
-    iot -->|instant wake| tray["HQ Sync<br/>(menubar)"]
-    tray -->|fetch + notify| notif["macOS notification"]
+    iot -->|instant wake| tray["HQ desktop app<br/>(menu bar / tray)"]
+    tray -->|fetch + notify| notif["native notification"]
 ```
 
 Key properties:
 
 - **Per-identity isolation** — each client connects with short-lived, scoped credentials and can only subscribe to its own DM topic; cross-user topics are denied at the broker.
 - **No DM is ever lost** — the durable store is the source of truth and MQTT is only the wake signal. If the real-time connection is unavailable, delivery falls back to the existing periodic poll with no loss and no regression.
-- **Nothing to configure** — the real-time path is automatic for signed-in users; DM notifications can be turned off in HQ Sync settings.
+- **Nothing to configure** — the real-time path is automatic for signed-in users; DM notifications can be turned off in the desktop app settings.
 
 ## Messaging people outside your workspaces
 
@@ -140,13 +141,12 @@ As of **0.10.241**, the search/create picker also handles addresses that match n
 
 ## Manage packages
 
-HQ ships capabilities as **packs** (engineering, design, and more). From **Settings → Packages → Manage…**, HQ Sync opens a dedicated Packages window where you can browse, install, update, and uninstall packs without touching the terminal:
+HQ ships capabilities as **packs** (design, integrations, and more). Installed packs live under **Library → Installed** in the desktop workspace; find new packs in the **Marketplace** tab. You can install, update, and uninstall packs without touching the terminal:
 
 - **Installed** packs show their version, an "update available" badge, and a warning if any of their links are broken — each with **Update** and **Uninstall** actions.
-- **Available** shows the curated pack catalog plus any registry packages you're entitled to, each with an **Install** action.
 - Installs and updates stream live progress; uninstalls cleanly remove a pack's wiring and archive it.
 
-Like everything else in HQ Sync, the window is a GUI over the `hq` CLI — it wraps the `hq packs` commands (see [hq-cli](/hq/products/hq-cli/)) so the CLI and the app share one implementation.
+The Library view is a GUI over the `hq` CLI — it wraps the `hq packs` commands (see [hq-cli](/hq/products/hq-cli/)) so the CLI and the app share one implementation.
 
 ## Messages and notifications
 
@@ -216,6 +216,6 @@ state, and a manual **Check for updates** action.
 
 ## Related
 
-- [hq-cloud](/hq/products/hq-cloud/) — the sync engine hq-sync drives
+- [hq-cloud](/hq/products/hq-cloud/) — the sync engine the desktop app drives
 - [hq-cli](/hq/products/hq-cli/) — `hq sync` runs the same engine from the terminal
-- [Cloud sync architecture](/hq/architecture/5-hq-cloud/) — engine internals
+- [Cloud Sync guide](/hq/guide/8-cloud-sync/) — how sync behaves day to day

@@ -1,6 +1,6 @@
 ---
 title: Workers
-description: Reference for reusable HQ worker definitions, including development, content, and standalone workers.
+description: Reference for the 43 reusable HQ worker definitions in core/workers/public/, including the dev, content, social, and gardener teams and standalone workers.
 ---
 
 :::note[Workers and Fleet Agents are different]
@@ -16,44 +16,72 @@ Workers are reusable task definitions that run inside an HQ session. [Fleet Agen
 | SocialWorker | Social media posting, engagement |
 | ResearchWorker | Analysis, market research, competitive intel |
 | OpsWorker | Reports, monitoring, automation |
+| PersonaWorker | A worker that runs as a chat bot, such as the Setup bot |
 | Library | Shared utilities (not directly executable) |
 
-## Dev Team (12 Workers)
+HQ ships 43 workers in `core/workers/public/`. The full list, with each worker's type and description, is `core/workers/registry.yaml`. HQ regenerates that file from each `worker.yaml`, so don't edit it by hand.
 
-A full autonomous development team at `workers/dev-team/`.
+## Dev Team (18 Workers)
+
+A development team at `core/workers/public/dev-team/`.
 
 | Worker | Type | Skills |
 |--------|------|--------|
-| **project-manager** | CodeWorker | PRD lifecycle, issue selection, learning aggregation |
-| **task-executor** | CodeWorker | Analyze issues, route to workers, validate completion |
+| **project-manager** | OpsWorker | PRD lifecycle, issue selection, learning aggregation |
+| **task-executor** | OpsWorker | Analyze issues, route to workers, validate completion |
+| **pipeline-conductor** | OpsWorker | Routing rules for `/run-project --pipeline` |
 | **architect** | CodeWorker | System design, API design, architecture decisions |
 | **backend-dev** | CodeWorker | API endpoints, business logic, backend implementation |
-| **frontend-dev** | CodeWorker | UI components, React, user interfaces |
+| **frontend-dev** | CodeWorker | React/Next components, pages, UI implementation |
 | **database-dev** | CodeWorker | Schema design, migrations, query optimization |
-| **infra-dev** | CodeWorker | Docker, CI/CD, deployment, monitoring |
-| **qa-tester** | CodeWorker | Write tests, run tests, create demo accounts |
-| **code-reviewer** | CodeWorker | Review PRs, request changes, merge to staging/production |
-| **motion-designer** | CodeWorker | Animations, image generation |
-| **knowledge-curator** | CodeWorker | Documentation sync, pattern updates, troubleshooting |
-| **product-planner** | CodeWorker | Feature planning, backlog management |
+| **infra-dev** | CodeWorker | CI/CD pipelines, deployment configurations, monitoring setup |
+| **dev-qa-tester** | CodeWorker | Testing, browser automation, accessibility, demo accounts |
+| **code-reviewer** | CodeWorker | PR review, merge management, code quality gating |
+| **reality-checker** | CodeWorker | Final quality gate that cross-validates QA findings |
+| **codex-coder** | CodeWorker | Code generation through the OpenAI Codex SDK |
+| **codex-debugger** | CodeWorker | Debugging and root-cause analysis through the OpenAI Codex SDK |
+| **codex-reviewer** | CodeWorker | Second-opinion code review through the OpenAI Codex SDK |
+| **context-manager** | CodeWorker | Discover, maintain, and audit project context |
+| **motion-designer** | CodeWorker | Animations, transitions, visual polish, image generation |
+| **knowledge-curator** | CodeWorker | Process learnings, update knowledge bases, maintain documentation |
+| **product-planner** | CodeWorker | PRD creation, technical specs, API contracts |
 
-## Content Team (5 Workers)
+## Content Team
 
-Multi-perspective content review at `workers/content-*/`.
+Multi-perspective content review at `core/workers/public/content-*/`.
 
 | Worker | Focus | Skills |
 |--------|-------|--------|
 | **content-brand** | Voice & tone | Voice analysis, tone check, messaging alignment |
-| **content-sales** | Conversion | Conversion analysis, CTA audit, value prop check |
-| **content-product** | Accuracy | Feature accuracy, claim verification, stats check |
-| **content-legal** | Compliance | Compliance scan, claim substantiation, disclaimer check |
+| **content-sales** | Conversion | Conversion copy, CTAs, value props |
+| **content-product** | Accuracy | Feature accuracy, technical claims verification |
+| **content-legal** | Compliance | Regulatory compliance, claim verification |
 | **content-shared** | Shared library | Shared analysis tools, scoring, reporting |
+
+## Other Teams
+
+| Team | Workers | Path |
+|------|---------|------|
+| Social | social-strategist, social-reviewer, social-publisher, social-verifier, social-shared | `core/workers/public/social-*/` |
+| Gardener | garden-scout, garden-auditor, garden-curator | `core/workers/public/gardener-team/` |
 
 ## Standalone Workers
 
 | Worker | Purpose |
 |--------|---------|
-| **security-scanner** | Pre-deploy security checks |
+| **setup** | The Setup bot that gets a new HQ working |
+| **security-scanner** | Security scanning and vulnerability detection |
+| **accessibility-auditor** | WCAG 2.2 AA auditing |
+| **qa-tester** | Adversarial website testing with screenshot evidence |
+| **performance-benchmarker** | Core Web Vitals, load testing, capacity planning |
+| **exec-summary** | Executive summaries with strict word limits |
+| **frontend-designer** | UI generation |
+| **paper-designer** | Paper Desktop design bridge |
+| **site-builder** | Build and deploy local business websites from a template and config |
+| **ontology** | Maintains a company's ontology and signals |
+| **knowledge-tagger** | Classifies knowledge docs against the ontology |
+| **pretty-mermaid** | Mermaid diagram rendering |
+| **ascii-artist** | ASCII banner images for social posts and OG images |
 
 ## Worker YAML Schema
 
@@ -67,23 +95,23 @@ worker:
   version: "1.0"
 
 execution:
-  mode: on-demand        # on-demand | scheduled | triggered
+  mode: on-demand        # on-demand | scheduled | event-triggered
   max_runtime: 30m
 
 context:
   base:
-    - knowledge/Ralph/   # Knowledge to load
+    - core/knowledge/public/Ralph/   # Knowledge to load
   dynamic: []
   exclude: []
 
 verification:
-  checks:
+  post_execute:
     - tests-pass
     - no-lint-errors
   approval_required: false
 
 tasks:
-  source: prd            # prd | queue
+  source: companies/my-company/projects/my-project/prd.json
 
 output:
   destination: workspace/reports/
@@ -108,9 +136,9 @@ The wizard asks for:
 4. Knowledge context paths
 5. Execution rules
 
-Generates:
+It then asks whether the worker belongs to one company or ships with HQ, and generates it at `companies/{co}/workers/{id}/` or `core/workers/public/{id}/`:
 ```
-workers/{id}/
+{id}/
 ├── worker.yaml
 ├── skills/
 │   ├── skill-one.md

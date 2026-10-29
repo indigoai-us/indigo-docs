@@ -29,9 +29,11 @@ Branch-protection / required-status-check enforcement (so the blocking jobs cann
 ## Dependency and supply-chain management
 
 - Pinned dependencies. All projects commit lockfiles and install from frozen lockfiles in CI, so builds are deterministic and a dependency cannot silently change under us.
+- Dependabot. The hq-pro, hq-cli, and hq-desktop-app repositories have Dependabot configured for security updates and monthly minor and patch version updates (npm and GitHub Actions in all three; also Cargo in hq-desktop-app and Docker in hq-cli).
+- Secret scanning. The same three repositories run gitleaks in CI on the commits each pull request adds and on each push to `main`.
 
 :::note[Honest note]
-Automated software-composition analysis (dependency vulnerability scanning, e.g., Dependabot/Snyk/Trivy), SBOM generation, and automated alerting on known-vulnerable dependencies are not yet in place and are a near-term roadmap item. Today, dependency review is performed manually during code review and at upgrade time.
+Dependabot and gitleaks are not yet configured on every HQ repository (for example, hq-console, hq-mcp, and hq-deploy). SBOM generation is not in place.
 :::
 
 ## Secrets in the SDLC
@@ -46,8 +48,9 @@ One container-deployment pipeline currently authenticates to AWS with long-lived
 
 ## Build integrity and distribution
 
-- Desktop applications are code-signed with an Apple Developer ID certificate and notarized by Apple, so macOS Gatekeeper verifies authenticity before launch. The signing private key never leaves the CI runner (imported into a temporary keychain that is destroyed after each build).
-- Auto-updates for desktop apps are cryptographically signed (Ed25519); clients verify the update signature before applying it, preventing tampered updates.
+- Auto-updates for the desktop app are cryptographically signed (minisign, Ed25519); clients verify the update signature before applying it, preventing tampered updates.
+- The release workflow can sign macOS builds with an Apple Developer ID certificate and notarize them with Apple, and sign Windows builds with Authenticode. Both are controlled by a release setting (`RELEASE_UNVERIFIED`, which defaults to on). While it is on, macOS builds are ad-hoc signed and not notarized, and Windows builds are not Authenticode-signed, so Gatekeeper and SmartScreen do not verify the publisher at install time. Update signatures are produced in both modes.
+- When Developer ID signing runs, the certificate is imported into a temporary keychain on the CI runner.
 - All CI secrets are masked in build logs.
 
 ## Application-layer protections
@@ -75,9 +78,11 @@ HQ has not yet undergone an independent third-party penetration test. Engaging a
 |---|---|
 | Type-check / lint / test / tenant-isolation CI gates | In place |
 | Lockfile-pinned, frozen-install dependencies | In place |
-| Code signing + notarization + signed auto-updates | In place |
+| Signed auto-updates | In place |
+| Developer ID signing + notarization (macOS), Authenticode (Windows) | Supported in the release workflow; depends on release setting |
 | Required-status-check enforcement everywhere | In progress |
-| Automated dependency/vulnerability scanning (SCA) | Planned (near-term) |
+| Dependabot + gitleaks on hq-pro, hq-cli, hq-desktop-app | In place |
+| Dependabot + gitleaks on remaining repositories | Not yet configured |
 | SBOM generation | Planned |
 | CI credentials fully on short-lived OIDC | In progress |
 | Independent third-party penetration test | Planned |

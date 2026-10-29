@@ -95,7 +95,7 @@ Official Anthropic reference:
 - Deploy small static sites to hq-deploy from explicit built file contents.
 - Search chat-visible personal and company content.
 - Read company knowledge, project records, project status, and policies.
-- Capture notes, journal entries, project updates, and knowledge captures back into allowed prefixes.
+- Capture notes, journal entries, project updates, and knowledge captures back into paths you have write access to.
 - Inspect secret names and project secret schemas without exposing secret values.
 - Generate a human submission link when a secret value needs to be supplied.
 - Create, discover, update, tag, govern, and grant access to first-class company skills.
@@ -112,7 +112,7 @@ Different chat clients present MCP tools with different UI labels, but the conne
 | --- | --- |
 | Identity | `hq_whoami`, `hq_companies_list`, `hq_company_ping` |
 | Files | `hq_files_list`, `hq_files_read`, `hq_files_write`, `hq_files_stat`, `hq_files_create`, `hq_files_update`, `hq_files_delete`, `hq_files_restore`, `hq_files_share` |
-| Knowledge | `hq_knowledge_list`, `hq_knowledge_get`, `hq_knowledge_search`, `hq_knowledge_capture` |
+| Knowledge | `hq_knowledge_list`, `hq_knowledge_get`, `hq_knowledge_capture` (plus `hq_knowledge_search` on local MCP servers only) |
 | Projects | `hq_projects_list`, `hq_project_get`, `hq_project_status`, `hq_project_journal_append` |
 | Policies | `hq_policies_list`, `hq_policy_get` |
 | Secrets | `hq_secrets_list`, `hq_secrets_schema`, `hq_secrets_generate_link` |
@@ -131,7 +131,7 @@ Some clients also expose the standard MCP `search` and `fetch` surface. Use that
 HQ MCP has two search paths:
 
 - `search` and `fetch` are the general MCP content discovery pair. Search returns matching chat-visible records, and fetch rechecks permission before returning the canonical content.
-- `hq_knowledge_search` keeps the company-scoped HQ tool shape. In cloud mode, it uses the vault content search service and filters results to the requested company. In local developer mode, it can fall back to `qmd`.
+- `hq_knowledge_search` is the `qmd`-backed search tool for local MCP servers. The cloud connector does not register it; in the cloud, use `search` and `fetch`.
 
 Production cloud MCP does not shell out to `qmd`. If a cloud client reports a `qmd` missing error, it is using an old connector bundle or a local MCP path, not the current production cloud path.
 
@@ -143,15 +143,7 @@ Company file tools are company-scoped. The connector first verifies that you are
 
 Readable company listings exclude private operational prefixes such as `settings/`, `secrets/`, and `workers/`. Reads are also rechecked at fetch time, so stale paths or newly revoked access fail closed.
 
-Writes are limited to explicitly writable areas, including:
-
-- `notes/`
-- `inbox/`
-- `drafts/`
-- `scratch/`
-- `journal/`
-- `projects/`
-- `knowledge/captures/`
+Writes are governed by the vault file ACL for the exact path, the same permission `hq files acl` reports. Company owners and admins can write anywhere outside the private prefixes; members and guests need a write grant that covers the path. There is no separate list of writable folders. Writes under `settings/`, `secrets`, and `workers/` are always refused, as are empty, `.`, and traversal paths.
 
 Use the explicit CRUD tools when an agent needs to modify an existing object:
 
@@ -283,6 +275,6 @@ If a rollout needs to be reversed, disable skill/content surfacing first, purge 
 | New file CRUD, skill management, agent, integration, or Work Mesh tools are missing | The client cached an older registry. Reconnect the MCP server or remove and re-add the connector so it scans tools again. |
 | `hq_deploy_site` is missing from the client tool list | The client probably cached the tool registry before the latest connector deploy. Relaunch or reconnect the chat client, then list tools again. |
 | `hq_deploy_site` refuses a protected deploy | HQ could not confirm the requested hq-deploy access gate. Retry with a valid company, or use `password`/`public` only when that access mode is intended. |
-| `hq_knowledge_search` returns an empty array | The cloud service found no matching chat-visible content in that company scope. Try listing knowledge docs or fetching a known path. |
+| `search` returns no results | The cloud service found no matching chat-visible content for your account. Try listing knowledge docs or fetching a known path. |
 | A cloud request mentions `qmd` | The client is not using the current production cloud bundle, or it is pointed at a local developer MCP server. |
 | A secret value is missing from the response | This is expected. MCP exposes secret names, schemas, and submission links only. |
