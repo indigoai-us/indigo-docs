@@ -16,7 +16,7 @@ This page describes how HQ stays available, recovers from failures, and responds
 
 - S3 object versioning is enabled on customer storage buckets, so overwritten or deleted objects can be recovered.
 - Point-in-time recovery (PITR) is enabled on primary databases, allowing restoration to a prior moment within the retention window.
-- KMS keys are configured with deletion protection to prevent accidental loss of the ability to decrypt.
+- The control-plane KMS key and the shared vault KMS key are protected against accidental deletion in infrastructure code. AWS KMS also enforces a waiting period before any key is deleted.
 
 :::note[Honest note]
 PITR/KMS-CMK coverage is being standardized across all secondary metadata/audit tables; a documented, regularly-tested restore runbook is being formalized as part of the SOC 2 program.
@@ -34,7 +34,7 @@ HQ currently runs in a single AWS region with no cross-region replication or aut
 
 Indigo maintains an incident-response approach covering the standard lifecycle:
 
-1. Detection — via monitoring and alerting (CloudWatch alarms to on-call, Sentry error tracking, CloudTrail and application audit logs), and via reports to security@hqforwork.com.
+1. Detection — via monitoring and alerting (CloudWatch alarms to on-call, Sentry error tracking, application audit logs, CloudTrail management events, and S3 server access logs), and via reports to security@hqforwork.com.
 2. Triage and classification — assess scope, severity, and whether customer data is affected.
 3. Containment — revoke credentials (access is recomputed per request, so revocation is fast), isolate affected components, and stop the bleeding.
 4. Eradication and recovery — remove the root cause and restore normal operation from backups/versioned data where needed.
@@ -54,7 +54,8 @@ The incident-response plan is being formalized into a written, role-assigned, pe
 
 HQ's logging supports incident investigation:
 
-- AWS CloudTrail with data-event logging across all customer storage and log-file validation for tamper-evidence.
+- AWS CloudTrail management events, with log-file validation for tamper-evidence. CloudTrail data events on vault buckets were turned off on 2026-09-24.
+- S3 server access logs from person and company vault buckets, loaded into ClickHouse. AWS delivers these logs on a best-effort basis, so they can be late or incomplete.
 - An application audit trail of every credential issuance and administrative/impersonation action.
 - A hash-chained audit log for executed agreements in the e-signature feature.
 
@@ -70,4 +71,4 @@ HQ's logging supports incident investigation:
 | Published RPO/RTO targets | Planned |
 | Cross-region backup / multi-region evaluation | Planned |
 | Formal, tested incident-response runbook | In progress |
-| Public status page | Planned |
+| Public status page ([status.hqforwork.com](https://status.hqforwork.com)) | In place |

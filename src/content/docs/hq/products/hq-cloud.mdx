@@ -1,36 +1,36 @@
 ---
 title: hq-cloud
-description: The HQ cloud sync engine — bidirectional S3 sync that backs the hq CLI and the hq-sync menubar app.
+description: The HQ cloud sync engine (@indigoai-us/hq-cloud 6.x) — bidirectional S3 sync behind the hq CLI and the HQ desktop app.
 ---
 
-**hq-cloud** is the sync engine of the HQ ecosystem, published to npm as **`@indigoai-us/hq-cloud`** (currently **6.x**). It does the actual work of keeping a local HQ instance synchronized with cloud storage.
+**hq-cloud** is the sync engine of the HQ ecosystem, published to npm as **`@indigoai-us/hq-cloud`** (currently **6.18.x**). It does the actual work of keeping a local HQ instance synchronized with cloud storage.
 
 ## What it is
 
-- *"HQ by Indigo cloud sync engine — bidirectional S3 sync for mobile access."*
-- A library plus a runner binary, `hq-sync-runner`, that emits ndjson sync events.
-- Built on ESM + TypeScript with AWS SDK v3 (S3, Cognito), chokidar for file-change detection, and a local journal with SHA-256 hashing for conflict detection.
+- The bidirectional sync engine between a local HQ folder and the company and personal vaults in S3.
+- A library plus binaries, chiefly `hq-sync-runner`, which emits ndjson sync events.
+- Built on ESM + TypeScript with AWS SDK v3 (S3, Cognito), chokidar for file-change detection, and per-company local journals with SHA-256 hashing for conflict detection.
 
 ## Who uses it / when
 
 You rarely invoke hq-cloud directly — it's consumed by other surfaces:
 
 - The [`hq` CLI](/hq/products/hq-cli/) imports it for `hq sync` commands.
-- The [hq-sync](/hq/products/hq-sync/) menubar app spawns its `hq-sync-runner` and renders the progress events.
+- The [HQ desktop app](/hq/products/hq-sync/) (macOS and Windows) spawns its `hq-sync-runner` and renders the progress events.
 
 ## What it does
 
 ```mermaid
 graph LR
     local["Local HQ"] -->|watch + hash| engine["hq-cloud<br/>(@indigoai-us/hq-cloud)"]
-    engine <-->|bidirectional| s3["AWS S3<br/>(encrypted, per-entity prefix)"]
-    engine -->|journal| journal["local sync journal<br/>(SHA-256 state)"]
+    engine <-->|bidirectional| s3["AWS S3<br/>(encrypted company and personal vaults)"]
+    engine -->|journal| journal["per-company sync journals<br/>(~/.hq/sync-journal.{slug}.json)"]
 ```
 
-- **Auth** against the shared Cognito identity.
-- **Bidirectional file sync** to S3 with per-entity prefixes.
-- **Change detection** via chokidar, with gitignore-compatible path filtering.
-- **Conflict resolution** via a local journal that tracks per-file sync state. When both sides changed, the higher frontmatter `version:` wins (else the newer modification time); the losing copy is parked under `.hq/conflict-backups/` rather than written beside the live file. See [Cloud Sync](/hq/guide/8-cloud-sync/#conflict-resolution).
+- **Auth** against the shared Cognito identity. Tokens are cached at `~/.hq/cognito-tokens.json`.
+- **Bidirectional file sync** to each company vault and your personal vault in S3.
+- **Change detection** via chokidar. Built-in defaults skip VCS folders, build output, caches, and secrets. Add patterns to `.hqignore` at the HQ root (`.hqsyncignore` is the legacy name); `!pattern` re-includes a path. If `.hqinclude` exists, only paths matching it sync. `.gitignore` is not read; it does not affect what syncs.
+- **Conflict resolution** via a per-company journal at `~/.hq/sync-journal.{slug}.json` that tracks per-file sync state. When both sides changed, the higher frontmatter `version:` wins (else the newer modification time); the losing copy is parked under `.hq/conflict-backups/` rather than written beside the live file. See [Cloud Sync](/hq/guide/8-cloud-sync/#conflict-resolution).
 
 ## Composition
 
@@ -38,6 +38,6 @@ hq-cloud is the single sync implementation in the ecosystem — both the CLI and
 
 ## Related
 
-- [hq-cloud architecture](/hq/architecture/5-hq-cloud/) — engine internals (journal, watcher, daemon)
+- [Cloud Sync guide](/hq/guide/8-cloud-sync/) — how sync behaves day to day
 - [hq-cli](/hq/products/hq-cli/) — `hq sync` command surface
-- [hq-sync](/hq/products/hq-sync/) — the menubar GUI over this engine
+- [HQ desktop app](/hq/products/hq-sync/) — the desktop GUI over this engine

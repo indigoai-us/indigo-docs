@@ -1,12 +1,12 @@
 ---
 title: Getting Started
-description: Install the HQ desktop app and open your workspace in Claude Code or Codex.
+description: Install the HQ desktop app on macOS or Windows, then finish setup in HQ Desktop or in Claude Code, Codex, or Grok.
 ---
 
 ## Prerequisites
 
-- A supported Mac or Windows PC
-- **Claude Code** or **Codex**
+- A Mac or Windows PC (Linux is not supported yet)
+- **Claude Code**, **Codex**, or **Grok** if you want to finish setup in an AI tool
 - An HQ account
 
 ## Install
@@ -15,56 +15,66 @@ description: Install the HQ desktop app and open your workspace in Claude Code o
    for your computer.
 2. Open **HQ** and sign in.
 3. Choose where your HQ workspace should live (the default is `~/hq`).
-4. Select **Install** and let HQ finish setup.
-5. On the **HQ is ready** screen, select **Open in Claude Code** or
-   **Open in Codex**.
+4. Select **Install** and let HQ finish setup. If you don't have a company yet,
+   HQ asks you to name one or join an invite, then sign up free. Start free.
+   $10 of usage included every month.
+5. On the **HQ is ready** screen, select **Open HQ Desktop**, or open the
+   workspace in an AI tool with **Open in Claude Code** or **Open in Codex**.
+   **Open in Grok** also appears when the Grok CLI is installed.
 
-Opening either AI tool is the final onboarding step. HQ opens the selected tool
-in your workspace, completes onboarding, and switches to the compact sync app in
-your menu bar or system tray. If you want to open the workspace yourself, select
-**Finish** instead.
+**Open HQ Desktop** opens the desktop app. Run Setup on `#welcome` to start the
+Setup bot, which walks you through the rest of setup in a chat. The AI tool
+buttons open the selected tool in your workspace so you can run `/setup` there.
 
 ## Finish setup in your AI tool
 
-Claude Code opens with `/setup` ready to run. In Codex, open the prompt and run:
+The Claude Code desktop app opens with a prompt that runs the setup wizard.
+Codex opens with `/setup` typed in the prompt. In the Claude Code CLI or Grok,
+run:
 
 ```bash
 /setup
 ```
 
-The setup wizard walks you through 5 phases:
+The setup wizard asks one question at a time. You can skip any step and setup
+still completes. It runs these phases:
 
-### Phase 1: Dependencies
-Checks that `qmd`, Claude Code, and `gh` are installed.
+| Phase | What it does |
+|-------|--------------|
+| **0a. Install manifest recovery** | Checks the tools the installer recorded and fixes anything missing |
+| **0b. Dependencies and auth** | Installs missing tools such as the `hq` CLI, `qmd`, and `gh` |
+| **0c. HQ Cloud** | Confirms your HQ login, claims invites, and makes sure sync is running |
+| **0d. Prior AI footprint** | Offers to import context from AI tools you used before |
+| **1. Identity** | Your name, what you do, your goals, your challenges, and your systems of record |
+| **1.5. Social presence** | Optionally reads your public profiles to learn your voice |
+| **2. Generate files** | Creates `repos/`, the `personal/` scaffold, and your profile files |
+| **3. Summary** | Lists what was created |
+| **4. HQ mental model** | Explains how HQ is organized |
+| **4.5. Dream big** | Captures a longer-term vision for how you will use HQ |
+| **5. What do you need help with?** | An interview that sets up what it can now and recommends commands to run next |
+| **6. Welcome page and hand-off** | Deploys a private welcome page (when you are signed in) and hands you off to a fresh session |
 
-### Phase 2: Identity
-- Your name and handle
-- What you do
-- Your domains/areas of expertise
-- Company or context name
+Phase 2 writes your profile here:
 
-### Phase 3: Starter Projects
-Choose one or more starter projects:
-
-| Project | What It Does |
-|---------|-------------|
-| **Personal Assistant** | Email digests, task scanning, daily briefings |
-| **Social Media Worker** | X/LinkedIn content creation and scheduling |
-| **Code Worker** | Autonomous coding via the Ralph methodology |
-
-### Phase 4: Customization
-Follow-up questions based on your selections (platforms, tech stack, preferences).
-
-### Phase 5: File Generation
-Creates your personalized directory structure:
 ```
-companies/{your-company}/
-├── settings/       # API credentials (gitignored)
-├── data/           # Exports, reports
-└── knowledge/
-    ├── profile.md
-    └── voice-style.md
+personal/
+├── knowledge/
+│   ├── profile.md
+│   ├── systems-of-record.md
+│   ├── social-presence.md   (only if you shared public profiles)
+│   └── voice-style.md
+├── policies/
+├── workers/
+├── settings/
+├── skills/
+└── hooks/
+agents-profile.md
+agents-companies.md
 ```
+
+Add a company with `/newcompany {slug}`. Company folders live at
+`companies/{slug}/` with `settings/`, `data/`, `knowledge/`, `workers/`, and
+`policies/`.
 
 ## First Task
 
@@ -72,7 +82,7 @@ After setup, try these:
 
 ```bash
 # Find what to work on
-/nexttask
+/startwork
 
 # Create a project
 /prd "Build a landing page for my product"
@@ -88,18 +98,23 @@ After setup, try these:
 
 ```
 hq/
-├── .claude/
-│   ├── CLAUDE.md        # Global instructions
-│   └── commands/        # 17 slash commands
-├── companies/           # Your company resources
-├── knowledge/           # Knowledge bases
-├── workers/             # AI worker configs
-├── projects/            # Project PRDs
-├── workspace/
-│   ├── threads/         # Session history
-│   ├── checkpoints/     # Session saves
-│   ├── learnings/       # Captured insights
-│   └── reports/         # Generated reports
-└── modules/
-    └── modules.yaml     # Module manifest
+├── .claude/             # Claude Code settings, hooks, and skills
+│   └── skills/          # Slash commands
+├── .codex/ .grok/ .cursor/ .agents/   # Other runtimes
+├── AGENTS.md            # Shared agent instructions
+├── companies/           # One folder per company, plus manifest.yaml
+│   └── {company}/projects/{name}/prd.json
+├── core/                # Files shipped with HQ (replaced by /update-hq)
+│   ├── knowledge/public/  # Bundled knowledge bases
+│   ├── workers/public/    # Bundled workers
+│   └── policies/
+├── personal/            # Your own knowledge, policies, workers, and skills
+├── repos/
+│   ├── public/          # Code repos
+│   └── private/
+└── workspace/
+    ├── threads/         # Session history
+    ├── checkpoints/     # Session saves
+    ├── learnings/       # Captured insights
+    └── reports/         # Generated reports
 ```

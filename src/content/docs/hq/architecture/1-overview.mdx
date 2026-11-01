@@ -5,71 +5,65 @@ description: System architecture of the HQ ecosystem — the split repos, data f
 
 ## System Architecture
 
-HQ ships as a set of independently versioned repos — a CLI, a cloud sync engine, a scaffold, desktop and admin apps, and shared cloud infrastructure — rather than one combined repository. The user interacts with HQ through Claude Code locally, and optionally through a desktop menubar app and an admin console. Cloud sync bridges local and cloud. See the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/) for how the repos compose.
+HQ ships as a set of independently versioned repos: a scaffold and its installer, a CLI, a cloud sync engine, a desktop app, an admin console, and shared cloud infrastructure. The user works in HQ through an agent runtime (Claude Code, Codex, or Grok; Cursor gets a rules file only) on the local HQ directory, and optionally through the HQ desktop app and the web console. Cloud sync connects the local directory to per-company vaults on S3. See the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/) for how the repos compose.
 
 ```mermaid
 graph TD
     subgraph local["Local + distribution"]
         direction TB
-        createhq["create-hq scaffold<br/>(hq-core)"]
+        createhq["create-hq<br/>(installer)"]
+        core["hq-core<br/>(scaffold)"]
         hqcli["hq-cli<br/>(the hq CLI)"]
         hqcloud["hq-cloud<br/>(sync engine)"]
-        hqsync["hq-sync<br/>(menubar app)"]
+        desktop["hq-desktop-app<br/>(macOS + Windows)"]
+        createhq -->|fetches| core
         hqcli -->|imports| hqcloud
-        hqsync -->|drives| hqcloud
+        desktop -->|runs hq-sync-runner| hqcloud
     end
     subgraph cloudapps["Cloud apps"]
-        console["hq-console<br/>(admin UI)"]
+        console["hq-console<br/>(web console)"]
         deploy["hq-deploy<br/>(artifact deploys)"]
-        pro["hq-pro<br/>(vault + teams)"]
+        pro["hq-pro<br/>(vault + teams + API)"]
     end
-    createhq --> npm["npm / GitHub Releases"]
+    createhq --> npm["npm"]
     hqcli --> npm
     cloudapps --> aws["AWS<br/>Cognito + S3 + CloudFront<br/>Lambda + API Gateway"]
-    hqcloud --> aws
+    hqcloud --> pro
 ```
 
 ### Runtime Flow
 
 ```mermaid
 graph LR
-    claude["Claude Code<br/>(terminal)"] <-->|"reads/<br/>writes"| local["Local HQ<br/>(~/HQ/)"]
-    local <-->|sync| cloud["hq-cloud<br/>(S3 engine)"]
-    local --> knowledge["Knowledge<br/>git repos<br/>(symlinked)"]
-    cloud --> s3["AWS S3<br/>bucket"]
-    s3 --> pwa["PWA (web)<br/>dashboard<br/>mobile/desktop"]
+    agent["Agent runtime<br/>(Claude Code, Codex,<br/>Grok)"] <-->|"reads/<br/>writes"| local["Local HQ<br/>directory"]
+    local <-->|sync| cloud["hq-cloud<br/>(sync engine)"]
+    cloud <--> api["hq-pro VaultApi<br/>hqapi.hq.computer"]
+    api --> s3["S3 company<br/>vaults"]
+    console["hq-console<br/>hq.computer"] --> api
 ```
 
 ## Data Flow
 
-HQ follows a linear progression from install to daily use:
-
 ### 1. Install
 
-```bash
-npx create-hq
-```
+There are two install paths:
 
-`create-hq` scaffolds a new HQ directory from `template/`, installs dependencies, and optionally runs `/setup` for interactive configuration.
+- **Desktop:** the HQ desktop app (macOS and Windows) runs an onboarding installer on first launch, then becomes the sync and workspace app.
+- **Terminal:** `npx create-hq` downloads the hq-core scaffold from GitHub, checks dependencies, and optionally installs `@indigoai-us/hq-cli` and the recommended content packs. It requires Node.js 22.13+ and git.
 
 ### 2. Setup
 
-The `/setup` command walks through:
-- Company configuration (names, settings)
-- API credentials (per company)
-- Worker selection and activation
-- Knowledge base initialization
-- Cloud sync credentials (optional)
+The `/setup` skill walks through first-run configuration: companies, workers, knowledge, and search indexing.
 
 ### 3. Work
 
-Daily workflow happens entirely through Claude Code:
+Daily work happens through the agent runtime:
 
 ```mermaid
 graph LR
-    user["User"] --> cc["Claude Code"]
-    cc --> claude["reads CLAUDE.md"]
-    claude --> discover["discovers commands,<br/>workers, knowledge"]
+    user["User"] --> cc["Agent runtime"]
+    cc --> claude["reads CLAUDE.md /<br/>AGENTS.md"]
+    claude --> discover["discovers skills,<br/>workers, knowledge"]
     cc --> run["/run worker skill"]
     cc --> prd["/prd"]
     cc --> rp["/run-project"]
@@ -77,32 +71,15 @@ graph LR
     cc --> ho["/handoff"]
 ```
 
-All state lives in the filesystem. Workers read knowledge, write reports, update threads, and commit to git repos.
+State lives in the filesystem. Workers read knowledge, write reports, update threads, and commit to git repos.
 
 ### 4. Sync
 
-`hq-cloud` synchronizes the local HQ directory to S3:
+`hq-cloud` syncs a cloud-backed company's files between the local HQ directory and that company's vault bucket on S3. Each sync call gets a Cognito token, asks the hq-pro vault service for STS-vended credentials scoped to the company, and transfers files. What syncs is set by `.hqignore` and the membership's sync mode (`shared`, `all`, or `custom`). Sync runs in the background from the desktop app, or on demand with `hq sync now`, `hq sync push`, and `hq sync pull`.
 
-```mermaid
-graph TD
-    local["Local HQ"] --> cloud["hq-cloud"]
-    cloud --> s3["S3 bucket<br/>(encrypted, per-user prefix)"]
-    s3 --> cdn["CloudFront CDN"]
-    cdn --> apigw["API Gateway + Lambda"]
-    apigw --> pwa["PWA dashboard"]
-```
+### 5. Web and mobile
 
-Sync is selective — only workspace state, reports, and social drafts are synced. Git repos, node_modules, and credentials are excluded.
-
-### 5. Mobile
-
-The PWA dashboard provides read access to:
-- Active threads and checkpoints
-- Reports and social drafts
-- Worker status and project progress
-- Quick actions (approve posts, review reports)
-
-Authentication flows through AWS Cognito. Content is served from S3 via CloudFront.
+The web surface is hq-console at `hq.computer`. Native iOS (beta) and Android apps are built from the hq-native-mobile repo. The cloud API (`VaultApi` in hq-pro) is served at `https://hqapi.hq.computer`.
 
 ## Repo Graph
 
@@ -110,16 +87,18 @@ Each surface is its own repo and ships on its own cadence. For the full breakdow
 
 ```mermaid
 graph TD
-    createhq["hq-core<br/><i>npx create-hq</i><br/>Scaffold / starter kit"]
-    hqcli["hq-cli<br/><i>@indigoai-us/hq-cli</i><br/>Ongoing management"]
-    hqcloud["hq-cloud<br/><i>@indigoai-us/hq-cloud</i><br/>S3 sync engine"]
-    hqsync["hq-sync<br/>Tauri menubar app"]
+    createhq["create-hq<br/><i>npx create-hq</i><br/>Installer"]
+    core["hq-core<br/>Scaffold"]
+    hqcli["hq-cli<br/><i>@indigoai-us/hq-cli</i><br/>The hq CLI"]
+    hqcloud["hq-cloud<br/><i>@indigoai-us/hq-cloud</i><br/>Sync engine"]
+    desktop["hq-desktop-app<br/>Tauri desktop app"]
+    createhq -->|fetches tarball| core
     hqcli -->|imports| hqcloud
-    hqsync -->|spawns runner| hqcloud
-    console["hq-console<br/>Next.js admin UI"]
+    desktop -->|spawns runner| hqcloud
+    console["hq-console<br/>Next.js web console"]
     deploy["hq-deploy<br/>artifact data plane"]
     pro["hq-pro<br/>vault + teams (SST)"]
-    packs["hq-packages<br/>@indigoai-us/hq-pack-*"]
+    packs["hq-packages<br/>content packs"]
     console --> pro
     deploy --> pro
 ```
@@ -128,74 +107,73 @@ graph TD
 
 ```mermaid
 graph LR
-    createhq["hq-core scaffold"] -->|"npx create-hq copies the seed"| inst["new HQ instance"]
+    createhq["create-hq"] -->|"downloads the scaffold"| inst["new HQ instance"]
     hqcli["hq-cli"] -->|"imports sync engine"| hqcloud["hq-cloud"]
-    hqsync["hq-sync"] -->|"spawns hq-sync-runner"| hqcloud2["hq-cloud"]
+    desktop["hq-desktop-app"] -->|"spawns hq-sync-runner"| hqcloud2["hq-cloud"]
     console["hq-console"] -->|"trusts Cognito + APIs"| pro["hq-pro"]
     deploy["hq-deploy"] -->|"trusts shared identity"| pro2["hq-pro"]
 ```
 
-The repos are loosely coupled. `create-hq` only seeds a new instance at install time and has no runtime dependency on the others. `hq-cli` is the primary user-facing package and depends on `hq-cloud` for sync; the `hq-sync` menubar app drives the same engine by spawning its `hq-sync-runner`. The cloud apps (`hq-console`, `hq-deploy`) own no identity of their own — they trust the shared Cognito pool provisioned by `hq-pro`.
+The repos are loosely coupled. `create-hq` seeds a new instance from hq-core at install time and has no runtime role after that. `hq-cli` is the main user-facing package and depends on `hq-cloud` for sync; the desktop app runs the same engine through its `hq-sync-runner` binary. The cloud apps (`hq-console`, `hq-deploy`) have no user store of their own; they trust the shared Cognito pool provisioned by `hq-pro`.
 
 ## Technology Stack
 
 ### Core
 
-| Technology | Purpose | Rationale |
+| Technology | Purpose | Notes |
 |---|---|---|
-| **Node.js 20+** | Runtime | Universal JS runtime, native in Claude Code environments (hq-cli requires Node ≥22) |
-| **TypeScript** | Language | Type safety across every repo, better IDE support |
-| **ESM + NodeNext** | Module system | Modern ESM conventions shared across the CLI and cloud packages |
+| **Node.js** | Runtime | hq-cli requires Node ≥20; create-hq requires Node ≥22.13 |
+| **TypeScript** | Language | Used across the CLI, sync engine, and cloud repos |
+| **pnpm** | Package manager | hq-cli, hq-cloud, hq-pro, hq-console, and hq-desktop-app; create-hq and hq-deploy use npm |
 
 ### CLI + sync packages
 
-| Technology | Package | Rationale |
+| Technology | Package | Purpose |
 |---|---|---|
-| **Commander.js** | hq-cli | Standard Node.js CLI framework |
-| **AWS SDK v3** | hq-cloud | Modular AWS client, tree-shakeable |
-| **zod** | hq-cli, hq-cloud | Runtime schema validation for configs |
-| **chokidar** | hq-cloud | File-change detection for sync |
+| **Commander.js** | hq-cli | CLI framework |
+| **AWS SDK v3** | hq-cloud | S3 and Cognito clients |
+| **simple-git** | hq-cli | Git operations for `hq modules` |
 
-### Desktop (hq-sync)
+### Desktop (hq-desktop-app)
 
-| Technology | Purpose | Rationale |
-|---|---|---|
-| **Tauri 2** | App shell | Native macOS menubar app with a small Rust backend |
-| **Svelte 5** | UI framework | Reactive runes, tiny runtime |
-| **Vite** | Build tool | Fast HMR, native ESM |
+| Technology | Purpose |
+|---|---|
+| **Tauri 2** | App shell with a Rust backend, for macOS and Windows |
+| **Svelte 5** | UI framework |
+| **Vite** | Build tool |
 
-### Admin + cloud apps (hq-console, hq-pro, hq-deploy)
+### Web and cloud apps (hq-console, hq-pro, hq-deploy)
 
-| Technology | Purpose | Rationale |
-|---|---|---|
-| **Next.js 15 / React 19** | hq-console UI | Admin surface over HQ Cloud |
-| **NextAuth v5** | Auth | OIDC over the shared Cognito pool |
-| **SST v3** | hq-pro IaC | TypeScript-native infrastructure on AWS |
-| **Hono on Lambda** | hq-deploy API | Lightweight deploy-management API |
+| Technology | Purpose |
+|---|---|
+| **Next.js 15 / React 19** | hq-console UI |
+| **NextAuth v5** | hq-console auth over the shared Cognito pool |
+| **SST 4** | hq-pro infrastructure on AWS |
+| **Hono** | hq-deploy API |
 
 ### Documentation (this site)
 
-| Technology | Purpose | Rationale |
-|---|---|---|
-| **Astro** | Framework | Static-first, fast builds, content-focused |
-| **Starlight** | Theme | Purpose-built for documentation, search included |
-| **MDX** | Content | Markdown with component support |
+| Technology | Purpose |
+|---|---|
+| **Astro** | Static site framework |
+| **Starlight** | Documentation theme with search |
+| **MDX** | Markdown with component support |
 
 ### Shared infrastructure
 
-| Technology | Purpose | Rationale |
-|---|---|---|
-| **AWS Cognito** | Auth | One managed identity pool shared across the cloud apps |
-| **AWS S3** | Storage | Encrypted file storage, per-entity prefixes |
-| **Lambda + API Gateway** | Compute / API | Serverless endpoints for sync, deploy, and vault |
-| **CloudFront** | CDN | Global edge caching for assets and APIs |
+| Technology | Purpose |
+|---|---|
+| **AWS Cognito** | One identity pool shared across the cloud apps |
+| **AWS S3** | Per-company vault buckets |
+| **Lambda + API Gateway** | Serverless endpoints for vault, sync, and deploy |
+| **CloudFront** | CDN for assets and APIs |
 
 ### Why These Choices
 
-**Split repos over one combined repository:** Each surface (CLI, sync engine, scaffold, desktop app, admin/cloud apps) ships on its own cadence and version. Splitting the former combined repo lets a CLI release go out without touching the desktop app, and keeps each repo's CI lean. The repos compose through published npm packages and a shared Cognito identity rather than through workspace links.
+**Split repos:** each surface (installer, scaffold, CLI, sync engine, desktop app, cloud apps) ships on its own cadence and version. A CLI release does not touch the desktop app, and each repo's CI stays scoped. The repos compose through published npm packages, GitHub Releases, and a shared Cognito identity.
 
-**SST over CDK/Terraform:** SST wraps AWS CDK with TypeScript-native constructs and provides live Lambda debugging during development. This aligns with the all-TypeScript stack and reduces the feedback loop for infrastructure changes.
+**SST for hq-pro:** TypeScript-native infrastructure definitions, in the same language as the services.
 
-**Astro Starlight over Docusaurus/Nextra:** Starlight is purpose-built for documentation. It ships with search, navigation, and i18n out of the box. Astro's partial hydration means zero JS ships to the client by default.
+**Astro Starlight for docs:** built for documentation, with search and navigation included and no client JavaScript by default.
 
-**Tauri over Electron for the desktop app:** the `hq-sync` menubar app uses a small Rust backend instead of bundling Chromium, keeping the download small for a background sync agent.
+**Tauri for the desktop app:** a Rust backend with the system webview instead of a bundled Chromium, which keeps the download small for a background sync app.

@@ -7,65 +7,52 @@ The original combined repository has been split into independently versioned pro
 
 ## What shipped
 
-`npx create-hq` installs a fully functional HQ on any machine with Node.js, and the ecosystem is published and deployed:
+HQ installs through the HQ desktop app (macOS and Windows) or from a terminal with `npx create-hq` (Node.js 22.13+ and git). The ecosystem is published and deployed:
 
-- **Scaffold** — `hq-core` (`hqVersion 15.x`) seeds new instances; existing ones upgrade via `/update-hq`.
-- **CLI + sync** — `@indigoai-us/hq-cli` (the `hq` command) and `@indigoai-us/hq-cloud` (the S3 sync engine) are published to npm and version independently.
-- **Desktop** — the `hq-sync` Tauri menubar app ships signed/notarized with `latest.json` auto-update.
-- **Cloud apps** — `hq-console` (admin UI), `hq-deploy` (artifact data plane), and `hq-pro` (vault + teams + shared Cognito identity) are deployed on AWS/Vercel.
-- **Content packs** — `hq-packages` distributes `@indigoai-us/hq-pack-*` add-ons via `hq install`.
+- **Scaffold:** `hq-core` (`hqVersion` 16.0.x in `core/core.yaml`) seeds new instances. Existing ones update with `/update-hq` or `hq rescue`.
+- **Installer:** `create-hq` downloads the scaffold and offers hq-cli and the recommended packs.
+- **CLI + sync:** `@indigoai-us/hq-cli` (the `hq` command) and `@indigoai-us/hq-cloud` (the sync engine) are published to npm and version independently.
+- **Desktop:** `hq-desktop-app` replaces the separate hq-sync, hq-sync-win, and hq-installer apps. It ships signed builds for macOS and Windows with auto-update.
+- **Cloud apps:** `hq-console` (web console at `hq.computer`), `hq-deploy` (artifact data plane), and `hq-pro` (vault, teams, `VaultApi`, shared Cognito identity) are deployed on Vercel and AWS.
+- **Content packs:** `hq-packages` distributes optional packs via `hq install`.
+- **Runtimes:** the scaffold ships configuration for Claude Code, Codex, and Grok, plus a rules file for Cursor (`.cursor/rules/hq.mdc`).
 
-## hq-core 15.0.0
+## hq-core 16.0
 
-The 15.0.0 release reshapes the scaffold around a clean split: vanilla `hq-core` is now a pure orchestration layer, and the coding toolkit moves into an optional pack. The upgrade is engineered to be invisible for existing coding installs.
+16.0.0 is a breaking release.
 
-### Engineering surface extracted to a pack
+- **Conduct mode by default.** Fresh interactive sessions open in `/conduct` mode. Unattended sessions (local bots, fleet boxes, scheduled jobs) are unaffected. Turn it off with `default_enabled: false` in `personal/settings/orchestrator.yaml`, `HQ_AUTO_CONDUCT=0`, or `/conduct off`.
+- **v15 deprecations removed.** The `/plan` stub is gone; use `/prd`. Skills such as `/tdd` and `/diagnose` read `GLOSSARY.md` only (no `CONTEXT.md` fallback).
+- **Engineering skills are back in core.** The v15.0.0 extraction into `hq-pack-engineering` was reversed: `/tdd`, `/review`, `/execute-task`, `/run-project`, `/land`, and the related workers ship in core again. Upgraders can remove the redundant pack with `hq packs uninstall hq-pack-engineering`.
+- **hq-cli floor.** `core/core.yaml` sets `requiresHqCli: ">=5.345.67"`.
 
-17 dev skills (`/tdd`, `/review`, `/execute-task`, `/run-project`, `/architect`, `/diagnose`, `/land`, and more), 6 workers (`qa-tester`, `security-scanner`, `accessibility-auditor`, `frontend-designer`, `performance-benchmarker`, `site-builder`), 4 knowledge bases, and 4 policies left shipped `core/` and now live in [`hq-pack-engineering`](/hq/products/hq-packages/overview/). The default scaffold stays minimal for founders, ops, and knowledge-work teams who never touch a repo.
+### Defaults
 
-Upgrading is transparent. `/update-hq` auto-installs the pack before removing the inline copies, then symlinks every capability back to its original path, so existing commands keep working with no prompts. If the install cannot reach the pack, inline copies are kept and a retry command is shown. Fresh `npx create-hq` installs stay lean and add the pack on demand:
+- **Permission mode `auto`.** `.claude/settings.json` ships `defaultMode: "auto"`. A v15 change to Plan mode was unintended and has been reverted.
+- **Model alias `opus`.** Sessions and subagents use the `opus` alias, which Claude Code resolves to its newest Opus model. The 1M-context variant (`opus[1m]`) stays opt-in per command.
 
-```bash
-hq install github:indigoai-us/hq-packages#packages/hq-pack-engineering
-```
+### New skills
 
-### Safer and smarter defaults
+- **`/conduct-join`** attaches an already-running session to a `/conduct` session.
+- **`/new-agent`** provisions a fleet agent end to end and verifies it for a defined job.
+- **`/new-hire`** onboards a human teammate: invite, grants, onboarding packet, and follow-through.
+- **`/project-summary`** renders a project's `prd.json` or `brainstorm.md` as a branded page and deploys it behind a gate.
 
-- **Plan mode by default.** New sessions start in Plan mode, so HQ proposes before it acts. Nothing changes on disk until the plan is approved. Auto mode remains available in the picker.
-- **Opus 4.8 default model.** Sessions and subagents run on Opus 4.8; the 1M-context variant stays opt-in per command.
-- **Plain-language routing.** Requests phrased in plain English route to the right skill, with the company and its policies bound first and an explicit stop before anything heavy or irreversible.
+### Structure
 
-### New capabilities
-
-- **`/humanize`** runs a pass over any human-facing prose so it does not read like generated text, and runs automatically before HQ delivers finished writing.
-- **`/work-broadcast`** composes right-sized team announcements with a draft-confirm step before sending.
-- **`/hq-heal`** triages a Claude Code or Codex error mid-session, proposes a fix, and files a bug for recurring classes.
-- **`/ontology`** is the runtime interface to the hq-pro ontology gardener (entity graph and situational-awareness brief per company).
-- **`/hq-share`** now drafts a short, factual note describing what is being shared, prefilled for the sender to review.
-
-### Reliability and structure
-
-- `hq-sync` reindexes search after any sync that pulled files, so freshly-synced knowledge is searchable immediately.
-- Codex reaches permission-deny parity with Claude, and its hook surface consolidates to three status rows with no loss of coverage.
-- `/setup` drives real first-session momentum, capturing pain points and systems of record and keeping them in front of HQ every session.
-- Top-level directories are trimmed to `companies/`, `core/`, `personal/`, `repos/`, and `workspace/`; public HQ docs moved to `core/docs/hq/`; `core/core.yaml` is the only shipped version manifest.
+- Top-level directories are `companies/`, `core/`, `personal/`, `repos/`, and `workspace/`; public HQ docs live in `core/docs/hq/`.
+- `core/core.yaml` is the only shipped version manifest.
 
 ## Near-term priorities per product
 
-### hq-sync (desktop)
-- Conflict-resolution UX in the menubar
+### hq-desktop-app
+- Conflict-resolution UX
 - Richer per-file progress and notifications
-- Broader platform coverage beyond macOS
 
 ### hq-pro + hq-console (teams)
 - Membership management and role workflows
-- Usage and deployment visibility in the admin UI
-- Tighter vault / capability-grant ergonomics
-
-### hq-deploy (artifacts)
-- SSR deploy flows alongside static
-- Custom domains and DNS automation
-- Enterprise init / CloudFormation polish
+- Usage and deployment visibility in the console
+- Vault and capability-grant ergonomics
 
 ### hq-cli + hq-cloud
 - Sync reliability and resumability
@@ -73,8 +60,8 @@ hq install github:indigoai-us/hq-packages#packages/hq-pack-engineering
 
 ### hq-packages
 - More first-party packs
-- Smoother pack authoring + install loop
+- A smoother pack authoring and install loop
 
 ## How priorities are sized
 
-Work is scoped by complexity and risk (S/M/L/XL), not by wall-clock dates. HQ runs at agent velocity with many concurrent sessions, so effort is expressed as sessions of work and concurrency rather than weeks. Genuine external deadlines, when they exist, are tracked separately.
+Work is scoped by complexity and risk (S/M/L/XL), not by calendar dates. HQ runs many concurrent agent sessions, so effort is expressed as sessions of work and concurrency rather than weeks. External deadlines, when they exist, are tracked separately.

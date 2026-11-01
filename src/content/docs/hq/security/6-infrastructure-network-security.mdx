@@ -8,7 +8,7 @@ This page describes the cloud infrastructure HQ runs on, how it is provisioned, 
 ## Cloud provider and region
 
 - Provider: Amazon Web Services (AWS).
-- Region: `us-east-1` (Northern Virginia, United States), used exclusively. There is no multi-region data replication, so customer data resides in the United States.
+- Region: `us-east-1` (Northern Virginia, United States) for HQ's primary stores. There is no multi-region data replication of those stores. AI requests through Bedrock cross-region inference may be processed in other AWS regions, and some subprocessors process data outside AWS `us-east-1` (see [Subprocessors](/hq/security/2-subprocessors/)).
 - HQ inherits AWS's physical and environmental data-center controls (AWS holds SOC 1/2/3, ISO 27001, and other certifications for the underlying infrastructure).
 
 ## Infrastructure as code
@@ -20,22 +20,30 @@ All cloud infrastructure is defined declaratively as infrastructure-as-code (pri
 HQ uses managed and serverless compute to minimize the host-level attack surface and patching burden:
 
 - AWS Lambda behind Amazon API Gateway is the dominant compute model for the API and most services — there are no long-lived application servers to harden or patch for these paths.
-- Containers (Amazon ECS) run specific long-running agent workloads, isolated within the private network.
+- Containers (Amazon ECS) run specific long-running agent workloads, including the agent meeting service.
 - Managed edge compute (Amazon CloudFront + Lambda@Edge) serves and gates static-artifact delivery.
 - Some auxiliary web front-ends run on managed hosting (Vercel / OpenNext-on-Lambda).
 
 ## Network architecture
 
-HQ's data plane runs inside a dedicated VPC designed for strong network isolation:
+HQ's vault data plane runs inside a dedicated VPC:
 
-- Private subnets only. Application compute has no direct inbound internet exposure.
-- No NAT gateway. Rather than routing egress out to the internet, services reach AWS APIs through VPC endpoints (for example, Amazon S3, AWS Secrets Manager, Amazon SES, and Amazon Bedrock). This sharply limits both inbound and outbound exposure.
+- The vault's own compute and databases sit in private subnets with no direct inbound internet exposure. Services in the VPC reach AWS APIs through VPC endpoints (gateway endpoints for Amazon S3 and DynamoDB, interface endpoints for services such as AWS Secrets Manager, Amazon SES, and Amazon Bedrock).
 - Tight security groups. Interface-endpoint, database, and mount-target security groups permit only the specific required ports from within the VPC CIDR (e.g., 443 to endpoints; the database port only from the application security group).
 - Databases are not publicly accessible. Managed PostgreSQL is private to the VPC; DynamoDB is reached over the AWS network.
-- Internet-facing surfaces are limited to the managed, hardened entry points: API Gateway, the Cognito hosted sign-in UI, and CloudFront/Lambda@Edge.
+- Lambda functions that call third-party APIs over the internet (for example, analytics writes to ClickHouse Cloud) run outside this VPC.
+
+Hosted-agent workloads share the vault VPC and can reach the internet:
+
+- Hosted company-agent instances run in two public subnets of the vault VPC, with public IPs and a route to an internet gateway. Their security group has no inbound rules; operator access is through AWS Systems Manager Session Manager.
+- In production, hosted-agent worker tasks run in the vault's private subnets, and those subnets route internet traffic through a NAT gateway so the workers can reach third-party model APIs. Replacing this with an in-VPC hostname-allowlist proxy is planned.
+
+The agent meeting service runs in its own VPC, in public subnets with public IPs, behind a public load balancer with an HTTPS listener. Its security group accepts traffic only from the load balancer. It reaches OpenAI and Recall.ai over the internet.
+
+Internet-facing entry points include API Gateway, the Cognito hosted sign-in UI, CloudFront/Lambda@Edge, and the meeting service's load balancer.
 
 :::note[Honest note]
-A small number of egress security-group rules are broader than strictly necessary (all-outbound) although they sit in private, no-NAT subnets; tightening these to least-privilege egress is on the roadmap.
+A small number of egress security-group rules are broader than strictly necessary (all-outbound); tightening these to least-privilege egress is on the roadmap.
 :::
 
 ## Identity and access management (cloud IAM)
@@ -44,7 +52,7 @@ HQ applies least privilege to its own AWS roles:
 
 - A baseline vault-access role acts as a ceiling; each customer request is served by a per-request STS session whose policy is narrowed to a single tenant's resources (see [Tenant Isolation](/hq/security/3-tenant-isolation/)).
 - The role that can assume the vault role is restricted to the specific service function, with KMS usage gated by resource tag.
-- CloudTrail data-event logging covers all customer storage.
+- S3 server access logging is configured on person and company vault buckets (see logging below).
 
 :::note[Honest note]
 A few internal administrative/maintenance functions hold broader permissions (for example, the ability to decrypt across per-tenant keys, compensated for by storage-level controls and audit logging). Narrowing these with tag conditions and scoped policies is tracked on the roadmap.
@@ -52,7 +60,7 @@ A few internal administrative/maintenance functions hold broader permissions (fo
 
 ## Secrets management
 
-- Secrets are stored in AWS SSM Parameter Store (SecureString) and AWS Secrets Manager, never in source control.
+- Secrets are stored in AWS SSM Parameter Store (SecureString) and AWS Secrets Manager, never in source control. Customer secrets in SSM use the AWS-managed SSM key.
 - In the primary application, secret values are bound at deploy time and runtime roles are not granted broad parameter-read permissions; third-party API keys are read at cold start through private VPC endpoints.
 - Human-held secrets are sourced from HQ Secrets (HQ's own encrypted secrets-management system) and referenced, not embedded.
 
@@ -60,7 +68,8 @@ A few internal administrative/maintenance functions hold broader permissions (fo
 
 - Application logs and metrics: Amazon CloudWatch (structured logs, custom metrics, and alarms that notify via Amazon SNS).
 - Error tracking: Sentry on the primary application, with an event scrubber that strips authentication tokens and home-directory paths before transmission.
-- Audit: AWS CloudTrail (with log-file validation) plus an application audit trail of credential issuance and administrative actions.
+- Audit: an application audit trail of credential issuance and administrative actions, and an AWS CloudTrail trail (multi-region, with log-file validation) that records management events. CloudTrail data events on vault buckets were turned off on 2026-09-24.
+- S3 data access: S3 server access logs from person and company vault buckets are delivered to a per-stage log bucket and loaded into ClickHouse. AWS delivers these logs on a best-effort basis (records can arrive hours late and a small fraction may not arrive), so they are an investigation aid rather than a complete audit record.
 - Credential hygiene in logs: embedded credentials are redacted from values (e.g., repository URLs) before logging.
 
 :::note[Honest note]

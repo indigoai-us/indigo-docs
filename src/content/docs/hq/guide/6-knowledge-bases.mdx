@@ -1,85 +1,68 @@
 ---
 title: Knowledge Bases
-description: Persistent memory for your AI workers — built-in bases, company knowledge, and the symlink-to-git pattern.
+description: Persistent memory for your AI workers — the bundled knowledge in core/knowledge/public/, personal and company knowledge, and how to add your own.
 ---
 
 ## Built-in Knowledge
 
-HQ ships with 8 knowledge bases in `knowledge/`:
+HQ ships with 10 knowledge bases in `core/knowledge/public/`:
 
 | Knowledge Base | Path | Contents |
 |---------------|------|----------|
-| **Ralph** | `knowledge/Ralph/` | Coding methodology — overview, core concepts, workflow, back-pressure, specifications, implementation |
-| **Workers** | `knowledge/workers/` | Worker framework — Ralph loop pattern, skill schema, state machines, templates |
-| **HQ Core** | `knowledge/hq-core/` | Thread schema, checkpoint schema, INDEX.md specification |
-| **AI Security** | `knowledge/ai-security/` | Security framework — core principles, threat landscape, checklists, incident response |
-| **Design Styles** | `knowledge/design-styles/` | Image generation style guides — American Industrial, Ethereal Abstract, Liminal Portal |
-| **Dev Team** | `knowledge/dev-team/` | Development patterns — React best practices, troubleshooting, workflows |
-| **Loom** | `knowledge/loom/` | Agent patterns reference — architecture, state machines, thread system |
-| **Projects** | `knowledge/projects/` | Project templates — README template for new projects |
+| **Ralph** | `core/knowledge/public/Ralph/` | Coding methodology — overview, core concepts, back-pressure, specifications, implementation |
+| **Workers** | `core/knowledge/public/workers/` | Worker framework — Ralph loop pattern, skill schema, state machines, templates |
+| **HQ Core** | `core/knowledge/public/hq-core/` | HQ system docs — agent session contract, thread and checkpoint schemas |
+| **AI Security Framework** | `core/knowledge/public/ai-security-framework/` | Security framework — principles, checklists, templates |
+| **Agent Browser** | `core/knowledge/public/agent-browser/` | Browser automation — auth profiles, social posting, Tauri testing |
+| **Brand Voice** | `core/knowledge/public/brand-voice/` | Brand-voice packs and their schema |
+| **Getting Started** | `core/knowledge/public/getting-started/` | HQ cheatsheet, quick-start guide, learning path |
+| **Dev Team** | `core/knowledge/public/dev-team/` | Development patterns, troubleshooting, workflows |
+| **Loom** | `core/knowledge/public/loom/` | Agent patterns reference — architecture, state machines, thread system |
+| **Projects** | `core/knowledge/public/projects/` | Project templates — README template for new projects |
 
-## Company-Scoped Knowledge
+`core/` is replaced when you run `/update-hq`, so don't edit these files. Put your own knowledge in `personal/knowledge/` or `companies/{co}/knowledge/`.
 
-After running `/setup`, you'll have company-specific knowledge:
+## Personal and Company Knowledge
+
+After running `/setup`, you'll have personal knowledge:
 
 ```
-companies/{your-company}/knowledge/
-├── profile.md           # Your identity, role, domains
+personal/knowledge/
+├── profile.md           # Your identity, role, goals
 └── voice-style.md       # Writing voice and style preferences
 ```
 
-## The Symlink Pattern
+Each company has its own knowledge folder at `companies/{co}/knowledge/`. For a cloud-backed company, that folder syncs to the company vault, so teammates get the same files.
 
-Knowledge bases are **independent git repos** symlinked into HQ. This enables:
+## Real Directories, Not Symlinks
 
-- **Independent versioning** — Each base has its own commit history
-- **Selective sharing** — Share some bases publicly, keep others private
-- **Easy updates** — `git pull` in the knowledge repo updates HQ
+Knowledge bases are **plain directories** inside HQ. Don't symlink knowledge into `repos/`: cloud sync records a symlink as a marker and teammates receive no content.
 
-```
-knowledge/Ralph/  →  repos/public/ralph-methodology/docs/
-knowledge/workers/ →  repos/public/knowledge-workers/
-```
+- **Company knowledge** stays a plain directory with no Git metadata. It syncs through the company vault.
+- **Personal knowledge** may use an embedded Git repo when you want separate version history.
 
-### How It Works
-
-1. Knowledge repos live in `repos/public/` or `repos/private/`
-2. Symlinks in `knowledge/` point to the repo content
-3. HQ git tracks the symlinks, not the content
-4. Changes are committed in the **target repo**, not in HQ
-
-### Committing Knowledge Changes
-
-```bash
-# Navigate to the knowledge repo
-cd repos/public/knowledge-ralph/
-
-# Standard git workflow
-git add .
-git commit -m "Update best practices"
-git push
-```
+If you have older knowledge bases that are symlinks into `repos/`, `hq reindex` converts them into real directories.
 
 ## Adding New Knowledge
 
-1. Create a new repo:
+1. Create a directory:
 ```bash
-cd repos/public/
-git init knowledge-my-topic
+mkdir -p personal/knowledge/my-topic
 ```
+For company knowledge, use `companies/{co}/knowledge/my-topic` instead.
 
 2. Add content (markdown files)
 
-3. Symlink into HQ:
+3. Optional, personal knowledge only: give it its own version history:
 ```bash
-ln -s ../repos/public/knowledge-my-topic knowledge/my-topic
+cd personal/knowledge/my-topic
+git init
+git add . && git commit -m "init knowledge repo"
 ```
 
-4. Add to `modules/modules.yaml` for sync tracking
-
-5. Reindex search:
+4. Update the search index:
 ```bash
-/search-reindex
+hq index sync
 ```
 
 ## Using Knowledge in Workers
@@ -89,12 +72,12 @@ Workers reference knowledge bases in their `worker.yaml`:
 ```yaml
 context:
   base:
-    - knowledge/Ralph/
-    - knowledge/workers/
+    - core/knowledge/public/Ralph/
+    - core/knowledge/public/workers/
     - companies/my-company/knowledge/
 ```
 
-When a worker runs, Claude Code loads these paths as context, giving the worker access to all relevant knowledge.
+When a worker runs, your AI tool loads these paths as context, giving the worker access to all relevant knowledge.
 
 ## Search Across Knowledge
 
@@ -104,4 +87,4 @@ All knowledge bases are indexed by qmd:
 /search "deployment best practices"
 ```
 
-This searches across all knowledge bases, workspace files, commands, and worker configurations.
+This searches across HQ content and indexed repos.

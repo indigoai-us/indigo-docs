@@ -7,7 +7,7 @@ sidebar:
 
 > **External Connections is a managed surface in [hq-console](/hq/products/hq-console/), backed by the [hq-pro](/hq/products/hq-pro/about/) vault.** It replaces ad-hoc credential hand-vending with a lifecycle object — create, list, rotate, revoke, audit.
 
-**External Connections** is how your AI-forward services read your company's HQ vault. Open the **Connections** tab in any company in the console, name a connection, allowlist the prefixes it can see, choose an auth mechanism, and hand the issued credential to your agent. The agent reads only the prefixes you grant; every other path returns `403`; writes are never permitted.
+**External Connections** is how your AI-forward services read your company's HQ vault. Open **Connections** in any company in the console, name a connection, allowlist the prefixes it can see, choose an auth mechanism, and hand the issued credential to your agent. The agent reads only the prefixes you grant; every other path returns `403`; writes are never permitted.
 
 ## When to use it
 
@@ -19,7 +19,7 @@ For one-off recipient grants to a known person, prefer [hq-share](/hq/products/c
 
 ## Where to find it
 
-`https://hq.{your-domain}.com/companies/{slug}/connections` — sits in the per-company nav next to **Vault**, **Secrets**, **Fleet**, **Groups**, and **Settings**. Owner and admin only.
+`https://hq.computer/companies/{slug}/connections` — in the **Admin** group of the per-company nav, next to **Groups**, **Grants**, **Billing**, and **Settings**. Owner and admin only.
 
 ## Create a connection
 
@@ -46,7 +46,7 @@ On submit, the credential is **revealed exactly once** with a copy-paste snippet
 Two endpoints, no SDK, no runtime. Drop into anything that can issue an HTTP request.
 
 ```ts
-const BASE = "https://hqapi.{your-domain}.com";
+const BASE = "https://hqapi.hq.computer";
 const KEY  = process.env.HQ_CONNECTION_KEY!;            // hqxc_…
 const h    = { Authorization: `Bearer ${KEY}` };
 
@@ -79,7 +79,7 @@ Each row in the connections list has three inline actions, owner/admin only:
 
 ```mermaid
 graph TD
-    console["hq-console<br/>Connections tab"] -->|create / rotate / revoke| pro["hq-pro vault-service"]
+    console["hq-console<br/>Connections"] -->|create / rotate / revoke| pro["hq-pro vault-service"]
     pro -->|issues + stores credential| vault["hq-secrets vault"]
     pro -->|optional| cognito["Cognito agent identity"]
     agent["External agent"] -->|Bearer apiKey| pro

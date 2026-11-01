@@ -1,64 +1,71 @@
 ---
 title: Cloud Sync
-description: Sync your HQ to the cloud for mobile access via the PWA dashboard.
+description: Sync your HQ folder with cloud vaults through HQ Desktop or the hq sync commands — one vault per company plus a personal vault.
 ---
 
 ## Overview
 
-HQ Cloud Sync enables bidirectional syncing between your local HQ folder and cloud storage (S3), with a mobile-friendly PWA dashboard for access from any device.
+HQ Cloud Sync keeps your local HQ folder in sync with cloud storage (S3). Each cloud-backed company has its own vault, and you have a personal vault. Teammates in the same company sync from the same company vault; each membership's sync mode (`shared`, `all`, or `custom`) sets which files it pulls.
 
 ```
-Local HQ  ←→  Sync Daemon  ←→  S3 Bucket  ←→  PWA Dashboard
-              (chokidar)       (AWS)          (hq.indigoai.com)
+Local HQ  ←→  hq-sync-runner  ←→  Company vaults + personal vault (S3)
+              (run by HQ Desktop)
 ```
 
 ## Setup
 
-### Install the CLI
+### With HQ Desktop
+
+Install HQ Desktop and sign in (see [Getting Started](/hq/guide/2-getting-started/)). HQ Desktop runs sync in the background: it starts `hq-sync-runner --watch`, which watches your HQ folder and syncs changes.
+
+### With the CLI
 
 ```bash
 npm install -g @indigoai-us/hq-cli
 ```
 
-### Authenticate
+Sign in:
 
 ```bash
-hq sync init
+hq login
 ```
 
-This opens your browser for IndigoAI sign-up/sign-in. After authentication:
-- Your account is provisioned
-- An S3 bucket is created for your files
-- Credentials are stored locally at `~/.hq/credentials.json`
+This opens your browser to sign in. Your tokens are stored at `~/.hq/cognito-tokens.json`.
 
-### Start Syncing
+Then sync:
 
 ```bash
-hq sync start
+hq sync now --all
 ```
 
-This starts a background daemon that watches your HQ directory for changes and syncs them to S3 in real-time.
+`hq sync now` pushes local changes, then pulls remote updates. `--all` covers every company you are a member of plus your personal vault. To make a local company cloud-backed, use `hq cloud provision company <slug>`.
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `hq sync init` | Authenticate and provision cloud storage |
-| `hq sync start` | Start the background sync daemon |
-| `hq sync stop` | Stop the daemon |
-| `hq sync status` | Show sync health (running, last sync, file count, errors) |
-| `hq sync push` | Force upload all local changes |
-| `hq sync pull` | Force download all cloud changes |
+| `hq login` | Sign in to HQ |
+| `hq sync now` | Push local changes, then pull remote updates (the same as **Sync Now** in HQ Desktop) |
+| `hq sync push` | Push local files to the company vault |
+| `hq sync pull` | Pull the files you have access to from the company vault |
+| `hq sync status` | Show the local sync journal summary |
+| `hq sync mode` | Set a membership's sync mode (`shared`, `all`, or `custom`), or `--show` the current modes |
+| `hq sync narrow` | Move a company membership from sync mode `all` to `shared` (dry run unless `--apply`) |
+| `hq sync held` | Show uploads held because someone else was signed in on this computer |
+| `hq sync release-held` | Confirm held files are yours and let sync upload them |
+| `hq sync manifest` | Upload a file manifest for the sync reconciliation audit |
 | `hq sync doctor --reconcile-conflicts` | Clean up legacy `.conflict-*` twin files (dry-run; add `--yes` to apply) |
+| `hq cloud provision company <slug>` | Make a local company cloud-backed: provisions the vault entity if missing, updates `manifest.yaml`, and runs an initial sync |
 | `hq access <path-or-query>` | One file missing or locked? Reports never-existed / not-synced / no-access, fetches it when you have access, otherwise asks the owner for a grant (see [hq-share](/hq/products/capabilities/hq-share/#requesting-access)) |
+
+`push`, `pull`, and `now` take `--company <slug>`, `--personal`, or `--all`. Run `hq sync <command> --help` for every option, or see the [CLI reference](/hq/products/hq-cli-reference/).
 
 ## How Sync Works
 
-1. **File watcher** monitors your HQ directory using chokidar
-2. Changes are **debounced** (2-second quiet period) and batched
-3. File hashes are computed and compared against the **sync journal**
-4. Changed files are uploaded to S3 at `s3://{bucket}/hq/{path}`
-5. The journal (`.hq-sync-journal.json`) is updated with new hashes
+1. **File watcher** — `hq-sync-runner --watch` watches your HQ directory
+2. File hashes are compared against the **sync journal**
+3. Changed files are uploaded to the matching vault: `companies/{slug}/` goes to that company's vault, and everything else goes to your personal vault
+4. The journal is updated with new hashes. There is one journal per company, at `~/.hq/sync-journal.{slug}.json`
 
 ### Conflict Resolution
 
@@ -82,34 +89,31 @@ Everything parked lands in `.hq/conflict-backups/`, so no content is destroyed. 
 
 ## What Syncs
 
-| Synced | Not Synced |
-|--------|------------|
-| `workspace/` | `repos/` (use git) |
-| `knowledge/` | `node_modules/` |
-| `companies/` | `.git/` |
-| `.claude/` | Build artifacts (`dist/`) |
-| `workers/` | Files > 50MB |
-| `projects/` | Paths in `.hqsyncignore` |
+| Vault | What it holds |
+|-------|---------------|
+| Company vault | `companies/{slug}/` for each cloud-backed company you belong to |
+| Personal vault | Top-level folders and files such as `personal/`, `core/`, `.claude/`, and `AGENTS.md`, plus `companies/manifest.yaml` and any local (not cloud-backed) companies |
 
-## .hqsyncignore
+These are not synced:
 
-Create a `.hqsyncignore` file in your HQ root to exclude additional paths (gitignore syntax):
+- `repos/` (use git) and `.git/`
+- `workspace/`, except `workspace/threads/handoff.json` and its active thread, `workspace/agency/`, and `workspace/.session-logs/`
+- `node_modules/`, build output such as `dist/`, `build/`, and `.next/`, and caches
+- Secrets: `.env` files, `credentials.json`, `*.credentials.json`, `.mcp.json`, `.secrets/`, and `companies/{slug}/secrets/` and `companies/{slug}/settings/`
+- `.claude/settings.json` and `.claude/settings.local.json`, at any depth
+- Files over 50 MB
+- Paths in `.hqignore`
+
+## .hqignore and .hqinclude
+
+Edit the `.hqignore` file in your HQ root (HQ ships one) to exclude more paths (gitignore syntax). Use `!pattern` to re-include something the defaults exclude. Sync does not read `.gitignore`. The older name `.hqsyncignore` still works when there is no `.hqignore`.
 
 ```
 # Exclude large data files
 companies/*/data/exports/*.csv
 
 # Exclude temp files
-workspace/scratch/
+personal/scratch/
 ```
 
-## Mobile Access
-
-Once sync is running, access your HQ at [hq.indigoai.com](https://hq.indigoai.com):
-
-- **File browser** — Navigate your HQ directory structure
-- **Markdown viewer** — Read knowledge files, reports, and threads
-- **Quick actions** — Approve social drafts, add notes
-- **Search** — Filter files by name and path
-
-The PWA can be installed on your phone's home screen for app-like access.
+To sync only what you list, create a `.hqinclude` file in your HQ root. When it exists, a path syncs only if it matches a pattern in `.hqinclude`. The default exclusions and `.hqignore` still apply on top.

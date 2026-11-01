@@ -40,4 +40,9 @@ This means gating a deploy to a password, a company, or a named set of people ga
 
 Comments are activated per deploy — turn them on for the deploys where you want feedback, leave them off elsewhere. Once enabled, the comment widget rides the **"Built in HQ"** badge already present on the deploy, so there is nothing extra to embed on the page.
 
-See also: [Authentication](/hq/products/hq-deploy/authentication/) for how the access gate works, and [Custom Deploy Domains](/hq/products/hq-deploy/custom-domains/) for how the same gate carries across white-labeled domains.
+## Limits
+
+- **Static deploys only.** The widget is added to static deploys. Next.js and Hono deploys do not get it.
+- **Platform URL only.** The API identifies the app from the page's origin on the platform domain (`{app}.indigo-hq.com` or `{app}.hq.work`). Comments do not work on a custom hostname or a custom base domain, so share the platform URL when you want feedback.
+
+See also: [Authentication](/hq/products/hq-deploy/authentication/) for how API requests are authenticated.

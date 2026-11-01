@@ -24,17 +24,18 @@ Indigo is an early-stage company. This page states our compliance posture honest
 
 These controls are implemented today and are documented in the supporting security pages:
 
-- Tenant isolation — dedicated per-tenant S3 bucket and KMS key; per-request scoped STS credentials; test-enforced in CI. ([Tenant Isolation](/hq/security/3-tenant-isolation/))
-- Encryption at rest — SSE-KMS (AES-256) with per-tenant customer-managed keys and annual rotation. ([Data Security & Encryption](/hq/security/4-data-security-encryption/))
+- Tenant isolation — dedicated per-tenant S3 bucket; a dedicated KMS key for each new vault; per-request scoped STS credentials; test-enforced in CI. ([Tenant Isolation](/hq/security/3-tenant-isolation/))
+- Encryption at rest — SSE-KMS with a dedicated customer-managed key and annual rotation for new vaults; some existing vaults use a shared Indigo-managed KMS key or SSE-S3 until re-keyed. ([Data Security & Encryption](/hq/security/4-data-security-encryption/))
 - Encryption in transit — enforced TLS; storage denies non-TLS requests.
-- Authentication — Cognito + Google Workspace SSO (OIDC); MFA enforced at the IdP; JWT authorization on every route. ([Identity & Access Management](/hq/security/5-identity-access-management/))
-- Network isolation — dedicated VPC, private subnets only, no NAT, VPC endpoints, private databases. ([Infrastructure & Network Security](/hq/security/6-infrastructure-network-security/))
-- Audit logging — CloudTrail data events with log-file validation; application audit trail of credential issuance and admin actions.
-- Secure SDLC — code review; lockfile-pinned dependencies; CI type-check/lint/test plus blocking cross-tenant isolation tests. ([Application Security & SDLC](/hq/security/7-application-security-sdlc/))
-- Signed software — code-signed, notarized desktop apps and signed auto-updates.
+- Authentication — Cognito with Google and Microsoft federated sign-in (OIDC); native self-registration blocked; MFA enforced at the IdP; JWT authorization on every route. ([Identity & Access Management](/hq/security/5-identity-access-management/))
+- Network isolation — the vault data plane runs in a dedicated VPC; its private subnets reach AWS services through VPC endpoints, and databases are private. Hosted-agent workloads share that VPC and reach the internet through public subnets or a NAT gateway; the meeting service runs in its own VPC. ([Infrastructure & Network Security](/hq/security/6-infrastructure-network-security/))
+- Audit logging — application audit trail of credential issuance and admin actions; CloudTrail management events with log-file validation; best-effort S3 server access logs on person and company vault buckets.
+- Secure SDLC — code review; lockfile-pinned dependencies; CI type-check/lint/test plus blocking cross-tenant isolation tests; Dependabot and gitleaks secret scanning on the hq-pro, hq-cli, and hq-desktop-app repositories. ([Application Security & SDLC](/hq/security/7-application-security-sdlc/))
+- Signed software — code-signed, notarized macOS builds, Authenticode-signed Windows installers, and signed desktop auto-updates ([Application Security & SDLC](/hq/security/7-application-security-sdlc/)).
 - Capability-based sharing — encrypted, single-use, time-limited, scope-pinned share tokens.
 - Subprocessor management — maintained, dated subprocessor list with a no-model-training stance. ([Subprocessors](/hq/security/2-subprocessors/))
 - Vulnerability disclosure — published policy and `security@hqforwork.com` contact. ([Vulnerability Disclosure](/hq/security/11-vulnerability-disclosure/))
+- Public status page — [status.hqforwork.com](https://status.hqforwork.com).
 
 ## What we are actively working on (Now / Next)
 
@@ -47,18 +48,18 @@ These controls are implemented today and are documented in the supporting securi
 | Formal, tested incident-response runbook | Resilience | In progress |
 | Native (in-platform) MFA, independent of upstream IdP | IAM | Planned |
 | Refresh-token rotation; keychain-only desktop token storage | IAM | Planned |
-| Automated dependency/vulnerability scanning (SCA) + SBOM | AppSec / supply chain | Planned (near-term) |
+| Dependabot and secret scanning on remaining repositories; SBOM | AppSec / supply chain | Planned |
+| Re-keying existing vaults onto their own KMS key | Data security | Planned |
+| Self-service account deletion (built; off by default) | Data lifecycle | In progress |
 | Independent third-party penetration test + published summary | AppSec | Planned |
 | Documented, tested backup-restore + DR runbook; published RPO/RTO | Resilience | Planned |
-| Public status / uptime page | Resilience | Planned |
 | Automated hard-delete tenant offboarding | Data lifecycle | Planned |
-| `security.txt` (RFC 9116) at HQ web domains | Disclosure | Planned (quick win) |
 | Minimum TLS version pinned uniformly across edge/API | Data in transit | Planned |
 | Data Processing Addendum (DPA) template published | Privacy | Planned |
 
 ## Data residency
 
-All customer data currently resides in AWS `us-east-1` (United States). For EU customers, transfers are handled under appropriate mechanisms (e.g., SCCs in a DPA). EU/other-region data residency is not offered today; it can be discussed for specific enterprise needs.
+HQ's primary stores are in AWS `us-east-1` (United States). Some subprocessors process data in other locations, and Bedrock cross-region inference may process AI requests in other AWS regions; see [Subprocessors](/hq/security/2-subprocessors/). For EU customers, transfers are handled under appropriate mechanisms (e.g., SCCs in a DPA). EU/other-region data residency is not offered today; it can be discussed for specific enterprise needs.
 
 ## Privacy and data-subject rights
 

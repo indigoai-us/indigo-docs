@@ -26,7 +26,7 @@ Owners and admins can also inspect session and transcript pages for an agent. Th
 Use the agent UID shown by `list` for commands that target one agent.
 
 ```bash
-hq agents provision "Fleet Scout" --company acme --size power
+hq agents provision "Fleet Scout" --company acme --size medium
 hq agents list --company acme
 hq agents status <agent-uid>
 hq agents set <agent-uid> --name "Fleet Scout" --title "Research Lead"
@@ -36,16 +36,17 @@ hq agents start <agent-uid>
 hq agents retry <agent-uid>
 ```
 
-`provision` accepts `--size basic`, `--size power`, or `--size dev`. It prints the selected capacity and company-specific monthly price before asking for confirmation. Use `--yes` only when that quote has already been approved for an automated flow.
+`provision` takes `--size`. The accepted names depend on the company's size ladder. Companies on usage pricing (accounts created from 16 October 2026) use `small`, `medium`, `large`, or `xlarge`; there the legacy names `basic`, `power`, and `dev` also work and map to `small`, `medium`, and `large`. Companies still on the earlier ladder use `basic`, `power`, or `dev`. The CLI refuses a size the company's ladder does not offer. It prints the selected capacity and company-specific monthly price before asking for confirmation. Use `--yes` only when that quote has already been approved for an automated flow.
 
 Add `--json` to supported read or update commands for machine-readable output. Rename and removal are also available:
 
 ```bash
 hq agents rename <agent-uid> fleet-scout
 hq agents rm <agent-uid> --yes
+hq agents rm <agent-uid> --yes --confirm-destroy-agents-v2 <instance-id>   # agents-v2 box
 ```
 
-`rm --yes` is destructive. Prefer the Console when a human should review the target and consequences.
+`rm --yes` is destructive. For an agent running on an agents-v2 box, HQ refuses the teardown unless you also pass `--confirm-destroy-agents-v2` with the live EC2 instance ID of that box. Prefer the Console when a human should review the target and consequences.
 
 ## Troubleshooting
 

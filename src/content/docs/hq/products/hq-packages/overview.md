@@ -7,15 +7,17 @@ sidebar:
 
 > Part of the split [HQ ecosystem](/hq/architecture/2-ecosystem/). This is the content-pack distribution system, distinct from the per-repo npm package publishing covered in [Development → Publishing Packages](/hq/development/3-publishing-packages/). The [hq-core](/hq/products/hq-core/) scaffold ships minimal; packs add the rich capabilities on top.
 
-HQ Packages let you distribute and install specialty content — workers, commands, skills, knowledge bases, policies, and hooks — into any HQ instance. Packs publish as `@indigoai-us/hq-pack-*` and install via `hq install`. The system went through two major iterations.
+HQ Packages let you distribute and install specialty content — workers, commands, skills, knowledge bases, policies, hooks, and scripts — into any HQ instance. Each pack is a directory with a `package.yaml` manifest. Packs are installed with `hq install`.
 
 ### First-party packs
 
-The `indigoai-us/hq-packages` repo ships the official packs, including `hq-pack-design-styles`, `hq-pack-design-quality`, `hq-pack-gemini`, `hq-pack-gstack`, and (as of hq-core v15.0.0) `hq-pack-engineering`. The engineering pack carries the coding toolkit that used to live inside core: 17 dev skills (`/tdd`, `/review`, `/execute-task`, `/run-project`, and more), 6 workers (qa-tester, security-scanner, and others), 4 knowledge bases, and 4 policies. Upgraders to v15 get it auto-installed by `/update-hq`; fresh installs add it on demand:
+The `indigoai-us/hq-packages` repo ships the official packs under `packages/`, including `hq-pack-design-styles`, `hq-pack-design-quality`, `hq-pack-gemini`, and `hq-pack-gstack`. Install one from git:
 
 ```bash
-hq install github:indigoai-us/hq-packages#packages/hq-pack-engineering
+hq install github:indigoai-us/hq-packages#packages/hq-pack-gstack
 ```
+
+The former `hq-pack-engineering` pack has been absorbed back into hq-core. Its dev skills, workers, knowledge, and policies now ship with core. If an older upgrade installed it, remove it with `hq packs uninstall hq-pack-engineering`.
 
 ## Creator Marketplace
 
@@ -23,66 +25,48 @@ Every pack can credit a **creator** — the person behind the skills, workers, o
 
 **Claimable profiles.** HQ grows its catalog by curating the best of the open-source ecosystem, so a creator may have a profile *before they've ever signed up*. When a pack credits an author who hasn't joined yet, their profile renders an **"is this you? Claim it"** state — the real author can claim the handle, which links it to their account and lets them manage their packs, bio, and links from then on. Attribution always points at the true author; nothing is published under someone else's name without crediting them.
 
-**The pack-porter.** A semi-automated workflow imports permissively-licensed open-source skills into HQ packs. It runs a strict pipeline: a **license gate first** (only clear permissive licenses like MIT/Apache are ported; no-license repos are held and link-only), then maps the upstream skill bundle into a pack, then a **security scan** that must pass before anything is distributed — populating the pack's [`capabilities`](/hq/products/hq-packages/spec-v2/#attribution--provenance) trust signal by static inspection. Ported packs record their origin in an [`upstream` provenance block](/hq/products/hq-packages/spec-v2/#attribution--provenance) so updates can track the source repo over time. Co-marketing announcements are drafted but held until the credited creator claims or consents.
+**The pack-porter.** A semi-automated workflow imports permissively-licensed open-source skills into HQ packs. It runs a strict pipeline: a **license gate first** (only clear permissive licenses like MIT/Apache are ported; no-license repos are held and link-only), then maps the upstream skill bundle into a pack, then a **security scan** that must pass before anything is distributed — populating the pack's `capabilities` trust signal by static inspection. Ported packs record their origin in an `upstream` provenance block so updates can track the source repo over time. Co-marketing announcements are drafted but held until the credited creator claims or consents.
 
 ## What's in a Package?
 
-A package is a tarball containing any combination of:
+A pack's `package.yaml` names the pack, its version and publisher, the hq-core version it requires, and a `contributes` block listing what it adds:
 
-| Content Type | Install Location | Example |
-|-------------|-----------------|---------|
-| Workers | `workers/public/` or `companies/{co}/workers/` | Campaign operations worker |
-| Commands | `.claude/commands/` | `/adobe-deploy` |
-| Skills | `.claude/skills/` | Agent browser automation |
-| Knowledge | `knowledge/public/` | Industry-specific guides |
-| Policies | `.claude/policies/` | Compliance rules |
-| Hooks | `.claude/hooks/` | Pre-commit checks |
+| Content type | Example |
+|-------------|---------|
+| Workers | Campaign operations worker |
+| Commands | `/adobe-deploy` |
+| Skills | Agent browser automation |
+| Knowledge | Industry-specific guides |
+| Policies | Compliance rules |
+| Hooks | Pre-commit checks |
+| Scripts | Helper shell scripts |
 
-## v1 vs v2
+Optional fields record the `author`, the `upstream` source for ported packs, and the `capabilities` the pack uses.
 
-The package system was built twice. v1 established the concept; v2 rebuilt it with security as the primary concern.
+## Installing and managing packs
 
-| Aspect | v1 (hq-packages-system) | v2 (hq-packages-v2) |
-|--------|------------------------|---------------------|
-| **Identity** | Anonymous + JWT license | Clerk user identity |
-| **Authorization** | JWT license key validation | Identity-gated entitlements |
-| **Integrity** | None | SHA256 + RSA signature |
-| **Install** | Single-step CLI | Two-step: CLI downloads, Claude merges |
-| **Content safety** | None | Allow-list (yaml, md, sh only) |
-| **Threat model** | None | Formal supply chain analysis |
-| **Status** | Superseded | Current |
+`hq install <source>` accepts:
 
-## Architecture
+| Source | Example |
+|--------|---------|
+| Bare slug, resolved through the HQ marketplace (requires HQ sign-in) | `hq install <slug>` |
+| npm package | `hq install @scope/name@1.2.0` |
+| Git URL or GitHub shorthand | `hq install github:owner/repo#packages/<pack>@<ref>` |
+| Local path | `hq install ./my-pack` |
 
-```
-Developer                 Registry (indigo-nx)           HQ Instance
-─────────                 ──────────────────            ────────────
-                          ┌─────────────┐
-                          │ Packages DB │
-                          │ Entitlements│
-                          │ S3 Tarballs │
-                          └──────┬──────┘
-                                 │
-hq install {pkg} ───────────────►│ Verify entitlement (Clerk JWT)
-                                 │ Download tarball
-                          ◄──────┘ + SHA256 + RSA signature headers
-                                 │
-CLI verifies integrity ──────────┘
-CLI extracts to packages/installed/{slug}/
-                                 │
-/package-install ────────────────► Claude merges content
-                                   into HQ directories
-                                   with conflict detection
-```
+The installer fetches the pack, validates `package.yaml`, asks before installing hooks or registering MCP servers (skip the prompts with `--allow-hooks` and `--allow-mcp`), moves the pack into `core/packages/<name>/`, and wires its contributions into the HQ instance. Git installs are pinned to a commit SHA unless you pass `--branch`.
 
-## Company Scoping
+Marketplace installs are verified before extraction: the CLI recomputes the SHA-256 of the downloaded tarball, compares it with the approved listing, and checks the platform's Ed25519 signature over that hash. Marketplace installs always require a valid signature. An unsigned local directory needs `--allow-unsigned`.
 
-Packages can be installed globally or scoped to specific companies:
+Day-to-day commands:
 
 ```bash
-hq install adobe-pack --company acme-corp
-# Installs workers to companies/acme-corp/workers/
-# Instead of workers/public/
+hq packs list                    # installed packs and the curated catalog
+hq packs list --check-updates    # also check each pack for updates
+hq packs update [name]           # re-install the latest version
+hq packs uninstall <name>        # un-wire and archive a pack
 ```
 
-The `packages/registry.yaml` tracks which packages are installed and their company scope.
+`hq packages list` shows the same view as `hq packs list`. Installed content packs are tracked by their presence under `core/packages/`; they have no separate registry file.
+
+`hq remove <slug>` (also `hq packages remove`) and `hq packages update` are older commands for the legacy package layout under `packages/installed/`, tracked in `packages/registry.yaml`. They do not act on content packs in `core/packages/`. Use `hq packs uninstall` and `hq packs update` for packs.

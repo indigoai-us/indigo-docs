@@ -61,4 +61,6 @@ export E2E_DOMAIN=staging.indigo-hq.com
 npm run test:e2e
 ```
 
-Tests run sequentially (`--runInBand`) with 120-second timeout per test. Output includes JUnit XML for CI integration.
+The suite runs on Vitest (`vitest.e2e.config.ts`): test files run one at a time (`fileParallelism: false`) with a 120-second timeout per test. `npm run test:e2e:report` writes JUnit output for CI.
+
+The SSR suite exercises the legacy Docker/ECS container path, which is dormant for new apps (see [SSR Deploys](/hq/products/hq-deploy/ssr-flow/)).

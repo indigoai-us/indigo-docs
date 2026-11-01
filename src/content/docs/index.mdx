@@ -5,17 +5,21 @@ description: Documentation for Indigo HQ, the OS for AI workers and its product 
 
 import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-Indigo HQ is the operating system for AI workers. It provides a shared context layer over Claude Code, Cursor, and Codex that syncs knowledge, skills, policies, and capabilities across your team. It scales from a solo builder to an enterprise.
+Indigo HQ is the operating system for AI workers. It provides a shared context layer over Claude Code, Codex, and Grok (with a rules file for Cursor) that syncs knowledge, skills, policies, and capabilities across your team. It scales from a solo builder to an enterprise.
 
 HQ ships as a **split ecosystem** of independently versioned products rather than one combined repository. This site is the comprehensive user and technical reference for all of them. To see how they compose, read the [Ecosystem & Repo Map](/hq/architecture/2-ecosystem/).
 
 ## Get started
+
+The usual way to install HQ is the desktop app for macOS or Windows; see [Getting started](/hq/guide/2-getting-started/). From a terminal, with Node.js 22.13 or later and git:
 
 ```bash
 npx create-hq
 cd hq && claude
 /setup
 ```
+
+`create-hq` asks for a folder name and defaults to `hq`.
 
 - [What is HQ?](/hq/guide/1-what-is-hq/): the product, the model, and why it exists.
 - [Getting started](/hq/guide/2-getting-started/): install, set up, and run your first session.
@@ -26,8 +30,8 @@ cd hq && claude
 <CardGrid>
   <LinkCard title="hq-core" href="/hq/products/hq-core/" description="The create-hq scaffold and starter kit that seeds a new HQ instance." />
   <LinkCard title="hq-cli" href="/hq/products/hq-cli/" description="The hq command for module management and cloud sync from the terminal." />
-  <LinkCard title="hq-cloud" href="/hq/products/hq-cloud/" description="The bidirectional S3 sync engine behind the CLI and the menubar app." />
-  <LinkCard title="hq-sync" href="/hq/products/hq-sync/" description="The macOS menubar app, providing a GUI over sync for non-technical users." />
+  <LinkCard title="hq-cloud" href="/hq/products/hq-cloud/" description="The bidirectional S3 sync engine behind the CLI and HQ Desktop." />
+  <LinkCard title="hq-sync" href="/hq/products/hq-sync/" description="HQ Desktop, the macOS and Windows app that handles sign-in and sync." />
   <LinkCard title="hq-console" href="/hq/products/hq-console/" description="The Next.js admin UI for deployments, teams, and usage." />
   <LinkCard title="Fleet Agents" href="/hq/products/fleet-agents/" description="Persistent AI teammates with managed runtimes, company access, and communication channels." />
   <LinkCard title="hq-deploy" href="/hq/products/hq-deploy/introduction/" description="A PaaS for deploying static and SSR web apps to AWS." />
@@ -48,8 +52,8 @@ cd hq && claude
 - [Development](/hq/development/1-local-setup/): clone and run the individual repos.
 - [Roadmap](/hq/roadmap/1-overview/): what is shipped and what is next.
 
-For the basic-user quickstart, see the [HQ quickstart site](https://github.com/indigoai-us). This site is the comprehensive reference.
+For the basic-user quickstart, see [Getting Started](/hq/guide/2-getting-started/). This site is the comprehensive reference.
 
 ## Meetings & signals
 
-Meeting intelligence and signals now live inside HQ as company skills and a synced signals store, surfaced through the `hq` CLI and HQ workers. This capability is being rebuilt on HQ. Documentation will return here once it ships.
+Meetings and signals have shipped in HQ. `hq meetings` lists, searches, and prints meeting transcripts and notes, and can invite the meeting bot to a Google Meet, Zoom, or Teams call. `hq signals` reads signals such as action items and decisions for a company. In your AI tool, `/meeting-notes`, `/join-meeting`, and `/signals` read the same data. Documentation pages are pending; until then, run `hq meetings --help` and `hq signals --help`.

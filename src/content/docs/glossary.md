@@ -14,7 +14,7 @@ head:
         "hasDefinedTerm": [
           { "@type": "DefinedTerm", "name": "Agent Amnesia", "description": "The anti-pattern where an AI coding agent forgets all company context at the start of every session, forcing constant re-explaining and re-discovery." },
           { "@type": "DefinedTerm", "name": "Shared context layer", "description": "A single, team-wide store of a company's knowledge, decisions, people, skills, and policies that AI agents read from automatically." },
-          { "@type": "DefinedTerm", "name": "Team AI operating system", "description": "A coordination layer over AI coding tools (Claude Code, Cursor, Codex) that syncs context and capabilities across a whole team rather than a single user." },
+          { "@type": "DefinedTerm", "name": "Team AI operating system", "description": "A coordination layer over AI coding tools (Claude Code, Codex, Grok) that syncs context and capabilities across a whole team rather than a single user." },
           { "@type": "DefinedTerm", "name": "Data gravity", "description": "The compounding effect by which accumulated company context makes agents smarter over time and raises the cost of switching away." },
           { "@type": "DefinedTerm", "name": "Worker", "description": "A specialized, reusable agent configuration in HQ with its own skills, tools, and knowledge, shareable across a team." },
           { "@type": "DefinedTerm", "name": "Skill", "description": "A packaged, reusable workflow an agent can invoke, sharable across a team." }
@@ -39,8 +39,8 @@ person's chat window.
 
 ## Team AI operating system
 
-A coordination layer over the AI coding tools a team already uses (Claude Code, Cursor,
-Codex) that syncs context and capabilities across the whole team rather than a single user.
+A coordination layer over the AI coding tools a team already uses (Claude Code, Codex,
+Grok, with a rules file for Cursor) that syncs context and capabilities across the whole team rather than a single user.
 What HQ is.
 
 ## Data gravity

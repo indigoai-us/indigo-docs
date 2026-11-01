@@ -14,7 +14,7 @@ This page pre-answers the common questions a security reviewer asks, organized b
 | Question | Resp. | Notes |
 |---|:--:|---|
 | Do you hold SOC 2 / ISO 27001? | ❌ | Not yet certified. Controls designed to align with SOC 2 TSC; SOC 2 on roadmap. ([Compliance Roadmap](/hq/security/10-compliance-roadmap/)) |
-| Do you maintain audit logs of access to customer data? | ✅ | CloudTrail data events (with log-file validation) + application audit trail of every credential issuance and admin action. |
+| Do you maintain audit logs of access to customer data? | 🟡 | Application audit trail of every credential issuance and admin action; CloudTrail management events (with log-file validation). S3 object access is recorded by S3 server access logs, which AWS delivers best-effort (can be late or incomplete). CloudTrail data events on vault buckets were turned off on 2026-09-24. |
 | Will you support a customer security review / questionnaire? | ✅ | This documentation, plus direct responses via security@hqforwork.com. |
 
 ## AIS — Application & Interface Security
@@ -24,7 +24,7 @@ This page pre-answers the common questions a security reviewer asks, organized b
 | Is every API request authenticated and authorized? | ✅ | API Gateway JWT authorizer (issuer + audience) on every route; then per-request scoped credentials. |
 | Do you follow a secure SDLC with code review? | ✅ | All changes peer-reviewed in Git; CI gates (typecheck/lint/test). ([Application Security & SDLC](/hq/security/7-application-security-sdlc/)) |
 | Do you test for multi-tenant isolation flaws? | ✅ | Blocking cross-tenant isolation E2E tests in CI. |
-| Do you perform SAST/DAST? | 🟡 | Type-checking + linting + adversarial internal testing today; dedicated SAST/DAST tooling on roadmap. |
+| Do you perform SAST/DAST? | 🟡 | Type-checking + linting + gitleaks secret scanning (hq-pro, hq-cli, hq-desktop-app) + adversarial internal testing today; dedicated SAST/DAST tooling on roadmap. |
 
 ## BCR — Business Continuity & Operational Resilience
 
@@ -46,25 +46,25 @@ This page pre-answers the common questions a security reviewer asks, organized b
 
 | Question | Resp. | Notes |
 |---|:--:|---|
-| Is customer data segregated per tenant? | ✅ | Dedicated S3 bucket and KMS key per tenant. ([Tenant Isolation](/hq/security/3-tenant-isolation/)) |
+| Is customer data segregated per tenant? | ✅ | Dedicated S3 bucket per tenant and per-request scoped credentials. New vaults also get a dedicated KMS key; some existing vaults use a shared Indigo-managed key or SSE-S3 until re-keyed. ([Tenant Isolation](/hq/security/3-tenant-isolation/)) |
 | Is data classified and minimized? | ✅ | Classification defined; credentials/datasets/workers excluded from sync by default with first-push protection. |
-| Can customers export and delete their data? | 🟡 | Export and deletion supported on request; automated hard-delete offboarding on roadmap (soft-tombstone today). |
-| Do you use customer data to train AI models? | ❌ (we do not) | No model training on customer data. Cloud-side AI runs on AWS Bedrock, which does not train on submitted data; local agent tools use the customer's own model-provider account. ([Subprocessors](/hq/security/2-subprocessors/)) |
+| Can customers export and delete their data? | 🟡 | Export and deletion supported on request. A self-service account-deletion flow with a 30-day company purge is built but off by default. Automated hard-delete offboarding on roadmap (soft-tombstone today). |
+| Do you use customer data to train AI models? | ❌ (we do not) | Indigo does not train models on customer data. Server-side AI runs mainly on AWS Bedrock; live meeting voice uses OpenAI; hosted agents and local agent tools use the model-provider account their owner supplies. ([Subprocessors](/hq/security/2-subprocessors/)) |
 
 ## DCS — Datacenter Security
 
 | Question | Resp. | Notes |
 |---|:--:|---|
-| Where is data hosted? | ✅ | AWS `us-east-1` (US). Indigo runs no own data centers. |
+| Where is data hosted? | ✅ | Primary stores in AWS `us-east-1` (US). Some subprocessors and Bedrock cross-region inference process data in other locations ([Subprocessors](/hq/security/2-subprocessors/)). Indigo runs no own data centers. |
 | Are physical controls in place? | ✅ | Provided by AWS under its SOC/ISO-certified physical controls. |
 
 ## CEK — Cryptography, Encryption & Key Management
 
 | Question | Resp. | Notes |
 |---|:--:|---|
-| Is data encrypted at rest? | ✅ | SSE-KMS (AES-256), per-tenant customer-managed key, annual rotation. |
+| Is data encrypted at rest? | ✅ | New vaults: SSE-KMS with a dedicated customer-managed key, annual rotation. Some existing vaults: a shared Indigo-managed KMS key or SSE-S3 (AES-256) until re-keyed. Customer secrets: SSM `SecureString` with the AWS-managed SSM key. |
 | Is data encrypted in transit? | ✅ | TLS enforced; storage denies non-TLS requests. |
-| Are encryption keys managed securely? | ✅ | AWS KMS; per-tenant CMKs tagged + IAM-gated; deletion protection. |
+| Are encryption keys managed securely? | ✅ | AWS KMS; vault keys tagged + IAM-gated; the control-plane key and shared vault key are protected against deletion. |
 | Customer-managed keys (BYOK) / end-to-end encryption? | ❌ | Keys are Indigo-managed; no BYOK/E2E today (on roadmap). Stated plainly in [Tenant Isolation](/hq/security/3-tenant-isolation/). |
 | Is a minimum TLS version pinned everywhere? | 🟡 | TLS enforced; uniform minimum-version pinning across all surfaces on roadmap. |
 
@@ -87,9 +87,9 @@ This page pre-answers the common questions a security reviewer asks, organized b
 
 | Question | Resp. | Notes |
 |---|:--:|---|
-| Is SSO supported? | ✅ | Google Workspace SSO (OIDC) is the primary path. ([Identity & Access Management](/hq/security/5-identity-access-management/)) |
-| Is MFA enforced? | 🟡 | Enforced at the IdP (Google Workspace); native in-platform MFA on roadmap. |
-| Is access role-based and least-privilege? | ✅ | Roles (admin/contributor/read-only) + path-scoped grants compiled into per-request scoped credentials. |
+| Is SSO supported? | ✅ | Federated sign-in through Google and Microsoft (OIDC). No GitHub sign-in. ([Identity & Access Management](/hq/security/5-identity-access-management/)) |
+| Is MFA enforced? | 🟡 | Enforced at the IdP (Google or Microsoft); native in-platform MFA on roadmap. |
+| Is access role-based and least-privilege? | ✅ | Roles (owner/admin/member/guest) + path-scoped grants compiled into per-request scoped credentials. |
 | How fast does deprovisioning take effect? | ✅ | Credentials recomputed per request, never cached, so on the next request; SSO deprovisioning honored. |
 | Are machine/agent identities scoped? | ✅ | Per-connection scoped identities; API keys stored only as SHA-256 hashes. |
 
@@ -97,9 +97,9 @@ This page pre-answers the common questions a security reviewer asks, organized b
 
 | Question | Resp. | Notes |
 |---|:--:|---|
-| Is the network segmented/isolated? | ✅ | Dedicated VPC, private subnets only, no NAT, VPC endpoints; private databases. |
-| Is compute hardened / patched? | ✅ | Predominantly serverless/managed (AWS-patched); containers isolated in private network. |
-| Are security groups least-privilege? | 🟡 | Ingress tightly scoped; a few egress rules broader than necessary (private/no-NAT) being tightened. |
+| Is the network segmented/isolated? | ✅ | Vault data plane: dedicated VPC; private subnets reach AWS services through VPC endpoints; private databases. Hosted-agent workloads share the vault VPC and reach the internet through public subnets with an internet gateway or, in production, a NAT gateway on the vault's private subnets. The meeting service runs in its own VPC, in public subnets behind a load balancer. |
+| Is compute hardened / patched? | ✅ | Predominantly serverless/managed (AWS-patched). The meeting service and hosted-agent instances run in public subnets with ingress limited by security groups; hosted-agent instances accept no inbound connections. |
+| Are security groups least-privilege? | 🟡 | Ingress tightly scoped; a few egress rules broader than necessary being tightened. |
 
 ## IPY — Interoperability & Portability
 
@@ -112,7 +112,7 @@ This page pre-answers the common questions a security reviewer asks, organized b
 
 | Question | Resp. | Notes |
 |---|:--:|---|
-| Are security-relevant events logged? | ✅ | CloudTrail data events + application audit trail; hash-chained log for agreements. |
+| Are security-relevant events logged? | ✅ | Application audit trail; CloudTrail management events; best-effort S3 server access logs; hash-chained log for agreements. |
 | Is monitoring/alerting in place? | ✅ | CloudWatch metrics/alarms → SNS; Sentry error tracking (token/path-scrubbed). |
 | Are logs protected from tampering? | ✅ | CloudTrail log-file validation; hash-chained agreement audit log. |
 | Is error tracking everywhere? | 🟡 | Primary app covered; extending to all services on roadmap. |
@@ -123,7 +123,7 @@ This page pre-answers the common questions a security reviewer asks, organized b
 |---|:--:|---|
 | Do you have an incident-response process? | 🟡 | Defined lifecycle in operation; written, role-assigned, tested runbook being formalized. ([Business Continuity & Incident Response](/hq/security/9-business-continuity-incident-response/)) |
 | Will you notify customers of a breach? | ✅ | Commit to notifying affected customers of confirmed breaches without undue delay; can enter into a DPA covering these terms. |
-| Are audit logs available to support investigations? | ✅ | CloudTrail + application audit trail. |
+| Are audit logs available to support investigations? | ✅ | Application audit trail, CloudTrail management events, and S3 server access logs (best-effort delivery). |
 
 ## STA — Supply Chain, Transparency & Accountability
 
@@ -131,33 +131,33 @@ This page pre-answers the common questions a security reviewer asks, organized b
 |---|:--:|---|
 | Do you disclose subprocessors? | ✅ | Maintained, dated [Subprocessors](/hq/security/2-subprocessors/) list. |
 | Do you provide subprocessor change notice? | ✅ | Advance notice (target ≥30 days) under a DPA. |
-| Are dependencies controlled? | 🟡 | Lockfile-pinned, frozen installs; automated dependency vulnerability scanning + SBOM on roadmap. |
+| Are dependencies controlled? | 🟡 | Lockfile-pinned, frozen installs; Dependabot on hq-pro, hq-cli, and hq-desktop-app; other repositories and SBOM on roadmap. |
 
 ## TVM — Threat & Vulnerability Management
 
 | Question | Resp. | Notes |
 |---|:--:|---|
 | Do you have a vulnerability disclosure channel? | ✅ | [Vulnerability Disclosure](/hq/security/11-vulnerability-disclosure/) + security@hqforwork.com. |
-| Do you run automated vulnerability scanning? | 🟡 | Internal review + adversarial testing today; automated SCA/dependency scanning on roadmap. |
+| Do you run automated vulnerability scanning? | 🟡 | Dependabot dependency alerts and gitleaks secret scanning on hq-pro, hq-cli, and hq-desktop-app; internal review + adversarial testing. Not yet on every repository. |
 | Have you had a third-party penetration test? | ❌ | Not yet; planned with published summary. |
-| Are software builds integrity-protected? | ✅ | Code-signed + notarized desktop apps; signed (Ed25519) auto-updates. |
+| Are software builds integrity-protected? | ✅ | macOS builds are Developer ID-signed and Apple-notarized; Windows installers are Authenticode-signed through Azure Trusted Signing; auto-updates are signed (minisign, Ed25519) and verified before install. |
 
 ## UEM — Universal Endpoint Management
 
 | Question | Resp. | Notes |
 |---|:--:|---|
 | Are Indigo employee endpoints managed/secured? | 🟡 | Baseline practices (disk encryption, OS keychain for secrets); formal MDM/endpoint policy being documented under SOC 2. |
-| Where do client-side credentials live? | ✅ | Desktop tokens in OS keychain (primary), file-fallback owner-only (`0600`); scrubbed from telemetry. |
+| Where do client-side credentials live? | ✅ | Desktop and CLI tokens in `~/.hq/cognito-tokens.json` with owner-only permissions (`0600`); signed macOS builds also keep a Keychain copy; scrubbed from telemetry. |
 | Note on customer endpoints | ➖ | HQ runs on customer machines; endpoint security of those devices is the customer's responsibility ([Shared Responsibility](/hq/security/8-shared-responsibility/)). |
 
 ## AI governance (supplemental — increasingly requested for AI vendors)
 
 | Question | Resp. | Notes |
 |---|:--:|---|
-| Is customer data used to train models? | ❌ (we do not) | No training on customer data by Indigo or the model provider behind Bedrock. |
-| Which model provider is used? | ✅ | Cloud-side AI: Claude models via AWS Bedrock. Local agent tools (Claude Code, Cursor, Codex): the customer's own model-provider account. See [Subprocessors](/hq/security/2-subprocessors/). |
+| Is customer data used to train models? | ❌ (we do not) | Indigo does not train models on customer data. |
+| Which model provider is used? | ✅ | Server-side AI: Claude models and Amazon Titan embeddings via AWS Bedrock; OpenAI for live meeting voice. Hosted agents: Anthropic, OpenAI, or xAI, using the subscription or API key the agent owner supplies. Local agent tools (Claude Code, Cursor, Codex): the customer's own model-provider account. See [Subprocessors](/hq/security/2-subprocessors/). |
 | Is there human oversight of AI actions? | ✅ (customer-side) | Customers review/approve agent actions; HQ surfaces decisions and risky/irreversible actions for confirmation. |
-| Is AI input/output logged or retained? | 🟡 | Processed to deliver the capability. AWS Bedrock does not retain submitted data; local agent retention follows the customer's own provider terms. Indigo does not retain inputs for training. |
+| Is AI input/output logged or retained? | 🟡 | Processed to deliver the capability. HQ has not enabled Bedrock model-invocation logging. Retention by AWS Bedrock and OpenAI follows each provider's terms; hosted and local agent retention follows the terms of the provider account the customer supplied. Indigo does not retain inputs for training. |
 
 :::note
 Responses are accurate to the best of our knowledge and are provided for security evaluation. They do not constitute a warranty or contract unless incorporated by Indigo in writing. For anything not covered, contact security@hqforwork.com.
