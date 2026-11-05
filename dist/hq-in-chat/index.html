@@ -1,0 +1,409 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-bguv2lll"> <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>HQ MCP | Indigo HQ Docs</title><link rel="canonical"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/><script>document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.social-icons a, header a[rel="me"]').forEach(a=>{a.setAttribute('target','_blank');a.setAttribute('rel','noopener noreferrer')});const s=document.querySelector('.social-icons');if(s){const l=document.createElement('a');l.href='https://www.hqforwork.com';l.target='_blank';l.rel='noopener noreferrer';l.textContent='hqforwork.com';l.className='site-link';s.parentNode.insertBefore(l,s)}});</script><link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/><meta name="generator" content="Astro v5.17.1"/><meta name="generator" content="Starlight v0.32.6"/><meta property="og:title" content="HQ MCP"/><meta property="og:type" content="article"/><meta property="og:url"/><meta property="og:locale" content="en"/><meta property="og:description" content="Use Indigo HQ from ChatGPT and Claude.ai through the cloud connector."/><meta property="og:site_name" content="Indigo HQ Docs"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="Use Indigo HQ from ChatGPT and Claude.ai through the cloud connector."/><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg> <svg aria-hidden="true" class="dark astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg> <svg aria-hidden="true" class="auto astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg> </template><link rel="stylesheet" href="/_astro/print.BJ0teN4y.css" media="print"><link rel="stylesheet" href="/_astro/index.BI7mG2Eg.css">
+<style>:root{--sl-badge-default-border: var(--sl-color-accent);--sl-badge-default-bg: var(--sl-color-accent-low);--sl-badge-default-text: #fff;--sl-badge-note-border: var(--sl-color-blue);--sl-badge-note-bg: var(--sl-color-blue-low);--sl-badge-note-text: #fff;--sl-badge-danger-border: var(--sl-color-red);--sl-badge-danger-bg: var(--sl-color-red-low);--sl-badge-danger-text: #fff;--sl-badge-success-border: var(--sl-color-green);--sl-badge-success-bg: var(--sl-color-green-low);--sl-badge-success-text: #fff;--sl-badge-caution-border: var(--sl-color-orange);--sl-badge-caution-bg: var(--sl-color-orange-low);--sl-badge-caution-text: #fff;--sl-badge-tip-border: var(--sl-color-purple);--sl-badge-tip-bg: var(--sl-color-purple-low);--sl-badge-tip-text: #fff}[data-theme=light]:root{--sl-badge-default-bg: var(--sl-color-accent-high);--sl-badge-note-bg: var(--sl-color-blue-high);--sl-badge-danger-bg: var(--sl-color-red-high);--sl-badge-success-bg: var(--sl-color-green-high);--sl-badge-caution-bg: var(--sl-color-orange-high);--sl-badge-tip-bg: var(--sl-color-purple-high)}.sl-badge:where(.astro-avdet4wd){display:inline-block;border:1px solid var(--sl-color-border-badge);border-radius:.25rem;font-family:var(--sl-font-system-mono);line-height:normal;color:var(--sl-color-text-badge);background-color:var(--sl-color-bg-badge);overflow-wrap:anywhere}.sidebar-content .sl-badge:where(.astro-avdet4wd){line-height:1;font-size:var(--sl-text-xs);padding:.125rem .375rem}.sidebar-content a[aria-current=page]>.sl-badge:where(.astro-avdet4wd){--sl-color-bg-badge: transparent;--sl-color-border-badge: currentColor;color:inherit}.default:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-default-bg);--sl-color-border-badge: var(--sl-badge-default-border);--sl-color-text-badge: var(--sl-badge-default-text)}.note:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-note-bg);--sl-color-border-badge: var(--sl-badge-note-border);--sl-color-text-badge: var(--sl-badge-note-text)}.danger:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-danger-bg);--sl-color-border-badge: var(--sl-badge-danger-border);--sl-color-text-badge: var(--sl-badge-danger-text)}.success:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-success-bg);--sl-color-border-badge: var(--sl-badge-success-border);--sl-color-text-badge: var(--sl-badge-success-text)}.tip:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-tip-bg);--sl-color-border-badge: var(--sl-badge-tip-border);--sl-color-text-badge: var(--sl-badge-tip-text)}.caution:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-caution-bg);--sl-color-border-badge: var(--sl-badge-caution-border);--sl-color-text-badge: var(--sl-badge-caution-text)}.small:where(.astro-avdet4wd){font-size:var(--sl-text-xs);padding:.125rem .25rem}.medium:where(.astro-avdet4wd){font-size:var(--sl-text-sm);padding:.175rem .35rem}.large:where(.astro-avdet4wd){font-size:var(--sl-text-base);padding:.225rem .45rem}.sl-markdown-content :is(h1,h2,h3,h4,h5,h6) .sl-badge:where(.astro-avdet4wd){vertical-align:middle}
+.card-grid:where(.astro-zntqmydn){display:grid;grid-template-columns:100%;gap:1rem}.card-grid:where(.astro-zntqmydn)>*{margin-top:0!important}@media(min-width:50rem){.card-grid:where(.astro-zntqmydn){grid-template-columns:1fr 1fr;gap:1.5rem}.stagger:where(.astro-zntqmydn){--stagger-height: 5rem;padding-bottom:var(--stagger-height)}.stagger:where(.astro-zntqmydn)>*:nth-child(2n){transform:translateY(var(--stagger-height))}}
+svg:where(.astro-c6vsoqas){color:var(--sl-icon-color);font-size:var(--sl-icon-size, 1em);width:1em;height:1em}
+.sl-link-card:where(.astro-mf7fz2mj){display:grid;grid-template-columns:1fr auto;gap:.5rem;border:1px solid var(--sl-color-gray-5);border-radius:.5rem;padding:1rem;box-shadow:var(--sl-shadow-sm);position:relative}a:where(.astro-mf7fz2mj){text-decoration:none;line-height:var(--sl-line-height-headings)}a:where(.astro-mf7fz2mj):before{content:"";position:absolute;inset:0}.stack:where(.astro-mf7fz2mj){flex-direction:column;gap:.5rem}.title:where(.astro-mf7fz2mj){color:var(--sl-color-white);font-weight:600;font-size:var(--sl-text-lg)}.description:where(.astro-mf7fz2mj){color:var(--sl-color-gray-3);line-height:1.5}.icon:where(.astro-mf7fz2mj){color:var(--sl-color-gray-3)}.sl-link-card:where(.astro-mf7fz2mj):hover{background:var(--sl-color-gray-7, var(--sl-color-gray-6));border-color:var(--sl-color-gray-2)}.sl-link-card:where(.astro-mf7fz2mj):hover .icon:where(.astro-mf7fz2mj){color:var(--sl-color-white)}
+.sl-steps{--bullet-size: calc(var(--sl-line-height) * 1rem);--bullet-margin: .375rem;list-style:none;counter-reset:steps-counter var(--sl-steps-start, 0);padding-inline-start:0}.sl-steps>li{counter-increment:steps-counter;position:relative;padding-inline-start:calc(var(--bullet-size) + 1rem);padding-bottom:1px;min-height:calc(var(--bullet-size) + var(--bullet-margin))}.sl-steps>li+li{margin-top:0}.sl-steps>li:before{content:counter(steps-counter);position:absolute;top:0;inset-inline-start:0;width:var(--bullet-size);height:var(--bullet-size);line-height:var(--bullet-size);font-size:var(--sl-text-xs);font-weight:600;text-align:center;color:var(--sl-color-white);background-color:var(--sl-color-gray-6);border-radius:99rem;box-shadow:inset 0 0 0 1px var(--sl-color-gray-5)}.sl-steps>li:after{--guide-width: 1px;content:"";position:absolute;top:calc(var(--bullet-size) + var(--bullet-margin));bottom:var(--bullet-margin);inset-inline-start:calc((var(--bullet-size) - var(--guide-width)) / 2);width:var(--guide-width);background-color:var(--sl-color-hairline-light)}.sl-steps>li>:first-child{--lh: calc(1em * var(--sl-line-height));--shift-y: calc(.5 * (var(--bullet-size) - var(--lh)));transform:translateY(var(--shift-y));margin-bottom:var(--shift-y)}.sl-steps>li>:first-child:where(h1,h2,h3,h4,h5,h6){--lh: calc(1em * var(--sl-line-height-headings))}@supports (--prop: 1lh){.sl-steps>li>:first-child{--lh: 1lh}}
+.sl-link-button:where(.astro-xwgiixxa){align-items:center;border:1px solid transparent;border-radius:999rem;display:inline-flex;font-size:var(--sl-text-sm);gap:.5em;line-height:1.1875;outline-offset:.25rem;padding:.4375rem 1.125rem;text-decoration:none}.sl-link-button:where(.astro-xwgiixxa).primary{background:var(--sl-color-text-accent);border-color:var(--sl-color-text-accent);color:var(--sl-color-black)}.sl-link-button:where(.astro-xwgiixxa).primary:hover{color:var(--sl-color-black)}.sl-link-button:where(.astro-xwgiixxa).secondary{border-color:inherit;color:var(--sl-color-white)}.sl-link-button:where(.astro-xwgiixxa).minimal{color:var(--sl-color-white);padding-inline:0}.sl-link-button:where(.astro-xwgiixxa) svg{flex-shrink:0}@media(min-width:50rem){.sl-link-button:where(.astro-xwgiixxa){font-size:var(--sl-text-base);padding:.9375rem 1.25rem}}.sl-markdown-content .sl-link-button:where(.astro-xwgiixxa){margin-inline-end:1rem}.sl-markdown-content .sl-link-button:where(.astro-xwgiixxa):not(:where(p *)){margin-block:1rem}
+</style><script type="module" src="/_astro/page.B1D-nYk3.js"></script></head> <body class="astro-bguv2lll"> <a href="#_top" class="astro-7q3lir66">Skip to content</a>  <div class="page sl-flex astro-vrdttmbt"> <header class="header astro-vrdttmbt"><div class="header sl-flex astro-kmkmnagf"> <div class="title-wrapper sl-flex astro-kmkmnagf"> <a href="/" class="site-title sl-flex astro-m46x6ez3">  <img class="astro-m46x6ez3" alt src="/_astro/logo.C6k44Hx_.svg" width="106" height="25">  <span class="sr-only astro-m46x6ez3" translate="no"> Indigo HQ Docs </span> </a>  </div> <div class="sl-flex print:hidden astro-kmkmnagf"> <site-search class="astro-kmkmnagf astro-v37mnknz" data-translations="{&#34;placeholder&#34;:&#34;Search&#34;}"> <button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-v37mnknz"> <svg aria-hidden="true" class="astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg>  <span class="sl-hidden md:sl-block astro-v37mnknz" aria-hidden="true">Search</span> <kbd class="sl-hidden md:sl-flex astro-v37mnknz" style="display: none;"> <kbd class="astro-v37mnknz">Ctrl</kbd><kbd class="astro-v37mnknz">K</kbd> </kbd> </button> <dialog style="padding:0" aria-label="Search" class="astro-v37mnknz"> <div class="dialog-frame sl-flex astro-v37mnknz">  <button data-close-modal class="sl-flex md:sl-hidden astro-v37mnknz"> Cancel </button> <div class="search-container astro-v37mnknz"> <div id="starlight__search" class="astro-v37mnknz"></div> </div> </div> </dialog> </site-search>  <script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script> <script type="module" src="/_astro/Search.astro_astro_type_script_index_0_lang.ZeYNpLV4.js"></script>   </div> <div class="sl-hidden md:sl-flex print:hidden right-group astro-kmkmnagf"> <div class="sl-flex social-icons astro-kmkmnagf"> <a href="https://github.com/indigoai-us" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg> </a><a href="https://x.com/getindigo" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">X</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M 18.242188 2.25 L 21.554688 2.25 L 14.324219 10.507812 L 22.828125 21.75 L 16.171875 21.75 L 10.953125 14.933594 L 4.992188 21.75 L 1.679688 21.75 L 9.40625 12.914062 L 1.257812 2.25 L 8.082031 2.25 L 12.792969 8.480469 Z M 17.082031 19.773438 L 18.914062 19.773438 L 7.082031 4.125 L 5.113281 4.125 Z M 17.082031 19.773438 "/></svg> </a> </div> <starlight-theme-select>  <label style="--sl-select-width: 6.25em" class="astro-4yphtoen"> <span class="sr-only astro-4yphtoen">Select theme</span> <svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg>  <select value="auto" autocomplete="off" class="astro-4yphtoen"> <option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected class="astro-4yphtoen">Auto</option> </select> <svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </label>  </starlight-theme-select>  <script>
+	StarlightThemeProvider.updatePickers();
+</script> <script type="module">const r="starlight-theme",o=e=>e==="auto"||e==="dark"||e==="light"?e:"auto",c=()=>o(typeof localStorage<"u"&&localStorage.getItem(r));function n(e){typeof localStorage<"u"&&localStorage.setItem(r,e==="light"||e==="dark"?e:"")}const l=()=>matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";function t(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e==="auto"?l():e,n(e)}matchMedia("(prefers-color-scheme: light)").addEventListener("change",()=>{c()==="auto"&&t("auto")});class s extends HTMLElement{constructor(){super(),t(c()),this.querySelector("select")?.addEventListener("change",a=>{a.currentTarget instanceof HTMLSelectElement&&t(o(a.currentTarget.value))})}}customElements.define("starlight-theme-select",s);</script> <script type="module">class s extends HTMLElement{constructor(){super();const e=this.querySelector("select");e&&(e.addEventListener("change",t=>{t.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=t.currentTarget.value)}),window.addEventListener("pageshow",t=>{if(!t.persisted)return;const n=e.querySelector("option[selected]")?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}}customElements.define("starlight-lang-select",s);</script> </div> </div> </header> <nav class="sidebar print:hidden astro-vrdttmbt" aria-label="Main"> <starlight-menu-button class="print:hidden astro-jif73yzw"> <button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-jif73yzw"> <svg aria-hidden="true" class="astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg>  </button> </starlight-menu-button> <script type="module">class s extends HTMLElement{constructor(){super(),this.btn=this.querySelector("button"),this.btn.addEventListener("click",()=>this.toggleExpanded());const t=this.closest("nav");t&&t.addEventListener("keyup",e=>this.closeOnEscape(e))}setExpanded(t){this.setAttribute("aria-expanded",String(t)),document.body.toggleAttribute("data-mobile-menu-expanded",t)}toggleExpanded(){this.setExpanded(this.getAttribute("aria-expanded")!=="true")}closeOnEscape(t){t.code==="Escape"&&(this.setExpanded(!1),this.btn.focus())}}customElements.define("starlight-menu-button",s);</script>   <div id="starlight__sidebar" class="sidebar-pane astro-vrdttmbt"> <div class="sidebar-content sl-flex astro-vrdttmbt"> <sl-sidebar-state-persist data-hash="0ots1p7" class="astro-kku4brbg"> <script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script>  <ul class="top-level astro-3ii7xxms"> <li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <sl-sidebar-restore data-index="0"></sl-sidebar-restore> <summary class="astro-3ii7xxms"> <div class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Product Guide</span>  </div> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </summary> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/hq/guide/1-what-is-hq/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">What is HQ?</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/guide/2-getting-started/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Getting Started</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/guide/3-core-concepts/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Core Concepts</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/guide/4-commands/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Commands</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/guide/5-workers/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Workers</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/guide/6-knowledge-bases/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Knowledge Bases</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/guide/7-projects/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Projects</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/guide/8-cloud-sync/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Cloud Sync</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <sl-sidebar-restore data-index="1"></sl-sidebar-restore> <summary class="astro-3ii7xxms"> <div class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Products</span>  </div> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </summary> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/hq/products/hq-core/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">hq-core</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-cli/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">hq-cli</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-cloud/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">hq-cloud</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-sync/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">hq-sync</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-workspace/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">HQ Workspace</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-console/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">hq-console</span>  </a> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <sl-sidebar-restore data-index="2"></sl-sidebar-restore> <summary class="astro-3ii7xxms"> <div class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">hq-deploy</span>  </div> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </summary> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/hq/products/hq-deploy/introduction/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">HQ Deploy Platform</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-deploy/authentication/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Authentication</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-deploy/cfn-template/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">CloudFormation Template</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-deploy/cli/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Deploy CLI</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-deploy/dns-domains/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">DNS &amp; Domains</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-deploy/e2e-tests/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">E2E Tests</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-deploy/enterprise-init/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Enterprise Init</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-deploy/multi-tenant/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Multi-Tenant Orgs</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-deploy/ssr-flow/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">SSR Deploys</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-deploy/static-flow/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Static Deploys</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-deploy/upgrades/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Upgrades</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <sl-sidebar-restore data-index="3"></sl-sidebar-restore> <summary class="astro-3ii7xxms"> <div class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">hq-pro</span>  </div> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </summary> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/hq/products/hq-pro/about/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">HQ Pro — Vault, Teams &amp; Identity</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-pro/access/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Requesting Access</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-pro/cognito-setup/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Cognito Setup (Admin)</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-pro/commands-v0/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Team Commands (v0)</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-pro/github-auth/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">GitHub Auth</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-pro/onboarding/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Team Onboarding</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-pro/overview/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">HQ Installer</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-pro/platform/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Team Platform</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-pro/quickstart/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Quickstart</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-pro/troubleshooting/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Troubleshooting</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <sl-sidebar-restore data-index="4"></sl-sidebar-restore> <summary class="astro-3ii7xxms"> <div class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">hq-packages</span>  </div> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </summary> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/hq/products/hq-packages/overview/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Package System</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-packages/claude-merge/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Claude Merge</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-packages/cli-install/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">CLI Install Flow</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-packages/registry-api/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Registry API</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/hq-packages/spec-v2/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Package Spec v2</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <sl-sidebar-restore data-index="5"></sl-sidebar-restore> <summary class="astro-3ii7xxms"> <div class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Capabilities</span>  </div> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </summary> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/hq/products/capabilities/external-connections/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">External Connections</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/capabilities/hq-share/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">hq-share</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/capabilities/hq-secrets/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">hq-secrets</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/products/capabilities/slack-bot-factory/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Slack Bot Factory</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq-in-chat/" aria-current="page" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">HQ MCP</span>  </a> </li> </ul>  </details> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <sl-sidebar-restore data-index="6"></sl-sidebar-restore> <summary class="astro-3ii7xxms"> <div class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Architecture</span>  </div> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </summary> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/hq/architecture/1-overview/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Architecture Overview</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/architecture/2-ecosystem/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Ecosystem &amp; Repo Map</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/architecture/3-create-hq/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">create-hq</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/architecture/4-hq-cli/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">hq-cli</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/architecture/5-hq-cloud/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">hq-cloud</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/architecture/6-infrastructure/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Infrastructure</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/architecture/7-pwa/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">PWA Dashboard</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/architecture/8-module-system/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Module System</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/architecture/9-api-reference/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">API Reference</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <sl-sidebar-restore data-index="7"></sl-sidebar-restore> <summary class="astro-3ii7xxms"> <div class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Security</span>  </div> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </summary> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/hq/security/1-overview/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Security &amp; Trust</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/security/10-compliance-roadmap/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Compliance Roadmap</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/security/11-vulnerability-disclosure/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Vulnerability Disclosure</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/security/12-caiq-questionnaire/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">CAIQ Questionnaire</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/security/2-subprocessors/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Subprocessors</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/security/3-tenant-isolation/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Tenant Isolation</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/security/4-data-security-encryption/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Data Security &amp; Encryption</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/security/5-identity-access-management/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Identity &amp; Access Management</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/security/6-infrastructure-network-security/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Infrastructure &amp; Network Security</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/security/7-application-security-sdlc/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Application Security &amp; SDLC</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/security/8-shared-responsibility/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Shared Responsibility</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/security/9-business-continuity-incident-response/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Business Continuity &amp; Incident Response</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <sl-sidebar-restore data-index="8"></sl-sidebar-restore> <summary class="astro-3ii7xxms"> <div class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Development</span>  </div> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </summary> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/hq/development/1-local-setup/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Local Setup</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/development/2-deploying-infra/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Deploying Infrastructure</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/development/3-publishing-packages/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Publishing Packages</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/development/4-template-updates/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Template Updates</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/development/5-testing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Testing</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/development/6-contributing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Contributing</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <sl-sidebar-restore data-index="9"></sl-sidebar-restore> <summary class="astro-3ii7xxms"> <div class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Roadmap</span>  </div> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </summary> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/hq/roadmap/1-overview/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Roadmap Overview</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/roadmap/2-shipped-and-next/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Shipped &amp; Next</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/roadmap/3-cloud-sync-ga/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Cloud Sync GA</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/roadmap/4-pwa-improvements/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">PWA Improvements</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/hq/roadmap/5-future/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Future Vision</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <sl-sidebar-restore data-index="10"></sl-sidebar-restore> <summary class="astro-3ii7xxms"> <div class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Reference</span>  </div> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </summary> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/glossary/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Glossary</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/comparison/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">HQ vs. alternatives</span>  </a> </li> </ul>  </details> </li> </ul>   <script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script> </sl-sidebar-state-persist>  <div class="md:sl-hidden"> <div class="mobile-preferences sl-flex astro-wu23bvmt"> <div class="sl-flex social-icons astro-wu23bvmt"> <a href="https://github.com/indigoai-us" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg> </a><a href="https://x.com/getindigo" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">X</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M 18.242188 2.25 L 21.554688 2.25 L 14.324219 10.507812 L 22.828125 21.75 L 16.171875 21.75 L 10.953125 14.933594 L 4.992188 21.75 L 1.679688 21.75 L 9.40625 12.914062 L 1.257812 2.25 L 8.082031 2.25 L 12.792969 8.480469 Z M 17.082031 19.773438 L 18.914062 19.773438 L 7.082031 4.125 L 5.113281 4.125 Z M 17.082031 19.773438 "/></svg> </a> </div> <starlight-theme-select>  <label style="--sl-select-width: 6.25em" class="astro-4yphtoen"> <span class="sr-only astro-4yphtoen">Select theme</span> <svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg>  <select value="auto" autocomplete="off" class="astro-4yphtoen"> <option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected class="astro-4yphtoen">Auto</option> </select> <svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg>  </label>  </starlight-theme-select>  <script>
+	StarlightThemeProvider.updatePickers();
+</script>   </div>  </div> </div> </div> </nav> <div class="main-frame astro-vrdttmbt">  <script type="module">const a=document.getElementById("starlight__sidebar"),n=a?.querySelector("sl-sidebar-state-persist"),o="sl-sidebar-state",i=()=>{let t=[];const e=n?.dataset.hash||"";try{const s=sessionStorage.getItem(o),r=JSON.parse(s||"{}");Array.isArray(r.open)&&r.hash===e&&(t=r.open)}catch{}return{hash:e,open:t,scroll:a?.scrollTop||0}},c=t=>{try{sessionStorage.setItem(o,JSON.stringify(t))}catch{}},d=()=>c(i()),l=(t,e)=>{const s=i();s.open[e]=t,c(s)};n?.addEventListener("click",t=>{if(!(t.target instanceof Element))return;const e=t.target.closest("summary")?.closest("details");if(!e)return;const s=e.querySelector("sl-sidebar-restore"),r=parseInt(s?.dataset.index||"");isNaN(r)||l(!e.open,r)});addEventListener("visibilitychange",()=>{document.visibilityState==="hidden"&&d()});addEventListener("pageHide",d);</script> <div class="lg:sl-flex astro-67yu43on"> <aside class="right-sidebar-container print:hidden astro-67yu43on"> <div class="right-sidebar astro-67yu43on"> <script type="module" src="/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.C181hMzK.js"></script><script type="module" src="/_astro/TableOfContents.astro_astro_type_script_index_0_lang.CKWWgpjV.js"></script><div class="lg:sl-hidden astro-pb3aqygn"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-doynk5tl"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-doynk5tl"><details id="starlight__mobile-toc" class="astro-doynk5tl"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-doynk5tl"><div class="toggle sl-flex astro-doynk5tl">On this page<svg aria-hidden="true" class="caret astro-doynk5tl astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </div><span class="display-current astro-doynk5tl"></span></summary><div class="dropdown astro-doynk5tl"><ul class="isMobile astro-g2bywc46" style="--depth: 0;"> <li class="astro-g2bywc46" style="--depth: 0;"> <a href="#_top" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Overview</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#connect-from-chatgpt" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Connect From ChatGPT</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#connect-from-claude" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Connect From Claude</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#what-you-can-do" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">What You Can Do</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#mcp-tool-groups" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">MCP Tool Groups</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#search-and-fetch" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Search And Fetch</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#files-and-writes" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Files And Writes</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#deploy-sites" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Deploy Sites</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#secrets" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Secrets</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#skills-in-chat" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Skills In Chat</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#contribution-flow" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Contribution Flow</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#security-model" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Security Model</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#operator-checks" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Operator Checks</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#troubleshooting" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Troubleshooting</span> </a>  </li> </ul> </div></details></nav></mobile-starlight-toc></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-pb3aqygn"><div class="sl-container astro-pb3aqygn"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-g2bywc46" style="--depth: 0;"> <li class="astro-g2bywc46" style="--depth: 0;"> <a href="#_top" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Overview</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#connect-from-chatgpt" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Connect From ChatGPT</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#connect-from-claude" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Connect From Claude</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#what-you-can-do" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">What You Can Do</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#mcp-tool-groups" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">MCP Tool Groups</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#search-and-fetch" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Search And Fetch</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#files-and-writes" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Files And Writes</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#deploy-sites" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Deploy Sites</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#secrets" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Secrets</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#skills-in-chat" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Skills In Chat</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#contribution-flow" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Contribution Flow</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#security-model" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Security Model</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#operator-checks" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Operator Checks</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#troubleshooting" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Troubleshooting</span> </a>  </li> </ul> </nav></starlight-toc></div></div> </div> </aside> <div class="main-pane astro-67yu43on">  <main data-pagefind-body class="astro-bguv2lll" lang="en" dir="ltr">   <script type="module" src="/_astro/MarkdownContent.astro_astro_type_script_index_0_lang.BDuN2Obh.js"></script> <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <h1 id="_top" class="astro-j6tvhyss">HQ MCP</h1>  </div> </div>  <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <div class="sl-markdown-content">  <p>HQ MCP connects ChatGPT and Claude.ai to the same governed HQ context your local agents use: company knowledge, project context, policies, files, and shared workflow skills.</p>
+<aside aria-label="MCP is in beta" class="starlight-aside starlight-aside--caution"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 16C11.8022 16 11.6089 16.0587 11.4444 16.1686C11.28 16.2784 11.1518 16.4346 11.0761 16.6173C11.0004 16.8001 10.9806 17.0011 11.0192 17.1951C11.0578 17.3891 11.153 17.5673 11.2929 17.7071C11.4327 17.847 11.6109 17.9422 11.8049 17.9808C11.9989 18.0194 12.2 17.9996 12.3827 17.9239C12.5654 17.8482 12.7216 17.72 12.8315 17.5556C12.9413 17.3911 13 17.1978 13 17C13 16.7348 12.8946 16.4805 12.7071 16.2929C12.5196 16.1054 12.2652 16 12 16ZM22.67 17.47L14.62 3.47003C14.3598 3.00354 13.9798 2.61498 13.5192 2.3445C13.0586 2.07401 12.5341 1.9314 12 1.9314C11.4659 1.9314 10.9414 2.07401 10.4808 2.3445C10.0202 2.61498 9.64019 3.00354 9.38 3.47003L1.38 17.47C1.11079 17.924 0.966141 18.441 0.960643 18.9688C0.955144 19.4966 1.089 20.0166 1.34868 20.4761C1.60837 20.9356 1.9847 21.3185 2.43968 21.5861C2.89466 21.8536 3.41218 21.9964 3.94 22H20.06C20.5921 22.0053 21.1159 21.8689 21.5779 21.6049C22.0399 21.341 22.4234 20.9589 22.689 20.4978C22.9546 20.0368 23.0928 19.5134 23.0895 18.9814C23.0862 18.4493 22.9414 17.9277 22.67 17.47ZM20.94 19.47C20.8523 19.626 20.7245 19.7556 20.5697 19.8453C20.4149 19.935 20.2389 19.9815 20.06 19.98H3.94C3.76111 19.9815 3.5851 19.935 3.43032 19.8453C3.27553 19.7556 3.14765 19.626 3.06 19.47C2.97223 19.318 2.92602 19.1456 2.92602 18.97C2.92602 18.7945 2.97223 18.622 3.06 18.47L11.06 4.47003C11.1439 4.30623 11.2714 4.16876 11.4284 4.07277C11.5855 3.97678 11.766 3.92599 11.95 3.92599C12.134 3.92599 12.3145 3.97678 12.4716 4.07277C12.6286 4.16876 12.7561 4.30623 12.84 4.47003L20.89 18.47C20.9892 18.6199 21.0462 18.7937 21.055 18.9732C21.0638 19.1527 21.0241 19.3312 20.94 19.49V19.47ZM12 8.00003C11.7348 8.00003 11.4804 8.10538 11.2929 8.29292C11.1054 8.48046 11 8.73481 11 9.00003V13C11 13.2652 11.1054 13.5196 11.2929 13.7071C11.4804 13.8947 11.7348 14 12 14C12.2652 14 12.5196 13.8947 12.7071 13.7071C12.8946 13.5196 13 13.2652 13 13V9.00003C13 8.73481 12.8946 8.48046 12.7071 8.29292C12.5196 8.10538 12.2652 8.00003 12 8.00003Z"></path></svg>MCP is in beta</p><div class="starlight-aside__content"><p>HQ MCP is currently in beta. The connector is usable today, but ChatGPT and Claude both treat remote MCP/custom connector support as beta surfaces, so setup screens, labels, permissions, and tool refresh behavior may change. Review write actions before approving them.</p></div></aside>
+<p>The connector is built on the Model Context Protocol (MCP). Each request is authenticated with your HQ identity, and vault-service resolves which personal and company vaults you can access before any company lookup, file read, search, fetch, write, or skill review happens.</p>
+<p>For clients that ask for a remote MCP server URL, use:</p>
+<div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.tm3va.css"><script type="module" src="/_astro/ec.8zarh.js"></script><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="txt"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">https://hq-mcp.hq.computer/mcp</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="https://hq-mcp.hq.computer/mcp"><div></div></button></div></figure></div>
+<p>The cloud connector does not require a local HQ install, local filesystem access, or <code dir="auto">qmd</code> on the client. Local and developer MCP runs may still use local HQ files and <code dir="auto">qmd</code> as a fallback, but the production cloud path talks to HQ cloud services directly.</p>
+<h2 id="connect-from-chatgpt">Connect From ChatGPT</h2>
+<p>ChatGPT exposes remote MCP through ChatGPT apps/custom connectors. During beta, the exact labels depend on your ChatGPT plan and workspace settings.</p>
+<p>Before you start, have these values ready:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>MCP server URL</td><td><code dir="auto">https://hq-mcp.hq.computer/mcp</code></td></tr><tr><td>Authentication</td><td>OAuth</td></tr><tr><td>Client ID</td><td><code dir="auto">6gorpnstao6ddli4tk8k5kv9s0</code></td></tr><tr><td>Client secret</td><td>Leave blank unless Indigo explicitly gives you one for your workspace.</td></tr><tr><td>Scopes</td><td><code dir="auto">openid</code>, <code dir="auto">email</code>, <code dir="auto">profile</code>, <code dir="auto">hq-mcp/use</code></td></tr></tbody></table>
+<p>Setup:</p>
+<ol>
+<li>Ask a ChatGPT workspace admin or owner to enable developer mode for custom MCP apps. OpenAI currently documents this under <strong>Workspace Settings -> Permissions &#x26; Roles -> Connected Data Developer mode / Create custom MCP connectors</strong>.</li>
+<li>Enable developer mode for your own account if your plan requires a per-user toggle. OpenAI documents the user toggle under <strong>Settings -> Apps -> Advanced Settings</strong> for eligible Enterprise/Edu users.</li>
+<li>Create a custom app from <strong>Workspace Settings -> Apps -> Create</strong> if you are an admin or owner, or from <strong>Settings -> Apps -> Create</strong> if your workspace lets authorized users create apps.</li>
+<li>Enter the MCP server URL, choose OAuth authentication, and provide the HQ MCP beta Client ID <code dir="auto">6gorpnstao6ddli4tk8k5kv9s0</code> if ChatGPT asks for one.</li>
+<li>Click <strong>Scan Tools</strong>. If ChatGPT opens the HQ authorization flow, sign in with your HQ identity and approve the requested access.</li>
+<li>After the scan completes, click <strong>Create</strong>. The app should appear with a developer or draft label until it is published for the workspace.</li>
+<li>Open a new chat and select the HQ app from the tools/app menu, or refer to it by name in your prompt.</li>
+</ol>
+<p>For write or share actions, ChatGPT may show an approval prompt before running the tool. Treat those prompts as the final human review step before HQ writes a file, grants access, or mints a share-session link.</p>
+<p>If the app shows an old tool list, refresh the app’s actions or recreate the draft. OpenAI’s beta app flow can cache tool definitions after the first scan.</p>
+<p>Official OpenAI references:</p>
+<ul>
+<li><a href="https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta">Developer mode and MCP apps in ChatGPT</a></li>
+<li><a href="https://developers.openai.com/api/docs/mcp">Building MCP servers for ChatGPT Apps and API integrations</a></li>
+</ul>
+<h2 id="connect-from-claude">Connect From Claude</h2>
+<p>Claude exposes remote MCP through custom connectors. Anthropic currently marks custom connectors as beta.</p>
+<p>Before you start, have these values ready:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>MCP server URL</td><td><code dir="auto">https://hq-mcp.hq.computer/mcp</code></td></tr><tr><td>OAuth Client ID</td><td><code dir="auto">6gorpnstao6ddli4tk8k5kv9s0</code></td></tr><tr><td>OAuth Client Secret</td><td>Leave blank unless Indigo explicitly gives you one for your workspace.</td></tr></tbody></table>
+<p>Setup for Team and Enterprise:</p>
+<ol>
+<li>Ask an owner or primary owner to open <strong>Organization settings -> Connectors</strong>.</li>
+<li>Click <strong>Add</strong>, choose <strong>Custom</strong>, then choose <strong>Web</strong>.</li>
+<li>Enter the MCP server URL.</li>
+<li>Open <strong>Advanced settings</strong> only if Claude asks for OAuth client details, then enter the HQ MCP beta Client ID <code dir="auto">6gorpnstao6ddli4tk8k5kv9s0</code>.</li>
+<li>Click <strong>Add</strong>.</li>
+<li>Each user then opens <strong>Customize -> Connectors</strong>, finds the custom HQ connector, clicks <strong>Connect</strong>, and completes the HQ OAuth sign-in.</li>
+</ol>
+<p>Setup for Pro or Max:</p>
+<ol>
+<li>Open <strong>Customize -> Connectors</strong>.</li>
+<li>Click <strong>+</strong>, then <strong>Add custom connector</strong>.</li>
+<li>Enter the MCP server URL.</li>
+<li>Open <strong>Advanced settings</strong> only if Claude asks for OAuth client details, then enter the HQ MCP beta Client ID <code dir="auto">6gorpnstao6ddli4tk8k5kv9s0</code>.</li>
+<li>Click <strong>Add</strong>, then <strong>Connect</strong>, and complete the HQ OAuth sign-in.</li>
+</ol>
+<p>Enable the connector per conversation from the chat composer <strong>+</strong> menu under <strong>Connectors</strong>. If Claude can see the connector but not the newest tools, remove and re-add the connector so Claude scans the current MCP tool registry.</p>
+<p>Official Anthropic reference:</p>
+<ul>
+<li><a href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp">Get started with custom connectors using remote MCP</a></li>
+</ul>
+<h2 id="what-you-can-do">What You Can Do</h2>
+<ul>
+<li>List the HQ companies your account can access.</li>
+<li>Browse readable company vault prefixes and fetch allowed files.</li>
+<li>Share company vault files or prefixes by minting a short-lived share-session link or granting one recipient directly.</li>
+<li>Deploy small static sites to hq-deploy from explicit built file contents.</li>
+<li>Search chat-visible personal and company content.</li>
+<li>Read company knowledge, project records, project status, and policies.</li>
+<li>Capture notes, journal entries, project updates, and knowledge captures back into allowed prefixes.</li>
+<li>Inspect secret names and project secret schemas without exposing secret values.</li>
+<li>Generate a human submission link when a secret value needs to be supplied.</li>
+<li>Fetch approved chat-visible skills as workflow guidance.</li>
+<li>Draft new team skills for review.</li>
+</ul>
+<h2 id="mcp-tool-groups">MCP Tool Groups</h2>
+<p>Different chat clients present MCP tools with different UI labels, but the connector exposes these capability groups:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Group</th><th>Tools</th></tr></thead><tbody><tr><td>Identity</td><td><code dir="auto">hq_whoami</code>, <code dir="auto">hq_companies_list</code>, <code dir="auto">hq_company_ping</code></td></tr><tr><td>Files</td><td><code dir="auto">hq_files_list</code>, <code dir="auto">hq_files_read</code>, <code dir="auto">hq_files_write</code>, <code dir="auto">hq_files_share</code></td></tr><tr><td>Knowledge</td><td><code dir="auto">hq_knowledge_list</code>, <code dir="auto">hq_knowledge_get</code>, <code dir="auto">hq_knowledge_search</code>, <code dir="auto">hq_knowledge_capture</code></td></tr><tr><td>Projects</td><td><code dir="auto">hq_projects_list</code>, <code dir="auto">hq_project_get</code>, <code dir="auto">hq_project_status</code>, <code dir="auto">hq_project_journal_append</code></td></tr><tr><td>Policies</td><td><code dir="auto">hq_policies_list</code>, <code dir="auto">hq_policy_get</code></td></tr><tr><td>Secrets</td><td><code dir="auto">hq_secrets_list</code>, <code dir="auto">hq_secrets_schema</code>, <code dir="auto">hq_secrets_generate_link</code></td></tr><tr><td>Deploy</td><td><code dir="auto">hq_deploy_site</code></td></tr><tr><td>Personal vault</td><td><code dir="auto">hq_personal_capture</code></td></tr><tr><td>Skills</td><td><code dir="auto">hq_skill_list</code>, <code dir="auto">hq_skill_get</code>, <code dir="auto">hq_skill_draft</code></td></tr><tr><td>Diagnostics</td><td><code dir="auto">hq_ping</code>, <code dir="auto">hq_version</code>, <code dir="auto">hq_exec_check</code></td></tr></tbody></table>
+<p>Some clients also expose the standard MCP <code dir="auto">search</code> and <code dir="auto">fetch</code> surface. Use that pair for general chat-visible HQ content discovery. Use the <code dir="auto">hq_*</code> tools when you need company-scoped behavior, explicit paths, project records, policy records, or write actions.</p>
+<h2 id="search-and-fetch">Search And Fetch</h2>
+<p>HQ MCP has two search paths:</p>
+<ul>
+<li><code dir="auto">search</code> and <code dir="auto">fetch</code> are the general MCP content discovery pair. Search returns matching chat-visible records, and fetch rechecks permission before returning the canonical content.</li>
+<li><code dir="auto">hq_knowledge_search</code> keeps the company-scoped HQ tool shape. In cloud mode, it uses the vault content search service and filters results to the requested company. In local developer mode, it can fall back to <code dir="auto">qmd</code>.</li>
+</ul>
+<p>Production cloud MCP does not shell out to <code dir="auto">qmd</code>. If a cloud client reports a <code dir="auto">qmd</code> missing error, it is using an old connector bundle or a local MCP path, not the current production cloud path.</p>
+<p>Cloud search currently indexes chat-visible vault content through the HQ content search service. Empty results mean no matching chat-visible content was found for your account and company scope. Use list and get tools for direct browsing when you already know the company or path. Vector-index infrastructure is scaffolded, but it is not the production source of truth for cloud MCP results yet.</p>
+<h2 id="files-and-writes">Files And Writes</h2>
+<p>Company file tools are company-scoped. The connector first verifies that you are a member of the requested company, then vault-service applies path-level rules.</p>
+<p>Readable company listings exclude private operational prefixes such as <code dir="auto">settings/</code>, <code dir="auto">secrets/</code>, and <code dir="auto">workers/</code>. Reads are also rechecked at fetch time, so stale paths or newly revoked access fail closed.</p>
+<p>Writes are limited to explicitly writable areas, including:</p>
+<ul>
+<li><code dir="auto">notes/</code></li>
+<li><code dir="auto">inbox/</code></li>
+<li><code dir="auto">drafts/</code></li>
+<li><code dir="auto">scratch/</code></li>
+<li><code dir="auto">journal/</code></li>
+<li><code dir="auto">projects/</code></li>
+<li><code dir="auto">knowledge/captures/</code></li>
+</ul>
+<p>Existing files are not overwritten unless the tool call explicitly confirms the overwrite.</p>
+<p>Files written from chat follow the same ownership model as files synced from a local HQ folder: the creator owns the new object first. Other people do not get access just because a chat wrote the file. Share it explicitly when someone else needs to read or edit it.</p>
+<p>Use <code dir="auto">hq_files_share</code> to share one or more company vault paths:</p>
+<ul>
+<li>Omit <code dir="auto">with</code> to mint a short-lived share-session URL. The browser flow lets a human pick recipients and per-recipient read/write access.</li>
+<li>Set <code dir="auto">with</code> to an email, <code dir="auto">prs_*</code> person UID, <code dir="auto">grp_*</code> group ID, or <code dir="auto">@all</code> to grant access directly from the tool call.</li>
+<li><code dir="auto">permission</code> defaults to <code dir="auto">read</code>; use <code dir="auto">write</code> only when the recipient should be able to edit the path.</li>
+</ul>
+<p>Share-session URLs are bearer capabilities. They should be surfaced only at mint time and redacted everywhere else as <code dir="auto">https://hq.{co}.com/share-session/&#x3C;TOKEN_REDACTED></code>.</p>
+<h2 id="deploy-sites">Deploy Sites</h2>
+<p>Use <code dir="auto">hq_deploy_site</code> when you want ChatGPT or Claude to create a small static web page and publish it through hq-deploy.</p>
+<p>The tool accepts explicit file contents, not a local project path. The request must include <code dir="auto">index.html</code>; additional assets can be supplied as UTF-8 text or base64. The cloud connector does not run shell commands, package-manager builds, Docker builds, SSR builds, or local filesystem scans.</p>
+<p>Supported access modes:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Mode</th><th>Behavior</th></tr></thead><tbody><tr><td><code dir="auto">public</code></td><td>Anyone with the deployed URL can open the site.</td></tr><tr><td><code dir="auto">password</code></td><td>The app is password-gated. Provide a password or let HQ generate one.</td></tr><tr><td><code dir="auto">company</code></td><td>The app is restricted through the HQ company access policy for the requested company.</td></tr></tbody></table>
+<p>For protected deploys, the connector wires the requested access gate before creating the new deploy. If hq-deploy cannot confirm the access mode, the tool refuses instead of uploading the new artifact.</p>
+<p>This tool is intended for lightweight static pages, previews, readouts, and handoff artifacts. Use the local <code dir="auto">/deploy</code> workflow or hq-deploy CLI for full project builds, SSR apps, Docker images, custom domain operations, or larger production releases.</p>
+<h2 id="secrets">Secrets</h2>
+<p>Secret values never enter the chat transcript. The MCP connector can list secret names and metadata, parse a project’s <code dir="auto">.env.schema</code>, and generate a time-limited submission link for a human to provide a value through HQ. It cannot return raw secret values to the model.</p>
+<h2 id="skills-in-chat">Skills In Chat</h2>
+<p>HQ skills are team-authored workflow instructions. In chat, they are treated as content, not code:</p>
+<ul>
+<li>A skill must opt into <code dir="auto">surfaces: [chat]</code>.</li>
+<li>Workflow-tier skills require review before they become visible.</li>
+<li>Skill bodies are returned as untrusted tool data and cannot override system, developer, or connector instructions.</li>
+<li>Cloud mode never enables local shell execution or <code dir="auto">hq_run</code>.</li>
+<li>Revoked or archived skills are blocked at fetch time, even if an old search result still exists.</li>
+</ul>
+<p>For tool-only clients, use <code dir="auto">hq_skill_list</code> to find skills and <code dir="auto">hq_skill_get</code> to fetch one by ID. MCP-native clients that support resources and prompts can also see <code dir="auto">hq-skill://skill/{id}</code> resources and the <code dir="auto">hq_skill_apply</code> prompt.</p>
+<h2 id="contribution-flow">Contribution Flow</h2>
+<p>General captures use existing writable areas such as notes, inbox, scratch, journal, project journals, and knowledge captures.</p>
+<p>Skill changes use a stricter flow:</p>
+<ol>
+<li>A user drafts a skill from chat.</li>
+<li>The draft is written to <code dir="auto">drafts/skills/{slug}/SKILL.md</code>.</li>
+<li>An owner or delegated <code dir="auto">manageChatSkills</code> reviewer approves, rejects, requests changes, revokes, or restores it.</li>
+<li>Approved skills are promoted into the live <code dir="auto">skills/{slug}/SKILL.md</code> path and queued for indexing.</li>
+</ol>
+<p>Chat cannot write directly to live company skill roots.</p>
+<h2 id="security-model">Security Model</h2>
+<p>HQ MCP keeps vault-service as the authority:</p>
+<ul>
+<li>The connector forwards the verified bearer token and does not accept client-supplied vault scope.</li>
+<li>Personal and company entitlements are resolved server-side.</li>
+<li>Company-scoped tools first confirm membership in the requested company.</li>
+<li>Chat writes create creator-owned files; sharing is a separate ACL action through the same vault-service rules used by HQ Console and HQ Sync.</li>
+<li>Chat deploys call hq-deploy with the verified caller token. Protected deploys fail closed if the requested access mode cannot be confirmed.</li>
+<li>Search results are hints; fetch rechecks canonical vault, source path, lifecycle, private-prefix, and skill review state.</li>
+<li>Settings, secrets, and workers paths are excluded.</li>
+<li>Secret values are never returned to chat.</li>
+<li>Client-visible denials collapse to a generic unavailable response, while internal telemetry records the exact cause.</li>
+</ul>
+<p>The result is the same tenant-isolation guarantee as the rest of HQ: one company cannot read or write another company’s content through chat.</p>
+<h2 id="operator-checks">Operator Checks</h2>
+<p>Release verification covers:</p>
+<ul>
+<li>OAuth metadata and connector boot.</li>
+<li>Company lookup and company ping.</li>
+<li>Company file listing, read, and write ACL behavior.</li>
+<li>Company file sharing through share-session minting and direct grant behavior.</li>
+<li>Static hq-deploy site creation and access-mode refusal behavior.</li>
+<li>Knowledge list, get, search, and capture behavior.</li>
+<li>Project, policy, and personal capture tools.</li>
+<li>Secret metadata and schema tools.</li>
+<li>Skill discovery and skill fetch.</li>
+<li>Safe capture write.</li>
+<li>Cross-vault fetch denial.</li>
+<li>Private-prefix write refusal.</li>
+<li>Revoked-skill stale fetch denial.</li>
+<li>Cloud search behavior without a local <code dir="auto">qmd</code> dependency.</li>
+<li>Index-lag threshold checks for seeded canary content where content indexing is enabled.</li>
+</ul>
+<p>If a rollout needs to be reversed, disable skill/content surfacing first, purge or rebuild affected index records, rerun the denial canaries, and restore surfaces progressively.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Symptom</th><th>What it usually means</th></tr></thead><tbody><tr><td>The client can see tool names but every company tool fails</td><td>The OAuth token reached MCP, but vault-service could not resolve the account’s company membership. Reconnect the client and verify <code dir="auto">hq_whoami</code> and <code dir="auto">hq_companies_list</code>.</td></tr><tr><td><code dir="auto">hq_companies_list</code> works but <code dir="auto">hq_files_list</code> returns not found</td><td>The company slug, deployed vault route, or file route bundle is stale. Verify the company slug and reconnect after the latest cloud deployment.</td></tr><tr><td><code dir="auto">hq_files_share</code> is missing from the client tool list</td><td>The client probably cached the tool registry before the latest connector deploy. Relaunch or reconnect the chat client, then list tools again.</td></tr><tr><td><code dir="auto">hq_deploy_site</code> is missing from the client tool list</td><td>The client probably cached the tool registry before the latest connector deploy. Relaunch or reconnect the chat client, then list tools again.</td></tr><tr><td><code dir="auto">hq_deploy_site</code> refuses a protected deploy</td><td>HQ could not confirm the requested hq-deploy access gate. Retry with a valid company, or use <code dir="auto">password</code>/<code dir="auto">public</code> only when that access mode is intended.</td></tr><tr><td><code dir="auto">hq_knowledge_search</code> returns an empty array</td><td>The cloud service found no matching chat-visible content in that company scope. Try listing knowledge docs or fetching a known path.</td></tr><tr><td>A cloud request mentions <code dir="auto">qmd</code></td><td>The client is not using the current production cloud bundle, or it is pointed at a local developer MCP server.</td></tr><tr><td>A secret value is missing from the response</td><td>This is expected. MCP exposes secret names, schemas, and submission links only.</td></tr></tbody></table>  <script>(function(){const className = "mermaid";
+
+    window.__mermaidClassName = className;
+  })();</script>   </div> <footer class="sl-flex astro-3yyafb3n"> <div class="meta sl-flex astro-3yyafb3n">   </div> <div class="pagination-links print:hidden astro-u2l5gyhi" dir="ltr"> <a href="/hq/products/capabilities/slack-bot-factory/" rel="prev" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg>  <span class="astro-u2l5gyhi"> Previous <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Slack Bot Factory</span> </span> </a> <a href="/hq/architecture/1-overview/" rel="next" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg>  <span class="astro-u2l5gyhi"> Next <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Architecture Overview</span> </span> </a> </div>   </footer>  </div> </div>   </main> </div> </div>  </div> </div>  </body></html>
