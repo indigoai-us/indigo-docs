@@ -21,7 +21,7 @@ Four sizes are available for new boxes on accounts created from 16 October
 | **Large** | t3.large | $400 | Complex development, many users |
 | **XLarge** | t3.xlarge | $800 | Heavy development and project orchestration |
 
-The HQ Console creation wizard and `hq agents provision` show the size names
+The HQ desktop app and `hq agents provision` show the size names
 and the monthly price for your company before you create an agent. Contract
 pricing, credits or sponsorship can make the displayed price different from
 the price for the size.
@@ -39,8 +39,10 @@ without selecting or requesting a change.
 ### Prices for existing customers
 
 Accounts created before 16 October 2026 keep the earlier ladder and its
-prices, for the boxes they run today and for new boxes, until their plan moves
-to usage pricing on 19 December 2026. HQ emails each account beforehand with
+prices, for the boxes they run today and for new boxes, until the account
+moves to usage pricing: 19 December 2026 for Workforce, Individual and
+Outpost-only accounts, and 14 days after HQ's notice for Free and Starter
+companies. HQ emails each account beforehand with
 what changes for it. Until then:
 
 | Size | Instance type | Monthly price |
@@ -50,7 +52,8 @@ what changes for it. Until then:
 | **Dev** | t3.xlarge | $500 |
 
 On that ladder, `hq agents provision --size basic|power|dev` picks the size.
-Outposts on those accounts move from $80 to $100 a month on 19 December 2026.
+Existing $80 Outposts keep $80. New Outposts are billed by size: $100 small,
+$200 medium, $400 large, $800 xlarge.
 
 Earlier ladders also included a smaller entry box and a larger top box. Agents
 already running on those sizes are grandfathered: they keep billing exactly

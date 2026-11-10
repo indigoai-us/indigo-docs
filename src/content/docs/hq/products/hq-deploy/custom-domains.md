@@ -63,7 +63,7 @@ Errors you may see when adding a domain:
 
 | Error | Meaning |
 |---|---|
-| `PAYMENT_METHOD_REQUIRED` | Add a default payment method on the company billing page, then retry |
+| `PAYMENT_METHOD_REQUIRED` | Add a card in the company's Settings › Billing in the HQ desktop app, then retry |
 | `BILLING_ADMIN_REQUIRED` | Only a company admin or owner can add a billed domain |
 | `DOMAIN_NOT_ENTITLED` | Custom domains are switched off for this company; contact support |
 | `DOMAIN_CROSS_TENANT` | The domain is already claimed by another company |
