@@ -44,9 +44,11 @@ choosing it for such a company returns the card to a blocked state with the
 refusal message; a Starter company's next step is switching to usage
 pricing. Companies already on Workforce keep it until 19 December 2026. Stay
 on Starter is a real action (`skipped`). Creating an agent does not require
-Workforce. From 19 December 2026 every company is on usage pricing: Step 3
-no longer offers Starter or Workforce, and HQ asks for a card the first time
-usage passes the $10 included in a month.
+Workforce. Existing Workforce, Individual and Outpost-only accounts move to
+usage pricing on 19 December 2026. Free and Starter companies move 14 days
+after HQ sends them a notice. After the move Step 3 no longer offers Starter
+or Workforce, and HQ asks for a card the first time usage passes the $10
+included in a month (during the trial, $10 of trial usage).
 
 Starter is a hard-capped free plan, not a trial, and it is closed to new
 signups (since 16 October 2026). It covers up to 5 members, 10 secrets, 10 GB
