@@ -23,7 +23,10 @@ The JSON body contains:
     ($500)
   - `meters[]`: each usage line with its id, label, unit and unit price:
     sync, gateway call, HQ MCP call, agent run, storage, secret and vault.
-    The vault line carries `waivedInTrial: true`.
+    The vault line carries `waivedInTrial: true`. `unitUsd` is always the
+    price of one unit. Lines that HQ shows per 100 units (gateway call and
+    HQ MCP call) also carry `displayPer` (100), `displayUsd` (0.10) and
+    `displayText` ("$0.10 per 100 calls"), which is the price HQ shows customers.
   - `boxes[]`: each box size with its instance type and monthly price (small
     t3.small, medium t3.medium, large t3.large, xlarge t3.xlarge)
   - `free`: what is never billed (deploys, DMs, background AI)
@@ -59,13 +62,14 @@ The `usage` block, shortened:
 ```json
 {
   "usage": {
-    "version": "2026-10-16",
+    "version": "2026-11-13",
     "newSignupsFrom": "2026-10-16T18:00:00Z",
     "includedUsd": 10,
     "trial": { "days": 30, "capUsd": 500 },
     "meters": [
       { "id": "member-sync", "label": "Sync", "unit": "sync", "unitUsd": 0.10 },
-      { "id": "integration-call", "label": "Gateway call", "unit": "call", "unitUsd": 0.001 },
+      { "id": "integration-call", "label": "Gateway call", "unit": "call", "unitUsd": 0.001, "displayPer": 100, "displayUsd": 0.10, "displayText": "$0.10 per 100 calls" },
+      { "id": "hq-mcp-call", "label": "HQ MCP call", "unit": "call", "unitUsd": 0.001, "displayPer": 100, "displayUsd": 0.10, "displayText": "$0.10 per 100 calls" },
       { "id": "vault", "label": "Vault", "unit": "vault-month", "unitUsd": 5.00, "waivedInTrial": true }
     ],
     "boxes": [
