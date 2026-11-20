@@ -38,7 +38,7 @@ hq agents provision "Fleet Scout" --company acme --size medium
 
 `--size` picks the size. The accepted names depend on the company's size ladder. Companies on usage pricing (accounts created from 16 October 2026) use `small`, `medium`, `large`, or `xlarge`; there the legacy names `basic`, `power`, and `dev` also work and map to `small`, `medium`, and `large`. Companies still on the earlier ladder use `basic`, `power`, or `dev`. The CLI refuses a size the company's ladder does not offer. Before provisioning, the CLI prints the selected size, capacity, and company-specific monthly price, then asks for confirmation. Add `--yes` only for an already-reviewed automated flow.
 
-See [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/) for the size ladder and plan inclusions.
+See [Agent sizes and billing](/hq/products/fleet-agents/sizes-and-billing/) for the size ladder and the monthly price of each size.
 
 ## 3. Choose a provider and authentication method
 

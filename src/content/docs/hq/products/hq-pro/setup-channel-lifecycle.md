@@ -44,7 +44,11 @@ choosing it for such a company returns the card to a blocked state with the
 refusal message; a Starter company's next step is switching to usage
 pricing. Companies already on Workforce keep it until 19 December 2026. Stay
 on Starter is a real action (`skipped`). Creating an agent does not require
-Workforce.
+Workforce. Existing Workforce, Individual and Outpost-only accounts move to
+usage pricing on 19 December 2026. Free and Starter companies move 14 days
+after HQ sends them a notice. After the move Step 3 no longer offers Starter
+or Workforce, and HQ asks for a card the first time usage passes the $10
+included in a month (during the trial, $10 of trial usage).
 
 Starter is a hard-capped free plan, not a trial, and it is closed to new
 signups (since 16 October 2026). It covers up to 5 members, 10 secrets, 10 GB
@@ -72,7 +76,7 @@ Each company channel header is **Chat · Atlas · Team · Settings**.
 - **Chat** is the feed (lifecycle cards plus ordinary messages).
 - **Team** is humans (roles and invite-by-email), agents (resize / remove / spend), and permissions (who can create agents, who can invite). Defaults: create-agents **Owner only**, invite **Everyone**. Members see values without controls. Removing an agent or changing an owner role is a second click in the row, never a modal.
 - **Integrations** is not a channel tab. Apps are connected only in the HQ console, on the company's Integrations page; in the desktop app, the company's **More → Integrations** entry opens that page in the system browser.
-- **Settings** is identity, plan and billing, cloud, and the danger zone. Wallpaper is stored on the company and drives the channel hero. Members see General read-only.
+- **Settings** is identity, billing (usage, card and spend limit), cloud, and the danger zone. Wallpaper is stored on the company and drives the channel hero. Members see General read-only.
 - **Atlas** is a read-only map of the company's people and agents.
 
 Everything an agent or a session can do (knowledge, policies, projects, branding beyond wallpaper) stays out of these tabs.
