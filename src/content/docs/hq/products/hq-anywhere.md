@@ -50,7 +50,7 @@ The command fetches the pack from the `indigoai-us/hq-packages` repository. It a
 ### Google Antigravity
 
 ```bash
-hq install --global --runtime antigravity
+hq install --global
 ```
 
 This adds two things to your Antigravity user setup:
@@ -142,7 +142,7 @@ The CLI cannot remove hosted connectors. In ChatGPT, remove the HQ app from **Se
 | --- | --- | --- | --- | --- | --- |
 | Claude Code | Local folder link | Local HQ daemon | Local HQ daemon | Local HQ daemon | `hq install --global --runtime claude` |
 | Codex | Local folder link | Local HQ daemon | Local HQ daemon | Local HQ daemon | `hq install --global --runtime codex` |
-| Google Antigravity | Local folder link | Local HQ daemon | Local HQ daemon | Local HQ daemon; no hook-based guards yet | `hq install --global --runtime antigravity` |
+| Google Antigravity | Local folder link | Local HQ daemon | Local HQ daemon | Local HQ daemon; no hook-based guards yet | `hq install --global` |
 | ChatGPT | Cloud membership tools; no local repo resolution | Cloud-only | Cloud-only | Local daemon-backed only; unavailable through the remote connector | ChatGPT web, Settings > Apps > Create, hosted HQ MCP URL |
 | Grok | Cloud membership tools; no local repo resolution | Cloud-only | Cloud-only | Local daemon-backed only; unavailable through the remote connector | grok.com/connectors > New Connector > Custom, hosted HQ MCP URL |
 
