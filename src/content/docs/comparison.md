@@ -29,7 +29,7 @@ These aren't rivals — HQ is the layer above them.
   leave is everything *between* repos and tools: company-wide knowledge, shared skills, and
   rules that travel with the team.
 - **IDE rules lock you to one tool.** HQ's context follows you across Claude Code, Codex,
-  and Grok (Cursor gets an HQ rules file), so switching tools doesn't reset your agent's memory.
+  Grok, and Google Antigravity (Cursor gets an HQ rules file), so switching tools doesn't reset your agent's memory.
 - **Agent-memory tools remember conversations.** HQ remembers the *company* — decisions,
   people, conventions, policies — and shares that across everyone's agents.
 
