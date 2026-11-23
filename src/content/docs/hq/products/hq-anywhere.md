@@ -1,9 +1,9 @@
 ---
 title: HQ anywhere
-description: Install HQ for Claude Code and Codex, connect hosted MCP clients, and check or remove your setup.
+description: Install HQ for Claude Code, Codex, and Google Antigravity, connect hosted MCP clients, and check or remove your setup.
 ---
 
-HQ Anywhere connects Claude Code, Codex, ChatGPT, and Grok to your HQ context. Claude Code and Codex use local HQ components. ChatGPT and Grok connect to the hosted HQ MCP service.
+HQ Anywhere connects Claude Code, Codex, Google Antigravity, ChatGPT, and Grok to your HQ context. Claude Code, Codex, and Antigravity use local HQ components. ChatGPT and Grok connect to the hosted HQ MCP service.
 
 HQ Anywhere is available when the `hq-anywhere-runtime` rollout switch is enabled for your account. The switch is an administrator kill switch.
 
@@ -46,6 +46,27 @@ hq install @indigoai-us/hq-anywhere
 ```
 
 The command fetches the pack from the `indigoai-us/hq-packages` repository. It adds the pack's skills, Codex hook adapter, and HQ MCP registration.
+
+### Google Antigravity
+
+```bash
+hq install --global --runtime antigravity
+```
+
+If Antigravity is installed, `hq install --global --runtime claude` and `--runtime codex` also set it up.
+
+This adds two things to your Antigravity user setup:
+
+- A global HQ rule at `~/.gemini/config/rules/hq.md` with `trigger: always_on`, so every Antigravity session loads the HQ instructions.
+- An `hq` entry in `~/.gemini/config/mcp_config.json` that registers the local HQ MCP server. Other MCP servers in that file are left as they are.
+
+Inside an HQ folder, Antigravity also reads the HQ charter through `AGENTS.md`, the always-on rule in `.agents/rules/`, and HQ skills in `.agents/skills/`, which appear as slash commands.
+
+Run `hq doctor` to confirm that Antigravity is detected and the MCP server is registered.
+
+HQ's hook-based guards do not run in Antigravity yet. That covers policy injection on every prompt, the scope and secret guards, and automatic Work Mesh presence. Antigravity has a hooks API, and HQ support for it ships in a later release. Until then, policies load through the rule and `AGENTS.md` only.
+
+Google's documentation: [Rules](https://antigravity.google/docs/rules), [MCP](https://antigravity.google/docs/mcp), [Skills](https://antigravity.google/docs/skills).
 
 ### ChatGPT
 
@@ -123,6 +144,7 @@ The CLI cannot remove hosted connectors. In ChatGPT, remove the HQ app from **Se
 | --- | --- | --- | --- | --- | --- |
 | Claude Code | Local folder link | Local HQ daemon | Local HQ daemon | Local HQ daemon | `hq install --global --runtime claude` |
 | Codex | Local folder link | Local HQ daemon | Local HQ daemon | Local HQ daemon | `hq install --global --runtime codex` |
+| Google Antigravity | Global rule + MCP entry | Local HQ daemon | Local HQ daemon | Local HQ daemon; no hook-based guards yet | `hq install --global --runtime antigravity` |
 | ChatGPT | Cloud membership tools; no local repo resolution | Cloud-only | Cloud-only | Local daemon-backed only; unavailable through the remote connector | ChatGPT web, Settings > Apps > Create, hosted HQ MCP URL |
 | Grok | Cloud membership tools; no local repo resolution | Cloud-only | Cloud-only | Local daemon-backed only; unavailable through the remote connector | grok.com/connectors > New Connector > Custom, hosted HQ MCP URL |
 

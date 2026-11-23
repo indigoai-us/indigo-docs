@@ -1,12 +1,12 @@
 ---
 title: Getting Started
-description: Install the HQ desktop app on macOS or Windows, then finish setup in HQ Desktop or in Claude Code, Codex, or Grok.
+description: Install the HQ desktop app on macOS or Windows, then finish setup in HQ Desktop or in Claude Code, Codex, Grok, or Google Antigravity.
 ---
 
 ## Prerequisites
 
 - A Mac or Windows PC (Linux is not supported yet)
-- **Claude Code**, **Codex**, or **Grok** if you want to finish setup in an AI tool
+- **Claude Code**, **Codex**, **Grok**, or **Google Antigravity** if you want to finish setup in an AI tool
 - An HQ account
 
 ## Install
@@ -100,7 +100,10 @@ After setup, try these:
 hq/
 ├── .claude/             # Claude Code settings, hooks, and skills
 │   └── skills/          # Slash commands
-├── .codex/ .grok/ .cursor/ .agents/   # Other runtimes
+├── .codex/ .grok/ .cursor/            # Other runtimes
+├── .agents/
+│   ├── rules/           # Always-on HQ rule (read by Antigravity)
+│   └── skills/          # Shared skills (read by Codex and Antigravity)
 ├── AGENTS.md            # Shared agent instructions
 ├── companies/           # One folder per company, plus manifest.yaml
 │   └── {company}/projects/{name}/prd.json
